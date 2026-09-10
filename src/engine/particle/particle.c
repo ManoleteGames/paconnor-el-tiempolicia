@@ -2,7 +2,11 @@
 #include "../engine.h"
 #include "particle.h"
 
-Particle particle[PARTICLE_MAX_PARTICLES];
+Particle *particle;
+
+void PARTICLE_Init(void) {
+	particle = MM_PushChunk(sizeof(Particle) * PARTICLE_MAX_PARTICLES, CT_ENGINE);
+}
 
 /** PARTICLE :: Draw colission pixels
  *  - Draws colission pixels just for debug
@@ -17,7 +21,7 @@ void PARTICLE_DrawColissionPixels(Particle p) {
 
 /** ACTOR :: Initialize bullet
  */
-void PARTICLE_InitParticle(int graphics_id, int entity_id, int source_x, int source_y, int target_x, int target_y, int speed, int damage, int range_x, int range_y) {
+void PARTICLE_LoadParticle(int graphics_id, int entity_id, int source_x, int source_y, int target_x, int target_y, int speed, int damage, int range_x, int range_y) {
 	int i;
 	int number;
 	int dx, dy;
@@ -35,7 +39,7 @@ void PARTICLE_InitParticle(int graphics_id, int entity_id, int source_x, int sou
 
 	// Check if max bullets is reached
 	if (number == PARTICLE_MAX_PARTICLES - 1) {
-		Error("PARTICLE_InitParticle function error", "Max number of bullets", "", ERROR_SYSTEM);
+		Error("PARTICLE_LoadParticle function error", "Max number of bullets", "", ERROR_SYSTEM);
 	}
 
 	// Calculate target
@@ -75,7 +79,7 @@ void PARTICLE_InitParticle(int graphics_id, int entity_id, int source_x, int sou
 
 	sprite_slot = GFX_FindEmptySpriteSlot();
 	if (sprite_slot == -1) {
-		sprintf(engine.system_error_message1, "PARTICLE_InitParticle function error");
+		sprintf(engine.system_error_message1, "PARTICLE_LoadParticle function error");
 		sprintf(engine.system_error_message2, "No empty sprite slot available");
 		sprintf(engine.system_error_message3, " ");
 		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_GRAPHICS);
@@ -114,8 +118,8 @@ void PARTICLE_InitParticle(int graphics_id, int entity_id, int source_x, int sou
 
 	gfx_sprite_stack[particle[number].sprite_num].unmasked = true;
 
-	gfx_sprite_stack[particle[number].sprite_num].screen_pos_x = particle[number].pos_x - camera.pos_x;
-	gfx_sprite_stack[particle[number].sprite_num].screen_pos_y = particle[number].pos_y - camera.pos_y;
+	gfx_sprite_stack[particle[number].sprite_num].screen_pos_x = particle[number].pos_x - camera->pos_x;
+	gfx_sprite_stack[particle[number].sprite_num].screen_pos_y = particle[number].pos_y - camera->pos_y;
 
 	particle[number].hit_on = 0;
 	particle[number].on_target = false;
@@ -170,22 +174,22 @@ int PARTICLE_CheckParticleColission(Particle p) {
 
 	/////// ACTOR COLISSIONS /////////////
 	collision_detected = true;
-	if (!actor.action_dead) {
-		if (point1_x > actor.pos_x + actor.hit_area.points[1][0]) collision_detected = false;// Out of left side
-		if (point2_x < actor.pos_x + actor.hit_area.points[0][0]) collision_detected = false;//  Out of right side
-		if (point3_y < actor.pos_y + actor.hit_area.points[0][1]) collision_detected = false;//  Out of top side
-		if (point1_y > actor.pos_y + actor.hit_area.points[2][1]) collision_detected = false;//  Out of bottom side
-		if (collision_detected) return gfx_sprite_stack[actor.sprite_num].id;
+	if (!actor->action_dead) {
+		if (point1_x > actor->pos_x + actor->hit_area.points[1][0]) collision_detected = false;// Out of left side
+		if (point2_x < actor->pos_x + actor->hit_area.points[0][0]) collision_detected = false;//  Out of right side
+		if (point3_y < actor->pos_y + actor->hit_area.points[0][1]) collision_detected = false;//  Out of top side
+		if (point1_y > actor->pos_y + actor->hit_area.points[2][1]) collision_detected = false;//  Out of bottom side
+		if (collision_detected) return gfx_sprite_stack[actor->sprite_num].id;
 	}
 
 	/////// BOSS COLISSIONS /////////////
 	collision_detected = true;
-	if (!boss.action_dead) {
-		if (point1_x > boss.pos_x + boss.hit_area.points[1][0]) collision_detected = false;// Out of left side
-		if (point2_x < boss.pos_x + boss.hit_area.points[0][0]) collision_detected = false;//  Out of right side
-		if (point3_y < boss.pos_y + boss.hit_area.points[0][1]) collision_detected = false;//  Out of top side
-		if (point1_y > boss.pos_y + boss.hit_area.points[2][1]) collision_detected = false;//  Out of bottom side
-		if (collision_detected) return gfx_sprite_stack[boss.sprite_num].id;
+	if (!boss->action_dead) {
+		if (point1_x > boss->pos_x + boss->hit_area.points[1][0]) collision_detected = false;// Out of left side
+		if (point2_x < boss->pos_x + boss->hit_area.points[0][0]) collision_detected = false;//  Out of right side
+		if (point3_y < boss->pos_y + boss->hit_area.points[0][1]) collision_detected = false;//  Out of top side
+		if (point1_y > boss->pos_y + boss->hit_area.points[2][1]) collision_detected = false;//  Out of bottom side
+		if (collision_detected) return gfx_sprite_stack[boss->sprite_num].id;
 	}
 
 	/////// BACKGROUND COLISSIONS ///////////
@@ -255,29 +259,29 @@ void PARTICLE_SetExplosionDamage(Particle p) {
 
 	/////// ACTOR COLISSIONS /////////////
 	collision_detected = true;
-	if (!actor.action_dead) {
-		if (point1_x > actor.pos_x + actor.hit_area.points[1][0]) collision_detected = false;// Out of left side
-		if (point2_x < actor.pos_x + actor.hit_area.points[0][0]) collision_detected = false;//  Out of right side
-		if (point3_y < actor.pos_y + actor.hit_area.points[0][1]) collision_detected = false;//  Out of top side
-		if (point1_y > actor.pos_y + actor.hit_area.points[2][1]) collision_detected = false;//  Out of bottom side
+	if (!actor->action_dead) {
+		if (point1_x > actor->pos_x + actor->hit_area.points[1][0]) collision_detected = false;// Out of left side
+		if (point2_x < actor->pos_x + actor->hit_area.points[0][0]) collision_detected = false;//  Out of right side
+		if (point3_y < actor->pos_y + actor->hit_area.points[0][1]) collision_detected = false;//  Out of top side
+		if (point1_y > actor->pos_y + actor->hit_area.points[2][1]) collision_detected = false;//  Out of bottom side
 		if (collision_detected) {
-			actor.is_hit = true;
-			actor.hit_by = ENTITY_ID_EXPLOSION;
-			actor.damage = p.damage;
+			actor->is_hit = true;
+			actor->hit_by = ENTITY_ID_EXPLOSION;
+			actor->damage = p.damage;
 		}
 	}
 
 	/////// BOSS COLISSIONS /////////////
 	collision_detected = true;
-	if (!boss.action_dead) {
-		if (point1_x > boss.pos_x + boss.hit_area.points[1][0]) collision_detected = false;// Out of left side
-		if (point2_x < boss.pos_x + boss.hit_area.points[0][0]) collision_detected = false;//  Out of right side
-		if (point3_y < boss.pos_y + boss.hit_area.points[0][1]) collision_detected = false;//  Out of top side
-		if (point1_y > boss.pos_y + boss.hit_area.points[2][1]) collision_detected = false;//  Out of bottom side
+	if (!boss->action_dead) {
+		if (point1_x > boss->pos_x + boss->hit_area.points[1][0]) collision_detected = false;// Out of left side
+		if (point2_x < boss->pos_x + boss->hit_area.points[0][0]) collision_detected = false;//  Out of right side
+		if (point3_y < boss->pos_y + boss->hit_area.points[0][1]) collision_detected = false;//  Out of top side
+		if (point1_y > boss->pos_y + boss->hit_area.points[2][1]) collision_detected = false;//  Out of bottom side
 		if (collision_detected) {
-			boss.is_hit = true;
-			boss.hit_by = ENTITY_ID_EXPLOSION;
-			boss.damage = p.damage;
+			boss->is_hit = true;
+			boss->hit_by = ENTITY_ID_EXPLOSION;
+			boss->damage = p.damage;
 		}
 	}
 }
@@ -341,15 +345,15 @@ void PARTICLE_UpdateParticles(void) {
 				}
 			}
 
+			// Update particle screen position
+			GFX_SetSpritePosition(particle[i].sprite_num, particle[i].pos_x - camera->pos_x, particle[i].pos_y - camera->pos_y);
+
 			// Wait for animation ending
 			if (particle[i].on_target) {
 				if (GFX_IsSpriteAnimationEnded(particle[i].sprite_num, 0)) {
 					PARTICLE_UnloadParticle(i);
 				}
 			}
-
-			// Update particle screen position
-			GFX_SetSpritePosition(particle[i].sprite_num, particle[i].pos_x - camera.pos_x, particle[i].pos_y - camera.pos_y);
 		}
 	}
 }

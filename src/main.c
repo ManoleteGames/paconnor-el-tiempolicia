@@ -1,14 +1,8 @@
 /**********************************************
 * main.c
-* Entry point for the game itself
+* Entry point
 * (c) 2025-2026 by J.Martin
 ***********************************************/
-
-//#include <bios.h>
-//#include <dpmi.h>
-//#include <sys/nearptr.h>
-//#include <stdlib.h>
-//#include <stdio.h>
 
 #include "engine/actor/actor.h"
 #include "engine/audio/audio.h"
@@ -38,17 +32,12 @@
 #define GDB_IMPLEMENTATION
 #include "gdbstub.h"
 
-bool hotspot_enabling_room1[32];
-bool event_enabling_room1[32];
-bool hotspot_enabling_room2[32];
-bool event_enabling_room2[32];
-
 /** Load language text files
  */
 static void LoadTexts(void) {
 	char language[13];
 	// Load game texts
-	switch (ui.language) {
+	switch (ui->language) {
 		case 0:// ES
 			sprintf(language, "DIALOGES.DAT");
 			break;
@@ -61,29 +50,29 @@ static void LoadTexts(void) {
 	}
 
 	// Clear dialogs buffers
-	FILE_LoadTextFile(language, "INTRO.TXT", &ui.txt_file[UI_TXT_INTRO]);
-	FILE_LoadTextFile(language, "GLOBAL.TXT", &ui.txt_file[UI_TXT_GLOBAL]);
-	FILE_LoadTextFile(language, "CREDITS.TXT", &ui.txt_file[UI_TXT_CREDITS]);
-	FILE_LoadTextFile(language, "NAMES.TXT", &ui.txt_file[UI_TXT_NAMES]);
-	FILE_LoadTextFile(language, "SCN1D.TXT", &ui.txt_file[UI_TXT_SCN1D]);
-	FILE_LoadTextFile(language, "SCN1H.TXT", &ui.txt_file[UI_TXT_SCN1H]);
-	FILE_LoadTextFile(language, "SCN1I.TXT", &ui.txt_file[UI_TXT_SCN1I]);
-	FILE_LoadTextFile(language, "SCN2D.TXT", &ui.txt_file[UI_TXT_SCN2D]);
-	FILE_LoadTextFile(language, "SCN2H.TXT", &ui.txt_file[UI_TXT_SCN2H]);
-	FILE_LoadTextFile(language, "SCN2I.TXT", &ui.txt_file[UI_TXT_SCN2I]);
-	FILE_LoadTextFile(language, "SCN3D.TXT", &ui.txt_file[UI_TXT_SCN3D]);
-	FILE_LoadTextFile(language, "SCN3H.TXT", &ui.txt_file[UI_TXT_SCN3H]);
-	FILE_LoadTextFile(language, "SCN3I.TXT", &ui.txt_file[UI_TXT_SCN3I]);
-	FILE_LoadTextFile(language, "SCN4D.TXT", &ui.txt_file[UI_TXT_SCN4D]);
-	FILE_LoadTextFile(language, "SCN4H.TXT", &ui.txt_file[UI_TXT_SCN4H]);
-	FILE_LoadTextFile(language, "SCN4I.TXT", &ui.txt_file[UI_TXT_SCN4I]);
-	FILE_LoadTextFile(language, "SCN5D.TXT", &ui.txt_file[UI_TXT_SCN5D]);
-	FILE_LoadTextFile(language, "SCN5H.TXT", &ui.txt_file[UI_TXT_SCN5H]);
-	FILE_LoadTextFile(language, "SCN5I.TXT", &ui.txt_file[UI_TXT_SCN5I]);
-	FILE_LoadTextFile(language, "SCN6D.TXT", &ui.txt_file[UI_TXT_SCN6D]);
-	FILE_LoadTextFile(language, "SCN6H.TXT", &ui.txt_file[UI_TXT_SCN6H]);
-	FILE_LoadTextFile(language, "SCN6I.TXT", &ui.txt_file[UI_TXT_SCN6I]);
-	FILE_LoadTextFile(language, "END.TXT", &ui.txt_file[UI_TXT_END]);
+	FILE_LoadTextFile(language, "INTRO.TXT", ui->txt_file[UI_TXT_INTRO]);
+	FILE_LoadTextFile(language, "GLOBAL.TXT", ui->txt_file[UI_TXT_GLOBAL]);
+	FILE_LoadTextFile(language, "CREDITS.TXT", ui->txt_file[UI_TXT_CREDITS]);
+	FILE_LoadTextFile(language, "NAMES.TXT", ui->txt_file[UI_TXT_NAMES]);
+	FILE_LoadTextFile(language, "SCN1D.TXT", ui->txt_file[UI_TXT_SCN1D]);
+	FILE_LoadTextFile(language, "SCN1H.TXT", ui->txt_file[UI_TXT_SCN1H]);
+	FILE_LoadTextFile(language, "SCN1I.TXT", ui->txt_file[UI_TXT_SCN1I]);
+	FILE_LoadTextFile(language, "SCN2D.TXT", ui->txt_file[UI_TXT_SCN2D]);
+	FILE_LoadTextFile(language, "SCN2H.TXT", ui->txt_file[UI_TXT_SCN2H]);
+	FILE_LoadTextFile(language, "SCN2I.TXT", ui->txt_file[UI_TXT_SCN2I]);
+	FILE_LoadTextFile(language, "SCN3D.TXT", ui->txt_file[UI_TXT_SCN3D]);
+	FILE_LoadTextFile(language, "SCN3H.TXT", ui->txt_file[UI_TXT_SCN3H]);
+	FILE_LoadTextFile(language, "SCN3I.TXT", ui->txt_file[UI_TXT_SCN3I]);
+	FILE_LoadTextFile(language, "SCN4D.TXT", ui->txt_file[UI_TXT_SCN4D]);
+	FILE_LoadTextFile(language, "SCN4H.TXT", ui->txt_file[UI_TXT_SCN4H]);
+	FILE_LoadTextFile(language, "SCN4I.TXT", ui->txt_file[UI_TXT_SCN4I]);
+	FILE_LoadTextFile(language, "SCN5D.TXT", ui->txt_file[UI_TXT_SCN5D]);
+	FILE_LoadTextFile(language, "SCN5H.TXT", ui->txt_file[UI_TXT_SCN5H]);
+	FILE_LoadTextFile(language, "SCN5I.TXT", ui->txt_file[UI_TXT_SCN5I]);
+	FILE_LoadTextFile(language, "SCN6D.TXT", ui->txt_file[UI_TXT_SCN6D]);
+	FILE_LoadTextFile(language, "SCN6H.TXT", ui->txt_file[UI_TXT_SCN6H]);
+	FILE_LoadTextFile(language, "SCN6I.TXT", ui->txt_file[UI_TXT_SCN6I]);
+	FILE_LoadTextFile(language, "END.TXT", ui->txt_file[UI_TXT_END]);
 }
 
 /** Main logo sequence
@@ -108,8 +97,8 @@ static void Logo(void) {
 				VIDEO_ClearPalette();
 				GFX_LoadPalette("PALETTES.DAT", "LDOSCLUB.PCX", 256);
 				AUDIO_LoadSong(AUDIO_SONG_6);// Load song
-				GFX_PCXImageToBuffer("ILOGO.DAT", "LDOSCLUB.PCX", 180 * 135, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 70, 32);
+				GFX_PCXImageToBuffer("ILOGO.DAT", "LDOSCLUB.PCX", 180 * 135, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 70, 32);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				VIDEO_FadeIn_Async(1);
@@ -141,9 +130,10 @@ static void Logo(void) {
 				logo_step = 20;
 				break;
 			case 20:// Load new image on second buffer
-				GFX_PCXImageToBuffer("ILOGO.DAT", "LCONTEST.PCX", 320 * 100, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
+				GFX_PCXImageToBuffer("ILOGO.DAT", "LCONTEST.PCX", 320 * 100, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
 				GFX_LoadSpriteGraphicsRLE("MISC.DAT", "IWORMS.PCX", SPRITE_GRAPHICS_ID_WORMS, 192, 24, 14, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 				GFX_LoadSpriteGraphicsRLE("MISC.DAT", "EMPTY.PCX", SPRITE_GRAPHICS_ID_EMPTY, 1, 1, 1, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
+				GFX_LoadSpriteGraphicsRLE("MISC.DAT", "FUCK.PCX", SPRITE_GRAPHICS_ID_FUCK, 158, 81, 1, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_TEMPORARY_SPRITE);
 
 				sprite_slot = GFX_FindEmptySpriteSlot();
 				if (sprite_slot == -1) {
@@ -189,16 +179,16 @@ static void Logo(void) {
 				VIDEO_ClearScreen();
 				VIDEO_ClearPalette();
 				GFX_LoadPalette("PALETTES.DAT", "LCONTEST.PCX", 256);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 0, 50);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 0, 50);
 				VIDEO_FadeIn(1);
 				logo_step = 24;
 				break;
 			case 24:// Draw logo and effects until delay is finished
 				while (!GFX_IsSpriteAnimationEnded(spr_num, 0)) {
-					VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 0, 50);
+					VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 0, 50);
 					GFX_UpdateSprites();
-					if (gfx_sprite_stack[spr_num].animation->current_frame == 2) AUDIO_PlaySound(AUDIO_JUMP_EFFECT, 1);
-					if (gfx_sprite_stack[spr_num].animation->current_frame == 12) AUDIO_PlaySound(AUDIO_CRASH_EFFECT, 1);
+					if (gfx_sprite_stack[spr_num].gfx[0].anim_current_frame == 2) AUDIO_PlaySound(AUDIO_JUMP_EFFECT, 1);
+					if (gfx_sprite_stack[spr_num].gfx[0].anim_current_frame == 12) AUDIO_PlaySound(AUDIO_CRASH_EFFECT, 1);
 					GFX_DrawSprites();
 					VIDEO_VSync();
 					VIDEO_ScreenBufferToVRAM();
@@ -214,7 +204,7 @@ static void Logo(void) {
 				logo_step = 30;
 				break;
 			case 30:// Load new image and fade out
-				GFX_PCXImageToBuffer("ILOGO.DAT", "LMANOL.PCX", 220 * 165, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
+				GFX_PCXImageToBuffer("ILOGO.DAT", "LMANOL.PCX", 220 * 165, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
 				VIDEO_FadeOut(1);
 				logo_step = 31;
 				break;
@@ -222,7 +212,7 @@ static void Logo(void) {
 				VIDEO_ClearScreen();
 				VIDEO_ClearPalette();
 				GFX_LoadPalette("PALETTES.DAT", "LMANOL.PCX", 256);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 50, 18);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 50, 18);
 				VIDEO_FadeIn(1);
 				logo_step = 32;
 				break;
@@ -230,7 +220,7 @@ static void Logo(void) {
 				spark_counter = 0;
 				spark_end = false;
 				while (!spark_end) {
-					VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 50, 18);
+					VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 50, 18);
 					switch (spark_counter) {
 						case 0:// Load some assets
 							GFX_LoadSpriteGraphicsRLE("CURSOR.DAT", "POINTER.PCX", SPRITE_GRAPHICS_ID_CURSOR, 7, 12, 1, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
@@ -322,14 +312,14 @@ static void Logo(void) {
 								// Just wait
 							}
 							VIDEO_ClearScreenBuffer();
-							VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 50, 18);
-							if (VIDEO_StringToScreenBufferSteps(82, 175, ui.txt_file[UI_TXT_INTRO].line[1], FONT_BIG_WHITE, &aux_counter)) {
+							VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 50, 18);
+							if (VIDEO_StringToScreenBufferSteps(82, 175, ui->txt_file[UI_TXT_INTRO]->line[1], FONT_BIG_WHITE, &aux_counter)) {
 								spark_counter++;
 							}
 							AUDIO_PlaySound(AUDIO_TICK_EFFECT, 1);
 							break;
 						case 17:
-							VIDEO_StringToScreenBuffer(82, 175, ui.txt_file[UI_TXT_INTRO].line[1], FONT_BIG_WHITE);
+							VIDEO_StringToScreenBuffer(82, 175, ui->txt_file[UI_TXT_INTRO]->line[1], FONT_BIG_WHITE);
 							AUDIO_PlaySound(AUDIO_CRASH_EFFECT, 1);
 							spark_end = true;
 							break;
@@ -347,9 +337,9 @@ static void Logo(void) {
 				logo_step = 40;
 				break;
 			case 40:
-				GFX_PCXImageToBuffer("ILOGO.DAT", "JOY1.PCX", 120 * 160, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("ILOGO.DAT", "JOY2.PCX", 120 * 160, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("ILOGO.DAT", "JOY3.PCX", 120 * 160, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("ILOGO.DAT", "JOY1.PCX", 120 * 160, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("ILOGO.DAT", "JOY2.PCX", 120 * 160, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("ILOGO.DAT", "JOY3.PCX", 120 * 160, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				VIDEO_FadeOut(1);
 				logo_step = 41;
 				break;
@@ -357,14 +347,14 @@ static void Logo(void) {
 				VIDEO_ClearScreen();
 				VIDEO_ClearPalette();
 				GFX_LoadPalette("PALETTES.DAT", "LMANOL.PCX", 256);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 100, 50);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 100, 50);
 				VIDEO_FadeIn(1);
 				logo_step = 42;
 				break;
 			case 42:
 				// Load some more assets
 
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 100, 50);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 100, 50);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				logo_step = 43;
@@ -372,7 +362,7 @@ static void Logo(void) {
 			case 43:
 				// Load some more assets
 
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 100, 50);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 100, 50);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				logo_step = 44;
@@ -381,7 +371,7 @@ static void Logo(void) {
 				// Load some more assets
 
 
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 100, 50);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 100, 50);
 
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
@@ -389,7 +379,7 @@ static void Logo(void) {
 			case 45:
 				// Load some more assets
 
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 100, 50);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 100, 50);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				logo_step = 46;
@@ -399,7 +389,7 @@ static void Logo(void) {
 				GFX_LoadSpriteGraphicsRLE("ISPR.DAT", "ACTOR.PCX", SPRITE_GRAPHICS_ID_ACTOR_INTRO, 20, 33, 12, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 				GFX_LoadSpriteGraphicsRLE("EFFECTS.DAT", "RAIN.PCX", SPRITE_GRAPHICS_ID_RAIN_EFFECT, 5, 5, 5, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 100, 50);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 100, 50);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				logo_step = 47;
@@ -418,7 +408,7 @@ static void Logo(void) {
 				GFX_LoadSpriteGraphicsRLE("ITEMS.DAT", "KEYYELLOW.PCX", SPRITE_GRAPHICS_ID_ITEM_YELLOW_KEY, 12, 14, 3, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 				GFX_LoadSpriteGraphicsRLE("ITEMS.DAT", "KEYGREEN.PCX", SPRITE_GRAPHICS_ID_ITEM_GREEN_KEY, 12, 14, 3, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 100, 50);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 100, 50);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				char_counter = 0;
@@ -427,9 +417,9 @@ static void Logo(void) {
 				break;
 			case 48:
 				VIDEO_ClearScreenBuffer();
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 100, 50);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 100, 50);
 
-				if (VIDEO_StringToScreenBufferRand(40, 15, ui.txt_file[UI_TXT_INTRO].line[3], FONT_BIG_WHITE, &char_counter, &aux_counter)) {
+				if (VIDEO_StringToScreenBufferRand(40, 15, ui->txt_file[UI_TXT_INTRO]->line[3], FONT_BIG_WHITE, &char_counter, &aux_counter)) {
 					aux_counter = 0;
 					logo_step = 49;
 				}
@@ -448,9 +438,9 @@ static void Logo(void) {
 					// Just wait
 				}
 				VIDEO_ClearScreenBuffer();
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 100, 50);
-				VIDEO_StringToScreenBuffer(40, 15, ui.txt_file[UI_TXT_INTRO].line[3], FONT_BIG_WHITE);
-				if (VIDEO_StringToScreenBufferSteps(80, 30, ui.txt_file[UI_TXT_INTRO].line[4], FONT_BIG_WHITE, &aux_counter)) {
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 100, 50);
+				VIDEO_StringToScreenBuffer(40, 15, ui->txt_file[UI_TXT_INTRO]->line[3], FONT_BIG_WHITE);
+				if (VIDEO_StringToScreenBufferSteps(80, 30, ui->txt_file[UI_TXT_INTRO]->line[4], FONT_BIG_WHITE, &aux_counter)) {
 					aux_counter = 0;
 					logo_step = 50;
 				}
@@ -459,9 +449,9 @@ static void Logo(void) {
 				VIDEO_ScreenBufferToVRAM();
 				break;
 			case 50:
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 100, 50);
-				VIDEO_StringToScreenBuffer(40, 15, ui.txt_file[UI_TXT_INTRO].line[3], FONT_BIG_WHITE);
-				VIDEO_StringToScreenBuffer(80, 30, ui.txt_file[UI_TXT_INTRO].line[4], FONT_BIG_WHITE);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 100, 50);
+				VIDEO_StringToScreenBuffer(40, 15, ui->txt_file[UI_TXT_INTRO]->line[3], FONT_BIG_WHITE);
+				VIDEO_StringToScreenBuffer(80, 30, ui->txt_file[UI_TXT_INTRO]->line[4], FONT_BIG_WHITE);
 				AUDIO_PlaySound(AUDIO_CRASH_EFFECT, 1);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
@@ -469,9 +459,8 @@ static void Logo(void) {
 				break;
 			case 51:
 				AUDIO_LoadSong(AUDIO_SONG_1);
-				GFX_PCXImageToBuffer("INTRO.DAT", "INTRO1.PCX", 224 * 32, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("INTRO.DAT", "INTRO2.PCX", 640 * 32, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("INTRO.DAT", "INTRO3.PCX", 640 * 96, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("INTRO.DAT", "INTRO1.PCX", 640 * 32, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("INTRO.DAT", "INTRO2.PCX", 640 * 96, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
 				logo_step = 52;
 				break;
 			case 52:
@@ -509,11 +498,14 @@ static void Intro(void) {
 				TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 50);
 				AUDIO_PlaySong(true);
 				GFX_LoadPalette("PALETTES.DAT", "INTRO.PCX", 256);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 230, 168, 45, 12, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 48, 16);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, 224, gfx.image_buffer2_height, 48, 48);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, 224, gfx.image_buffer3_height, 48, 80);
-				VIDEO_StringToScreenBuffer(40, 185, ui.txt_file[UI_TXT_INTRO].line[25], FONT_SLIM_WHITE);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 230, 168, 45, 12, 222);
+
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 224, 32, 48, 16, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 218, 26, 51, 19, 208);
+
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, 224, gfx->image_buffer1_height, 48, 48);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, 224, gfx->image_buffer2_height, 48, 80);
+				VIDEO_StringToScreenBuffer(40, 185, ui->txt_file[UI_TXT_INTRO]->line[25], FONT_SLIM_WHITE);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				VIDEO_FadeIn(4);
@@ -537,9 +529,11 @@ static void Intro(void) {
 				step++;
 				break;
 			case 2:// actor walk to middle screen
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 48, 16);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, 224, gfx.image_buffer2_height, 48, 48);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, 224, gfx.image_buffer3_height, 48, 80);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 224, 32, 48, 16, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 218, 26, 51, 19, 208);
+
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, 224, gfx->image_buffer1_height, 48, 48);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, 224, gfx->image_buffer2_height, 48, 80);
 				scroll_counter++;
 				if (scroll_counter >= 5) {
 					GFX_SetSpritePosition(actor_spr_num, GFX_GetSpriteScreenPosX(actor_spr_num) + 1, GFX_GetSpriteScreenPosY(actor_spr_num));
@@ -568,26 +562,26 @@ static void Intro(void) {
 				if (GFX_GetSpriteScreenPosX(actor_spr_num) == 160) {
 					src_index2 = 0;
 					horizontal_scroll2 = 0;
-					max_scroll2 = gfx.image_buffer2_width - 224;
+					max_scroll2 = gfx->image_buffer1_width - 224;
 					src_index3 = 0;
 					horizontal_scroll3 = 0;
-					max_scroll3 = gfx.image_buffer3_width - 224;
+					max_scroll3 = gfx->image_buffer2_width - 224;
 					scroll_end = false;
 					scroll_counter = 0;
 					step++;
 				}
 				break;
 			case 3:// Start scrolling
-
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 48, 16);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 224, 32, 48, 16, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 218, 26, 51, 19, 208);
 
 				if (scroll_counter % 32 == 0) {
 					// Draw buffer 2. slow scroll
 					src_index2 = horizontal_scroll2;
 					dst_index2 = 48 * CAM_VISIBLE_WIDTH + 48;
-					for (i = 0; i < gfx.image_buffer2_height; i++) {
-						memcpy(&video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index2], &gfx.image_buffer2[src_index2], 224);
-						src_index2 += gfx.image_buffer2_width;
+					for (i = 0; i < gfx->image_buffer1_height; i++) {
+						memcpy(&video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index2], &gfx->image_buffer1[src_index2], 224);
+						src_index2 += gfx->image_buffer1_width;
 						dst_index2 += CAM_VISIBLE_WIDTH;
 					}
 					horizontal_scroll2 += 1;
@@ -600,9 +594,9 @@ static void Intro(void) {
 					// Draw buffer 3. fast scroll
 					src_index3 = horizontal_scroll3;
 					dst_index3 = 80 * CAM_VISIBLE_WIDTH + 48;
-					for (i = 0; i < gfx.image_buffer3_height; i++) {
-						memcpy(&video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index3], &gfx.image_buffer3[src_index3], 224);
-						src_index3 += gfx.image_buffer3_width;
+					for (i = 0; i < gfx->image_buffer2_height; i++) {
+						memcpy(&video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index3], &gfx->image_buffer2[src_index3], 224);
+						src_index3 += gfx->image_buffer2_width;
 						dst_index3 += CAM_VISIBLE_WIDTH;
 					}
 					horizontal_scroll3 += 1;
@@ -673,19 +667,21 @@ static void Intro(void) {
 				if (scroll_end) step++;
 				break;
 			case 4:
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 48, 16);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 224, 32, 48, 16, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 218, 26, 51, 19, 208);
+
 				src_index2 = horizontal_scroll2;
 				dst_index2 = 48 * CAM_VISIBLE_WIDTH + 48;
-				for (i = 0; i < gfx.image_buffer2_height; i++) {
-					memcpy(&video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index2], &gfx.image_buffer2[src_index2], 224);
-					src_index2 += gfx.image_buffer2_width;
+				for (i = 0; i < gfx->image_buffer1_height; i++) {
+					memcpy(&video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index2], &gfx->image_buffer1[src_index2], 224);
+					src_index2 += gfx->image_buffer1_width;
 					dst_index2 += CAM_VISIBLE_WIDTH;
 				}
 				src_index3 = horizontal_scroll3;
 				dst_index3 = 80 * CAM_VISIBLE_WIDTH + 48;
-				for (i = 0; i < gfx.image_buffer3_height; i++) {
-					memcpy(&video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index3], &gfx.image_buffer3[src_index3], 224);
-					src_index3 += gfx.image_buffer3_width;
+				for (i = 0; i < gfx->image_buffer2_height; i++) {
+					memcpy(&video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index3], &gfx->image_buffer2[src_index3], 224);
+					src_index3 += gfx->image_buffer2_width;
 					dst_index3 += CAM_VISIBLE_WIDTH;
 				}
 				scroll_counter++;
@@ -715,56 +711,56 @@ static void Intro(void) {
 			case 0:// no speech
 				break;
 			case 1:// speech 1
-				VIDEO_StringToScreenBuffer(52, 22, ui.txt_file[UI_TXT_INTRO].line[5], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(52, 30, ui.txt_file[UI_TXT_INTRO].line[6], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(52, 22, ui->txt_file[UI_TXT_INTRO]->line[5], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(52, 30, ui->txt_file[UI_TXT_INTRO]->line[6], FONT_SLIM_BLACK);
 				break;
 			case 2:// silence
 				break;
 			case 3:// speech 1
-				VIDEO_StringToScreenBuffer(52, 22, ui.txt_file[UI_TXT_INTRO].line[7], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(52, 30, ui.txt_file[UI_TXT_INTRO].line[8], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(52, 22, ui->txt_file[UI_TXT_INTRO]->line[7], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(52, 30, ui->txt_file[UI_TXT_INTRO]->line[8], FONT_SLIM_BLACK);
 				break;
 			case 4:// silence
 				break;
 			case 5:// speech 1
-				VIDEO_StringToScreenBuffer(52, 22, ui.txt_file[UI_TXT_INTRO].line[9], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(52, 30, ui.txt_file[UI_TXT_INTRO].line[10], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(52, 22, ui->txt_file[UI_TXT_INTRO]->line[9], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(52, 30, ui->txt_file[UI_TXT_INTRO]->line[10], FONT_SLIM_BLACK);
 				break;
 			case 6:// silence
 				break;
 			case 7:// speech 1
-				VIDEO_StringToScreenBuffer(52, 22, ui.txt_file[UI_TXT_INTRO].line[11], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(52, 30, ui.txt_file[UI_TXT_INTRO].line[12], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(52, 22, ui->txt_file[UI_TXT_INTRO]->line[11], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(52, 30, ui->txt_file[UI_TXT_INTRO]->line[12], FONT_SLIM_BLACK);
 				break;
 			case 8:// silence
 				break;
 			case 9:// speech 1
-				VIDEO_StringToScreenBuffer(52, 22, ui.txt_file[UI_TXT_INTRO].line[13], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(52, 30, ui.txt_file[UI_TXT_INTRO].line[14], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(52, 22, ui->txt_file[UI_TXT_INTRO]->line[13], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(52, 30, ui->txt_file[UI_TXT_INTRO]->line[14], FONT_SLIM_BLACK);
 				break;
 			case 10:// silence
 				break;
 			case 11:// speech 1
-				VIDEO_StringToScreenBuffer(52, 22, ui.txt_file[UI_TXT_INTRO].line[15], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(52, 30, ui.txt_file[UI_TXT_INTRO].line[16], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(52, 22, ui->txt_file[UI_TXT_INTRO]->line[15], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(52, 30, ui->txt_file[UI_TXT_INTRO]->line[16], FONT_SLIM_BLACK);
 				break;
 			case 12:// silence
 				break;
 			case 13:// speech 1
-				VIDEO_StringToScreenBuffer(52, 22, ui.txt_file[UI_TXT_INTRO].line[17], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(52, 30, ui.txt_file[UI_TXT_INTRO].line[18], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(52, 22, ui->txt_file[UI_TXT_INTRO]->line[17], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(52, 30, ui->txt_file[UI_TXT_INTRO]->line[18], FONT_SLIM_BLACK);
 				break;
 			case 14:// silence
 				break;
 			case 15:// speech 1
-				VIDEO_StringToScreenBuffer(52, 22, ui.txt_file[UI_TXT_INTRO].line[19], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(52, 30, ui.txt_file[UI_TXT_INTRO].line[20], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(52, 22, ui->txt_file[UI_TXT_INTRO]->line[19], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(52, 30, ui->txt_file[UI_TXT_INTRO]->line[20], FONT_SLIM_BLACK);
 				break;
 			case 16:
 				break;
 			case 17:// speech 1
-				VIDEO_StringToScreenBuffer(52, 22, ui.txt_file[UI_TXT_INTRO].line[21], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(52, 30, ui.txt_file[UI_TXT_INTRO].line[22], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(52, 22, ui->txt_file[UI_TXT_INTRO]->line[21], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(52, 30, ui->txt_file[UI_TXT_INTRO]->line[22], FONT_SLIM_BLACK);
 				break;
 			case 18:
 				break;
@@ -853,7 +849,7 @@ static void Menu(void) {
 	title_spr_num2 = GFX_FindEmptySpriteSlot();
 	GFX_InitSprite(0, 0, title_spr_num2, 1, gfx_sprite_graphics_stack[SPRITE_GRAPHICS_ID_TITLE].width_px, gfx_sprite_graphics_stack[SPRITE_GRAPHICS_ID_TITLE].height_px);
 	GFX_SetSpriteGraphic(title_spr_num2, 0, SPRITE_GRAPHICS_ID_TITLE, 0, 0);
-	GFX_SetSpritePosition(title_spr_num2, video.screen_width, 100);
+	GFX_SetSpritePosition(title_spr_num2, video->screen_width, 100);
 
 	for (i = 0; i < 53; i++) {
 		VIDEO_ClearScreenBuffer();
@@ -887,8 +883,7 @@ static void Menu(void) {
 	VIDEO_ScreenBufferToVRAM();
 	/// ------------------
 
-
-	GFX_PCXImageToBuffer("IMENU.DAT", "MENUBACK.PCX", 360 * 200, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
+	GFX_PCXImageToBuffer("IMENU.DAT", "MENUBACK.PCX", 360 * 200, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
 
 	GFX_UnloadSprite(title_spr_num2);
 	GFX_UpdateSprites();
@@ -898,7 +893,7 @@ static void Menu(void) {
 
 	// move title down
 	while (GFX_GetSpriteScreenPosY(title_spr_num1) < 140) {
-		VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 0, 0);
+		VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 0, 0);
 		GFX_SetSpritePosition(title_spr_num1, GFX_GetSpriteScreenPosX(title_spr_num1), GFX_GetSpriteScreenPosY(title_spr_num1) + 1);
 		GFX_UpdateSprites();
 		GFX_DrawSprites();
@@ -906,10 +901,10 @@ static void Menu(void) {
 		VIDEO_ScreenBufferToVRAM();
 	}
 
-	while (char_number < strlen(ui.txt_file[UI_TXT_INTRO].line[2])) {
-		aux_string[char_number] = ui.txt_file[UI_TXT_INTRO].line[2][char_number];
+	while (char_number < strlen(ui->txt_file[UI_TXT_INTRO]->line[2])) {
+		aux_string[char_number] = ui->txt_file[UI_TXT_INTRO]->line[2][char_number];
 		aux_string[char_number + 1] = '\0';
-		VIDEO_StringToScreenBuffer(40, 180, aux_string, FONT_BIG_WHITE);
+		VIDEO_StringToScreenBuffer(40, 180, aux_string, FONT_BIG_BLACK);
 		char_number++;
 		VIDEO_VSync();
 		VIDEO_ScreenBufferToVRAM();
@@ -985,9 +980,9 @@ static void Menu(void) {
 		if (UI_GetButtonXPosition(5) > 300) UI_SetButtonPosition(5, UI_GetButtonXPosition(5) - 4, UI_GetButtonYPosition(5));
 		if (UI_GetButtonXPosition(5) > 255) UI_SetButtonPosition(5, UI_GetButtonXPosition(5) - 2, UI_GetButtonYPosition(5));
 		if (UI_GetButtonXPosition(5) > 250) UI_SetButtonPosition(5, UI_GetButtonXPosition(5) - 1, UI_GetButtonYPosition(5));
-		VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 0, 0);
+		VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 0, 0);
 		GFX_UpdateSprites();
-		VIDEO_StringToScreenBuffer(40, 180, ui.txt_file[UI_TXT_INTRO].line[2], FONT_BIG_WHITE);
+		VIDEO_StringToScreenBuffer(40, 180, ui->txt_file[UI_TXT_INTRO]->line[2], FONT_BIG_BLACK);
 		GFX_DrawSprites();
 		VIDEO_VSync();
 		VIDEO_ScreenBufferToVRAM();
@@ -1007,8 +1002,8 @@ static void Menu(void) {
 		EFFECT_UpdateEffects();
 
 		GFX_UpdateSprites();
-		VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 0, 0);
-		VIDEO_StringToScreenBuffer(40, 180, ui.txt_file[UI_TXT_INTRO].line[2], FONT_BIG_WHITE);
+		VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 0, 0);
+		VIDEO_StringToScreenBuffer(40, 180, ui->txt_file[UI_TXT_INTRO]->line[2], FONT_BIG_BLACK);
 		GFX_DrawSprites();
 		GFX_DrawCursorSprite();
 
@@ -1076,13 +1071,13 @@ static void Menu(void) {
 			// Language
 			switch (settings.language) {
 				case UI_LANGUAGE_ES:// spanish
-					VIDEO_StringToScreenBuffer(266, 120, ui.txt_file[UI_TXT_GLOBAL].line[18], FONT_SLIM_WHITE);
+					VIDEO_StringToScreenBuffer(266, 120, ui->txt_file[UI_TXT_GLOBAL]->line[18], FONT_SLIM_WHITE);
 					break;
 				case UI_LANGUAGE_EN:// english
-					VIDEO_StringToScreenBuffer(266, 120, ui.txt_file[UI_TXT_GLOBAL].line[19], FONT_SLIM_WHITE);
+					VIDEO_StringToScreenBuffer(266, 120, ui->txt_file[UI_TXT_GLOBAL]->line[19], FONT_SLIM_WHITE);
 					break;
 				case UI_LANGUAGE_FR:// French
-					VIDEO_StringToScreenBuffer(266, 120, ui.txt_file[UI_TXT_GLOBAL].line[20], FONT_SLIM_WHITE);
+					VIDEO_StringToScreenBuffer(266, 120, ui->txt_file[UI_TXT_GLOBAL]->line[20], FONT_SLIM_WHITE);
 					break;
 				default:
 					break;
@@ -1313,9 +1308,9 @@ static void Menu(void) {
 		if (credits_shown) {
 			switch (credits_step) {
 				case 0:
-					VIDEO_StringToScreenBuffer(180, 40, ui.txt_file[UI_TXT_CREDITS].line[1], FONT_SLIM_BLACK);
-					VIDEO_StringToScreenBuffer(180, 60, ui.txt_file[UI_TXT_CREDITS].line[2], FONT_SLIM_BLACK);
-					VIDEO_StringToScreenBuffer(180, 80, ui.txt_file[UI_TXT_CREDITS].line[3], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(180, 40, ui->txt_file[UI_TXT_CREDITS]->line[1], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(180, 60, ui->txt_file[UI_TXT_CREDITS]->line[2], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(180, 80, ui->txt_file[UI_TXT_CREDITS]->line[3], FONT_SLIM_BLACK);
 					if (AwaitDelayTime()) {
 						credits_step++;
 					}
@@ -1325,9 +1320,9 @@ static void Menu(void) {
 					credits_step++;
 					break;
 				case 2:
-					VIDEO_StringToScreenBuffer(180, 40, ui.txt_file[UI_TXT_CREDITS].line[4], FONT_SLIM_BLACK);
-					VIDEO_StringToScreenBuffer(180, 60, ui.txt_file[UI_TXT_CREDITS].line[5], FONT_SLIM_BLACK);
-					VIDEO_StringToScreenBuffer(180, 80, ui.txt_file[UI_TXT_CREDITS].line[6], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(180, 40, ui->txt_file[UI_TXT_CREDITS]->line[4], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(180, 60, ui->txt_file[UI_TXT_CREDITS]->line[5], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(180, 80, ui->txt_file[UI_TXT_CREDITS]->line[6], FONT_SLIM_BLACK);
 					if (AwaitDelayTime()) {
 						credits_step++;
 					}
@@ -1337,9 +1332,9 @@ static void Menu(void) {
 					credits_step++;
 					break;
 				case 4:
-					VIDEO_StringToScreenBuffer(180, 40, ui.txt_file[UI_TXT_CREDITS].line[7], FONT_SLIM_BLACK);
-					VIDEO_StringToScreenBuffer(180, 60, ui.txt_file[UI_TXT_CREDITS].line[8], FONT_SLIM_BLACK);
-					VIDEO_StringToScreenBuffer(180, 80, ui.txt_file[UI_TXT_CREDITS].line[9], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(180, 40, ui->txt_file[UI_TXT_CREDITS]->line[7], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(180, 60, ui->txt_file[UI_TXT_CREDITS]->line[8], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(180, 80, ui->txt_file[UI_TXT_CREDITS]->line[9], FONT_SLIM_BLACK);
 					if (AwaitDelayTime()) {
 						credits_step++;
 					}
@@ -1349,9 +1344,9 @@ static void Menu(void) {
 					credits_step++;
 					break;
 				case 6:
-					VIDEO_StringToScreenBuffer(180, 40, ui.txt_file[UI_TXT_CREDITS].line[10], FONT_SLIM_BLACK);
-					VIDEO_StringToScreenBuffer(180, 60, ui.txt_file[UI_TXT_CREDITS].line[11], FONT_SLIM_BLACK);
-					VIDEO_StringToScreenBuffer(180, 80, ui.txt_file[UI_TXT_CREDITS].line[12], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(180, 40, ui->txt_file[UI_TXT_CREDITS]->line[10], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(180, 60, ui->txt_file[UI_TXT_CREDITS]->line[11], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(180, 80, ui->txt_file[UI_TXT_CREDITS]->line[12], FONT_SLIM_BLACK);
 					if (AwaitDelayTime()) {
 						credits_step++;
 					}
@@ -1361,9 +1356,9 @@ static void Menu(void) {
 					credits_step++;
 					break;
 				case 8:
-					VIDEO_StringToScreenBuffer(170, 30, ui.txt_file[UI_TXT_CREDITS].line[13], FONT_SLIM_BLACK);
-					VIDEO_StringToScreenBuffer(170, 50, ui.txt_file[UI_TXT_CREDITS].line[14], FONT_SLIM_BLACK);
-					VIDEO_StringToScreenBuffer(170, 70, ui.txt_file[UI_TXT_CREDITS].line[15], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(170, 30, ui->txt_file[UI_TXT_CREDITS]->line[13], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(170, 50, ui->txt_file[UI_TXT_CREDITS]->line[14], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(170, 70, ui->txt_file[UI_TXT_CREDITS]->line[15], FONT_SLIM_BLACK);
 					if (AwaitDelayTime()) {
 						credits_step++;
 					}
@@ -1373,9 +1368,9 @@ static void Menu(void) {
 					credits_step++;
 					break;
 				case 10:
-					VIDEO_StringToScreenBuffer(170, 30, ui.txt_file[UI_TXT_CREDITS].line[16], FONT_SLIM_BLACK);
-					VIDEO_StringToScreenBuffer(170, 50, ui.txt_file[UI_TXT_CREDITS].line[17], FONT_SLIM_BLACK);
-					VIDEO_StringToScreenBuffer(170, 70, ui.txt_file[UI_TXT_CREDITS].line[18], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(170, 30, ui->txt_file[UI_TXT_CREDITS]->line[16], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(170, 50, ui->txt_file[UI_TXT_CREDITS]->line[17], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(170, 70, ui->txt_file[UI_TXT_CREDITS]->line[18], FONT_SLIM_BLACK);
 					if (AwaitDelayTime()) {
 						credits_step++;
 					}
@@ -1389,7 +1384,7 @@ static void Menu(void) {
 		}
 
 		// Option selected
-		switch (ui.button_pressed) {
+		switch (ui->button_pressed) {
 			case 0:// No button pressed
 				break;
 			case 1:// New game
@@ -1518,7 +1513,7 @@ static void GameOver(void) {
 	NPC_UnloadNpcs();
 	Update(false);
 
-	VIDEO_StringToScreenBuffer(80, 90, ui.txt_file[UI_TXT_GLOBAL].line[25], FONT_BIG_WHITE);
+	VIDEO_StringToScreenBuffer(80, 90, ui->txt_file[UI_TXT_GLOBAL]->line[25], FONT_BIG_WHITE);
 
 	Update(false);
 
@@ -1556,7 +1551,7 @@ static void Scene1_Intro(void) {
 				break;
 			case 1:// Load first intro scene
 				AUDIO_LoadSong(AUDIO_SONG_3);
-				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO0.PCX", 564 * 177, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
+				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO0.PCX", 564 * 177, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
 				step++;
 				break;
 			case 2:// Hide loading screen
@@ -1566,8 +1561,8 @@ static void Scene1_Intro(void) {
 			case 3:/// Scene 1 :: City with horizontal scroll
 				VIDEO_ClearScreenBuffer();
 				GFX_LoadPalette("PALETTES.DAT", "ISCN1.PCX", 256);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 292, 183, 13, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, 286, gfx.image_buffer1_height, 16, 14);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 292, 183, 13, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, 286, gfx->image_buffer1_height, 16, 14);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				VIDEO_FadeIn(4);
@@ -1578,7 +1573,7 @@ static void Scene1_Intro(void) {
 
 				src_index = 0;
 				horizontal_scroll = 0;
-				max_scroll = gfx.image_buffer1_width - 280;
+				max_scroll = gfx->image_buffer1_width - 280;
 				scroll_end = false;
 				dialog_step = 0;
 				while (!scroll_end & engine.sequence) {
@@ -1586,9 +1581,9 @@ static void Scene1_Intro(void) {
 					dst_index = CAM_VISIBLE_WIDTH * 14 + 16;
 
 					// Draw image with scroll
-					for (i = 0; i < gfx.image_buffer1_height; i++) {
-						memcpy(&video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx.image_buffer1[src_index], CAM_VISIBLE_WIDTH - 35);
-						src_index += gfx.image_buffer1_width;
+					for (i = 0; i < gfx->image_buffer1_height; i++) {
+						memcpy(&video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx->image_buffer1[src_index], CAM_VISIBLE_WIDTH - 35);
+						src_index += gfx->image_buffer1_width;
 						dst_index += CAM_VISIBLE_WIDTH;
 					}
 					if (horizontal_scroll < max_scroll) horizontal_scroll++;
@@ -1596,8 +1591,8 @@ static void Scene1_Intro(void) {
 						scroll_end = true;
 
 					// Draw text background
-					VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 128, 46, 25, 21, 233);
-					VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 120, 40, 29, 24, 208);
+					VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 128, 46, 25, 21, 202);
+					VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 120, 40, 29, 24, 208);
 
 					// Draw text
 					switch (dialog_step) {
@@ -1607,7 +1602,7 @@ static void Scene1_Intro(void) {
 							dialog_step++;
 							break;
 						case 1:
-							aux_string[char_number] = ui.txt_file[UI_TXT_SCN1I].line[1][char_number];
+							aux_string[char_number] = ui->txt_file[UI_TXT_SCN1I]->line[1][char_number];
 							aux_string[char_number + 1] = '\0';
 							VIDEO_StringToScreenBuffer(38, 28, aux_string, FONT_SLIM_BLACK);
 							dialog_delay_counter++;
@@ -1615,18 +1610,18 @@ static void Scene1_Intro(void) {
 								char_number++;
 								dialog_delay_counter = 0;
 							}
-							if (char_number >= strlen(ui.txt_file[UI_TXT_SCN1I].line[1])) {
+							if (char_number >= strlen(ui->txt_file[UI_TXT_SCN1I]->line[1])) {
 								dialog_step++;
 							}
 							break;
 						case 2:
-							VIDEO_StringToScreenBuffer(38, 28, ui.txt_file[UI_TXT_SCN1I].line[1], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(38, 28, ui->txt_file[UI_TXT_SCN1I]->line[1], FONT_SLIM_BLACK);
 							char_number = 0;
 							dialog_step++;
 							break;
 						case 3:
-							VIDEO_StringToScreenBuffer(38, 28, ui.txt_file[UI_TXT_SCN1I].line[1], FONT_SLIM_BLACK);
-							aux_string[char_number] = ui.txt_file[UI_TXT_SCN1I].line[2][char_number];
+							VIDEO_StringToScreenBuffer(38, 28, ui->txt_file[UI_TXT_SCN1I]->line[1], FONT_SLIM_BLACK);
+							aux_string[char_number] = ui->txt_file[UI_TXT_SCN1I]->line[2][char_number];
 							aux_string[char_number + 1] = '\0';
 							VIDEO_StringToScreenBuffer(38, 40, aux_string, FONT_SLIM_BLACK);
 							dialog_delay_counter++;
@@ -1634,21 +1629,21 @@ static void Scene1_Intro(void) {
 								char_number++;
 								dialog_delay_counter = 0;
 							}
-							if (char_number >= strlen(ui.txt_file[UI_TXT_SCN1I].line[2])) {
+							if (char_number >= strlen(ui->txt_file[UI_TXT_SCN1I]->line[2])) {
 								dialog_step++;
 							}
 							break;
 						case 4:
-							VIDEO_StringToScreenBuffer(38, 28, ui.txt_file[UI_TXT_SCN1I].line[1], FONT_SLIM_BLACK);
-							VIDEO_StringToScreenBuffer(38, 40, ui.txt_file[UI_TXT_SCN1I].line[2], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(38, 28, ui->txt_file[UI_TXT_SCN1I]->line[1], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(38, 40, ui->txt_file[UI_TXT_SCN1I]->line[2], FONT_SLIM_BLACK);
 							char_number = 0;
 							dialog_step++;
 							break;
 						case 5:
-							VIDEO_StringToScreenBuffer(38, 28, ui.txt_file[UI_TXT_SCN1I].line[1], FONT_SLIM_BLACK);
-							VIDEO_StringToScreenBuffer(38, 40, ui.txt_file[UI_TXT_SCN1I].line[2], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(38, 28, ui->txt_file[UI_TXT_SCN1I]->line[1], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(38, 40, ui->txt_file[UI_TXT_SCN1I]->line[2], FONT_SLIM_BLACK);
 
-							aux_string[char_number] = ui.txt_file[UI_TXT_SCN1I].line[3][char_number];
+							aux_string[char_number] = ui->txt_file[UI_TXT_SCN1I]->line[3][char_number];
 							aux_string[char_number + 1] = '\0';
 							VIDEO_StringToScreenBuffer(38, 52, aux_string, FONT_SLIM_BLACK);
 							dialog_delay_counter++;
@@ -1656,14 +1651,14 @@ static void Scene1_Intro(void) {
 								char_number++;
 								dialog_delay_counter = 0;
 							}
-							if (char_number >= strlen(ui.txt_file[UI_TXT_SCN1I].line[3])) {
+							if (char_number >= strlen(ui->txt_file[UI_TXT_SCN1I]->line[3])) {
 								dialog_step++;
 							}
 							break;
 						case 6:
-							VIDEO_StringToScreenBuffer(38, 28, ui.txt_file[UI_TXT_SCN1I].line[1], FONT_SLIM_BLACK);
-							VIDEO_StringToScreenBuffer(38, 40, ui.txt_file[UI_TXT_SCN1I].line[2], FONT_SLIM_BLACK);
-							VIDEO_StringToScreenBuffer(38, 52, ui.txt_file[UI_TXT_SCN1I].line[3], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(38, 28, ui->txt_file[UI_TXT_SCN1I]->line[1], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(38, 40, ui->txt_file[UI_TXT_SCN1I]->line[2], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(38, 52, ui->txt_file[UI_TXT_SCN1I]->line[3], FONT_SLIM_BLACK);
 							break;
 						default:
 							break;
@@ -1680,25 +1675,25 @@ static void Scene1_Intro(void) {
 				step = 5;
 				break;
 			case 5:// Coach horizontal scroll and text
-				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO1H.PCX", 251 * 135, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO1L.PCX", 205 * 135, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
+				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO1H.PCX", 251 * 135, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO1L.PCX", 205 * 135, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
 				VIDEO_FadeOut(4);
 				horizontal_scroll = 36;
 				scroll_end = false;
 
 				VIDEO_ClearScreenBuffer();
 				VIDEO_ScreenBufferToVRAM();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 211, 140, 11, 3, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, 205, gfx.image_buffer1_height, 14, 6);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 211, 140, 11, 3, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, 205, gfx->image_buffer1_height, 14, 6);
 				VIDEO_FadeIn(4);
 				while (!scroll_end & engine.sequence) {
 					src_index = horizontal_scroll;
 					dst_index = CAM_VISIBLE_WIDTH * 6 + 14;
 
 					// Draw image with scroll
-					for (i = 0; i < gfx.image_buffer1_height; i++) {
-						memcpy(&video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx.image_buffer1[src_index], 205);
-						src_index += gfx.image_buffer1_width;
+					for (i = 0; i < gfx->image_buffer1_height; i++) {
+						memcpy(&video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx->image_buffer1[src_index], 205);
+						src_index += gfx->image_buffer1_width;
 						dst_index += CAM_VISIBLE_WIDTH;
 					}
 					if (horizontal_scroll > 0) horizontal_scroll--;
@@ -1721,9 +1716,9 @@ static void Scene1_Intro(void) {
 				step = 6;
 				break;
 			case 6:// Clock (high)
-				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO2H.PCX", 105 * 56, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 111, 62, 67, 117, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 70, 120);
+				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO2H.PCX", 105 * 56, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 111, 62, 67, 117, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 70, 120);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(200);
@@ -1733,9 +1728,9 @@ static void Scene1_Intro(void) {
 				step = 7;
 				break;
 			case 7:// Fade coach
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 14, 6);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 111, 62, 67, 117, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 70, 120);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 14, 6);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 111, 62, 67, 117, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 70, 120);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 
@@ -1746,10 +1741,10 @@ static void Scene1_Intro(void) {
 				step = 8;
 				break;
 			case 8:// Eye
-				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO2L.PCX", 105 * 56, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO3H.PCX", 111 * 55, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 94, 61, 190, 100, 222);
-				VIDEO_BufferToScreenBuffer(&gfx.image_buffer1[23], gfx.image_buffer1_width, gfx.image_buffer1_height, 88, gfx.image_buffer1_height, 193, 103);
+				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO2L.PCX", 105 * 56, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO3H.PCX", 111 * 55, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 94, 61, 190, 100, 222);
+				VIDEO_BufferToScreenBuffer(&gfx->image_buffer1[23], gfx->image_buffer1_width, gfx->image_buffer1_height, 88, gfx->image_buffer1_height, 193, 103);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(200);
@@ -1759,9 +1754,9 @@ static void Scene1_Intro(void) {
 				step = 9;
 				break;
 			case 9:// Fade clock
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 70, 120);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 94, 61, 190, 100, 222);
-				VIDEO_BufferToScreenBuffer(&gfx.image_buffer1[23], gfx.image_buffer1_width, gfx.image_buffer1_height, 88, gfx.image_buffer1_height, 193, 103);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 70, 120);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 94, 61, 190, 100, 222);
+				VIDEO_BufferToScreenBuffer(&gfx->image_buffer1[23], gfx->image_buffer1_width, gfx->image_buffer1_height, 88, gfx->image_buffer1_height, 193, 103);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				step = 10;
@@ -1774,9 +1769,9 @@ static void Scene1_Intro(void) {
 					dst_index = CAM_VISIBLE_WIDTH * 103 + 193;
 
 					// Draw image with scroll
-					for (i = 0; i < gfx.image_buffer1_height; i++) {
-						memcpy(&video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx.image_buffer1[src_index], 88);
-						src_index += gfx.image_buffer1_width;
+					for (i = 0; i < gfx->image_buffer1_height; i++) {
+						memcpy(&video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx->image_buffer1[src_index], 88);
+						src_index += gfx->image_buffer1_width;
 						dst_index += CAM_VISIBLE_WIDTH;
 					}
 					if (horizontal_scroll > 0) horizontal_scroll--;
@@ -1817,8 +1812,8 @@ static void Scene1_Intro(void) {
 				VIDEO_ScreenBufferToVRAM();
 				char_number = 0;
 				dialog_delay_counter = 0;
-				while ((char_number < strlen(ui.txt_file[UI_TXT_SCN1I].line[4])) & engine.sequence) {
-					aux_string[char_number] = ui.txt_file[UI_TXT_SCN1I].line[4][char_number];
+				while ((char_number < strlen(ui->txt_file[UI_TXT_SCN1I]->line[4])) & engine.sequence) {
+					aux_string[char_number] = ui->txt_file[UI_TXT_SCN1I]->line[4][char_number];
 					aux_string[char_number + 1] = '\0';
 					VIDEO_StringToScreenBuffer(256, 134, aux_string, FONT_SLIM_BLACK);
 					dialog_delay_counter++;
@@ -1833,9 +1828,8 @@ static void Scene1_Intro(void) {
 				step = 12;
 				break;
 			case 12:// Fuck scene
-				GFX_LoadSpriteGraphicsRLE("MISC.DAT", "FUCK.PCX", SPRITE_GRAPHICS_ID_FUCK, 158, 81, 1, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_TEMPORARY_SPRITE);
-				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO4H.PCX", 250 * 180, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO4L.PCX", 194 * 180, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
+				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO4H.PCX", 250 * 180, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO4L.PCX", 194 * 180, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
 				VIDEO_FadeOut(4);
 				GFX_UnloadSprite(chat_spr_num);
 
@@ -1844,17 +1838,17 @@ static void Scene1_Intro(void) {
 
 				VIDEO_ClearScreenBuffer();
 				VIDEO_ScreenBufferToVRAM();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 200, 186, 110, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, 194, gfx.image_buffer1_height, 113, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 200, 186, 110, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, 194, gfx->image_buffer1_height, 113, 13);
 				VIDEO_FadeIn(4);
 				while (!scroll_end & engine.sequence) {
 					src_index = horizontal_scroll;
 					dst_index = CAM_VISIBLE_WIDTH * 13 + 113;
 
 					// Draw image with scroll
-					for (i = 0; i < gfx.image_buffer1_height; i++) {
-						memcpy(&video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx.image_buffer1[src_index], 194);
-						src_index += gfx.image_buffer1_width;
+					for (i = 0; i < gfx->image_buffer1_height; i++) {
+						memcpy(&video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx->image_buffer1[src_index], 194);
+						src_index += gfx->image_buffer1_width;
 						dst_index += CAM_VISIBLE_WIDTH;
 					}
 					if (horizontal_scroll > 0) horizontal_scroll--;
@@ -1915,9 +1909,9 @@ static void Scene1_Intro(void) {
 				step = 15;
 				break;
 			case 15:// Washing face (high)
-				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO5H.PCX", 130 * 60, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 136, 66, 10, 30, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 13, 33);
+				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO5H.PCX", 130 * 60, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 136, 66, 10, 30, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 13, 33);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 
@@ -1929,9 +1923,9 @@ static void Scene1_Intro(void) {
 				step = 16;
 				break;
 			case 16:// Fade fuck image
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 113, 13);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 136, 66, 10, 30, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 13, 33);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 113, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 136, 66, 10, 30, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 13, 33);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 
@@ -1942,10 +1936,10 @@ static void Scene1_Intro(void) {
 				step = 17;
 				break;
 			case 17:// Dead image
-				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO6H.PCX", 130 * 60, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO5L.PCX", 130 * 60, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 136, 66, 10, 120, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 13, 123);
+				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO6H.PCX", 130 * 60, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO5L.PCX", 130 * 60, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 136, 66, 10, 120, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 13, 123);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 
@@ -1957,9 +1951,9 @@ static void Scene1_Intro(void) {
 				step = 18;
 				break;
 			case 18:// Fade washing face image
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 13, 33);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 136, 66, 10, 120, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 13, 123);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 13, 33);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 136, 66, 10, 120, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 13, 123);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 
@@ -1971,14 +1965,14 @@ static void Scene1_Intro(void) {
 				step = 19;
 				break;
 			case 19:// Fade out and show image
-				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO7H.PCX", 285 * 97, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO8H.PCX", 82 * 100, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
+				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO7H.PCX", 285 * 97, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO8H.PCX", 82 * 100, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
 				VIDEO_FadeOut(4);
 
 				VIDEO_ClearScreenBuffer();
 				VIDEO_ScreenBufferToVRAM();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 291, 103, 15, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 18, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 291, 103, 15, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 18, 13);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 
@@ -1994,8 +1988,8 @@ static void Scene1_Intro(void) {
 				char_number = 0;
 				dialog_delay_counter = 0;
 
-				while ((char_number < strlen(ui.txt_file[UI_TXT_SCN1I].line[6])) & engine.sequence) {
-					aux_string[char_number] = ui.txt_file[UI_TXT_SCN1I].line[6][char_number];
+				while ((char_number < strlen(ui->txt_file[UI_TXT_SCN1I]->line[6])) & engine.sequence) {
+					aux_string[char_number] = ui->txt_file[UI_TXT_SCN1I]->line[6][char_number];
 					aux_string[char_number + 1] = '\0';
 					VIDEO_StringToScreenBuffer(215, 34, aux_string, FONT_SLIM_BLACK);
 					dialog_delay_counter++;
@@ -2011,8 +2005,8 @@ static void Scene1_Intro(void) {
 				char_number = 0;
 				dialog_delay_counter = 0;
 
-				while ((char_number < strlen(ui.txt_file[UI_TXT_SCN1I].line[7])) & engine.sequence) {
-					aux_string[char_number] = ui.txt_file[UI_TXT_SCN1I].line[7][char_number];
+				while ((char_number < strlen(ui->txt_file[UI_TXT_SCN1I]->line[7])) & engine.sequence) {
+					aux_string[char_number] = ui->txt_file[UI_TXT_SCN1I]->line[7][char_number];
 					aux_string[char_number + 1] = '\0';
 					VIDEO_StringToScreenBuffer(210, 46, aux_string, FONT_SLIM_BLACK);
 					dialog_delay_counter++;
@@ -2033,9 +2027,9 @@ static void Scene1_Intro(void) {
 				step = 21;
 				break;
 			case 21:// Getting things
-				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO7L.PCX", 285 * 97, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 88, 106, 20, 80, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 23, 83);
+				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO7L.PCX", 285 * 97, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 88, 106, 20, 80, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 23, 83);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 
@@ -2047,11 +2041,11 @@ static void Scene1_Intro(void) {
 				step = 22;
 				break;
 			case 22:// Fade chat
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 18, 13);
-				VIDEO_StringToScreenBuffer(215, 34, ui.txt_file[UI_TXT_SCN1I].line[6], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(210, 46, ui.txt_file[UI_TXT_SCN1I].line[7], FONT_SLIM_BLACK);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 88, 106, 20, 80, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 23, 83);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 18, 13);
+				VIDEO_StringToScreenBuffer(215, 34, ui->txt_file[UI_TXT_SCN1I]->line[6], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(210, 46, ui->txt_file[UI_TXT_SCN1I]->line[7], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 88, 106, 20, 80, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 23, 83);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 
@@ -2063,10 +2057,10 @@ static void Scene1_Intro(void) {
 				step = 23;
 				break;
 			case 23:// Show gun
-				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO9H.PCX", 82 * 100, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO8L.PCX", 82 * 100, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 88, 106, 118, 80, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 121, 83);
+				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO9H.PCX", 82 * 100, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO8L.PCX", 82 * 100, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 88, 106, 118, 80, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 121, 83);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 
@@ -2078,7 +2072,7 @@ static void Scene1_Intro(void) {
 				step = 24;
 				break;
 			case 24:// Fade getting things
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 23, 83);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 23, 83);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 
@@ -2090,10 +2084,10 @@ static void Scene1_Intro(void) {
 				step = 25;
 				break;
 			case 25:// Show running
-				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO10H.PCX", 194 * 180, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO9L.PCX", 194 * 180, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 88, 106, 213, 80, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 216, 83);
+				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO10H.PCX", 194 * 180, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("ISCN1.DAT", "INTRO9L.PCX", 194 * 180, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 88, 106, 213, 80, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 216, 83);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 
@@ -2105,7 +2099,7 @@ static void Scene1_Intro(void) {
 				step = 26;
 				break;
 			case 26:// Fade gun
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 121, 83);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 121, 83);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 
@@ -2120,8 +2114,8 @@ static void Scene1_Intro(void) {
 				char_number = 0;
 				dialog_delay_counter = 0;
 
-				while ((char_number < strlen(ui.txt_file[UI_TXT_SCN1I].line[8])) & engine.sequence) {
-					aux_string[char_number] = ui.txt_file[UI_TXT_SCN1I].line[8][char_number];
+				while ((char_number < strlen(ui->txt_file[UI_TXT_SCN1I]->line[8])) & engine.sequence) {
+					aux_string[char_number] = ui->txt_file[UI_TXT_SCN1I]->line[8][char_number];
 					aux_string[char_number + 1] = '\0';
 					VIDEO_StringToScreenBuffer(220, 86, aux_string, FONT_SLIM_BLACK);
 					dialog_delay_counter++;
@@ -2149,44 +2143,42 @@ static void Scene1_Intro(void) {
 		}
 	}
 	VIDEO_FadeOut(1);
+	ITEM_UnloadItems();
+	EFFECT_UnloadEffects();
+	PARTICLE_UnloadParticles();
+	ENEMY_UnloadEnemies();
 	GFX_UnloadSprites();
 	AUDIO_StopSong();
 	AUDIO_UnloadSong();
-	GFX_UnloadSprite(SPRITE_GRAPHICS_ID_FUCK);
 	MM_PopChunks(CT_TEMPORARY_SPRITE);
 }
 static void Scene1_LoadAssets(void) {
-	// Load assets
-	ENEMY_Init();// Initialize enemy system
-
-	ACTOR_Init(1 << 4, 22 << 4, SPRITE_GRAPHICS_ID_ACTOR_FEET, SPRITE_GRAPHICS_ID_ACTOR_BODY, SPRITE_GRAPHICS_ID_ACTOR_HEAD, SPRITE_GRAPHICS_ID_ACTOR_LARM, SPRITE_GRAPHICS_ID_ACTOR_RARM_BARE_HANDS, ACTOR_FACING_RIGHT);
-	ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
-	ACTOR_SetBulletStatus(99, 29, 199, 19, 9);
+	ACTOR_Load(1 << 4, 22 << 4, SPRITE_GRAPHICS_ID_ACTOR_FEET, SPRITE_GRAPHICS_ID_ACTOR_BODY, SPRITE_GRAPHICS_ID_ACTOR_HEAD, SPRITE_GRAPHICS_ID_ACTOR_LARM, SPRITE_GRAPHICS_ID_ACTOR_RARM_BARE_HANDS, ACTOR_FACING_RIGHT);
+	ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
+	ACTOR_SetBulletStatus(99, 0, 0, 0, 0);
 
 	// Load enemies and unload them just to preload graphics
 	ENEMY_Load("ENEMY1.DAT", 0, 0, 0, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_SLEEP, 50);
-	ENEMY_Load("ENEMY2.DAT", 6, 0, 0, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_RIGHT, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_SLEEP, 100);
-	ENEMY_Load("ENEMY3.DAT", 7, 0, 0, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_ENEMY3_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY3_FEET, SPRITE_GRAPHICS_ID_ENEMY3_BODY, SPRITE_GRAPHICS_ID_ENEMY3_HEAD, SPRITE_GRAPHICS_ID_ENEMY3_LARM, SPRITE_GRAPHICS_ID_ENEMY3_RARM, ENEMY_FACING_LEFT, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_SLEEP, 100);
-	ENEMY_Load("ENEMY4.DAT", 8, 0, 0, SPRITE_GRAPHICS_ID_ENEMY4_CHAT, SPRITE_GRAPHICS_ID_ENEMY4_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY4_FEET, SPRITE_GRAPHICS_ID_ENEMY4_BODY, SPRITE_GRAPHICS_ID_ENEMY4_HEAD, SPRITE_GRAPHICS_ID_ENEMY4_LARM, SPRITE_GRAPHICS_ID_ENEMY4_RARM, ENEMY_FACING_RIGHT, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_SLEEP, 100);
-	ENEMY_Load("ENEMY5.DAT", 9, 0, 0, SPRITE_GRAPHICS_ID_ENEMY5_CHAT, SPRITE_GRAPHICS_ID_ENEMY5_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY5_FEET, SPRITE_GRAPHICS_ID_ENEMY5_BODY, SPRITE_GRAPHICS_ID_ENEMY5_HEAD, SPRITE_GRAPHICS_ID_ENEMY5_LARM, SPRITE_GRAPHICS_ID_ENEMY5_RARM, ENEMY_FACING_LEFT, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_SLEEP, 100);
+	ENEMY_Load("ENEMY2.DAT", 1, 0, 0, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_RIGHT, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_SLEEP, 100);
+	ENEMY_Load("ENEMY3.DAT", 2, 0, 0, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_ENEMY3_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY3_FEET, SPRITE_GRAPHICS_ID_ENEMY3_BODY, SPRITE_GRAPHICS_ID_ENEMY3_HEAD, SPRITE_GRAPHICS_ID_ENEMY3_LARM, SPRITE_GRAPHICS_ID_ENEMY3_RARM, ENEMY_FACING_LEFT, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_SLEEP, 100);
+	ENEMY_Load("ENEMY4.DAT", 3, 0, 0, SPRITE_GRAPHICS_ID_ENEMY4_CHAT, SPRITE_GRAPHICS_ID_ENEMY4_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY4_FEET, SPRITE_GRAPHICS_ID_ENEMY4_BODY, SPRITE_GRAPHICS_ID_ENEMY4_HEAD, SPRITE_GRAPHICS_ID_ENEMY4_LARM, SPRITE_GRAPHICS_ID_ENEMY4_RARM, ENEMY_FACING_RIGHT, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_SLEEP, 100);
+	ENEMY_Load("ENEMY5.DAT", 4, 0, 0, SPRITE_GRAPHICS_ID_ENEMY5_CHAT, SPRITE_GRAPHICS_ID_ENEMY5_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY5_FEET, SPRITE_GRAPHICS_ID_ENEMY5_BODY, SPRITE_GRAPHICS_ID_ENEMY5_HEAD, SPRITE_GRAPHICS_ID_ENEMY5_LARM, SPRITE_GRAPHICS_ID_ENEMY5_RARM, ENEMY_FACING_LEFT, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_SLEEP, 100);
 	ENEMY_UnloadEnemies();
 
 	// Load npcs and unload them just to preload graphics
-	NPC_Load("NPC1.DAT", 3, 0, 0, SPRITE_GRAPHICS_ID_NPC_AGENT1_CHAT, SPRITE_GRAPHICS_ID_NPC_AGENT1, NPC_FACING_DOWN, NPC_STATUS_IDLE, 200);
-	NPC_Load("NPC2.DAT", 4, 0, 0, SPRITE_GRAPHICS_ID_NPC_AGENT2_CHAT, SPRITE_GRAPHICS_ID_NPC_AGENT2, NPC_FACING_DOWN, NPC_STATUS_IDLE, 200);
-	NPC_Load("NPC3.DAT", 5, 0, 0, SPRITE_GRAPHICS_ID_NPC_BOSS_CHAT, SPRITE_GRAPHICS_ID_NPC_BOSS, NPC_FACING_DOWN, NPC_STATUS_IDLE, 20);
-	NPC_Load("NPC5.DAT", 2, 0, 0, SPRITE_GRAPHICS_ID_NPC_DROID1_CHAT, SPRITE_GRAPHICS_ID_NPC_DROID1, NPC_FACING_DOWN, NPC_STATUS_IDLE, 200);
-	NPC_Load("NPC6.DAT", 8, 0, 0, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_NPC_DROID2, NPC_FACING_DOWN, NPC_STATUS_IDLE, 200);
-	NPC_Load("NPC7.DAT", 7, 0, 0, SPRITE_GRAPHICS_ID_NPC_DROID3_CHAT, SPRITE_GRAPHICS_ID_NPC_DROID3, NPC_FACING_DOWN, NPC_STATUS_IDLE, 400);
-	NPC_Load("NPC8.DAT", 1, 0, 0, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_NPC_SARA, NPC_FACING_DOWN, NPC_STATUS_IDLE, 100);
+	NPC_Load("NPC1.DAT", 0, 0, 0, SPRITE_GRAPHICS_ID_NPC_AGENT1_CHAT, SPRITE_GRAPHICS_ID_NPC_AGENT1, NPC_FACING_DOWN, NPC_STATUS_IDLE, 200);
+	NPC_Load("NPC2.DAT", 1, 0, 0, SPRITE_GRAPHICS_ID_NPC_AGENT2_CHAT, SPRITE_GRAPHICS_ID_NPC_AGENT2, NPC_FACING_DOWN, NPC_STATUS_IDLE, 200);
+	NPC_Load("NPC3.DAT", 2, 0, 0, SPRITE_GRAPHICS_ID_NPC_BOSS_CHAT, SPRITE_GRAPHICS_ID_NPC_BOSS, NPC_FACING_DOWN, NPC_STATUS_IDLE, 20);
+	NPC_Load("NPC5.DAT", 3, 0, 0, SPRITE_GRAPHICS_ID_NPC_DROID1_CHAT, SPRITE_GRAPHICS_ID_NPC_DROID1, NPC_FACING_DOWN, NPC_STATUS_IDLE, 200);
+	NPC_Load("NPC6.DAT", 4, 0, 0, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_NPC_DROID2, NPC_FACING_DOWN, NPC_STATUS_IDLE, 200);
+	NPC_Load("NPC7.DAT", 5, 0, 0, SPRITE_GRAPHICS_ID_NPC_DROID3_CHAT, SPRITE_GRAPHICS_ID_NPC_DROID3, NPC_FACING_DOWN, NPC_STATUS_IDLE, 400);
+	NPC_Load("NPC8.DAT", 6, 0, 0, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_NPC_SARA, NPC_FACING_DOWN, NPC_STATUS_IDLE, 100);
 	NPC_UnloadNpcs();
 
 	// Load objects and unload them just to preload graphics
 	OBJECT_LoadObject("OBJECT2.DAT", 0, ENTITY_ID_BARREL, SPRITE_GRAPHICS_ID_OBJECT1, SPRITE_GRAPHICS_ID_OBJECT1_PORTAIT, 0, 0);
 	OBJECT_LoadObject("OBJECT3.DAT", 1, ENTITY_ID_TARGET, SPRITE_GRAPHICS_ID_OBJECT2, SPRITE_GRAPHICS_ID_OBJECT2_PORTAIT, 0, 0);
 	OBJECT_UnloadObjects();
-
-	NPC_Init();
 
 	UI_SetStatusPanels();// Set status panels
 
@@ -2314,140 +2306,140 @@ static void Scene1_SetHotspotsAndEvents(void) {
 
 	// Initialize hotspots and events
 	// Update hotspots
-	hotspot_enabling_room1[0] = false;
-	hotspot_enabling_room1[1] = true;
-	hotspot_enabling_room1[2] = true;
-	hotspot_enabling_room1[3] = true;
-	hotspot_enabling_room1[4] = true;
-	hotspot_enabling_room1[5] = true;
-	hotspot_enabling_room1[6] = true;
-	hotspot_enabling_room1[7] = true;
-	hotspot_enabling_room1[8] = true;
-	hotspot_enabling_room1[9] = true;
-	hotspot_enabling_room1[10] = true;
-	hotspot_enabling_room1[11] = true;
-	hotspot_enabling_room1[12] = false;
-	hotspot_enabling_room1[13] = false;
-	hotspot_enabling_room1[14] = false;
-	hotspot_enabling_room1[15] = false;
-	hotspot_enabling_room1[16] = false;
-	hotspot_enabling_room1[17] = false;
-	hotspot_enabling_room1[18] = false;
-	hotspot_enabling_room1[19] = false;
-	hotspot_enabling_room1[20] = false;
-	hotspot_enabling_room1[21] = false;
-	hotspot_enabling_room1[22] = false;
-	hotspot_enabling_room1[23] = false;
-	hotspot_enabling_room1[24] = false;
-	hotspot_enabling_room1[25] = false;
-	hotspot_enabling_room1[26] = false;
-	hotspot_enabling_room1[27] = false;
-	hotspot_enabling_room1[28] = false;
-	hotspot_enabling_room1[29] = false;
-	hotspot_enabling_room1[30] = false;
-	hotspot_enabling_room1[31] = false;
+	map->hotspot_enabling_room1[0] = false;
+	map->hotspot_enabling_room1[1] = true;
+	map->hotspot_enabling_room1[2] = true;
+	map->hotspot_enabling_room1[3] = true;
+	map->hotspot_enabling_room1[4] = true;
+	map->hotspot_enabling_room1[5] = true;
+	map->hotspot_enabling_room1[6] = true;
+	map->hotspot_enabling_room1[7] = true;
+	map->hotspot_enabling_room1[8] = true;
+	map->hotspot_enabling_room1[9] = true;
+	map->hotspot_enabling_room1[10] = true;
+	map->hotspot_enabling_room1[11] = true;
+	map->hotspot_enabling_room1[12] = false;
+	map->hotspot_enabling_room1[13] = false;
+	map->hotspot_enabling_room1[14] = false;
+	map->hotspot_enabling_room1[15] = false;
+	map->hotspot_enabling_room1[16] = false;
+	map->hotspot_enabling_room1[17] = false;
+	map->hotspot_enabling_room1[18] = false;
+	map->hotspot_enabling_room1[19] = false;
+	map->hotspot_enabling_room1[20] = false;
+	map->hotspot_enabling_room1[21] = false;
+	map->hotspot_enabling_room1[22] = false;
+	map->hotspot_enabling_room1[23] = false;
+	map->hotspot_enabling_room1[24] = false;
+	map->hotspot_enabling_room1[25] = false;
+	map->hotspot_enabling_room1[26] = false;
+	map->hotspot_enabling_room1[27] = false;
+	map->hotspot_enabling_room1[28] = false;
+	map->hotspot_enabling_room1[29] = false;
+	map->hotspot_enabling_room1[30] = false;
+	map->hotspot_enabling_room1[31] = false;
 
 	// Update events
-	event_enabling_room1[0] = false;
-	event_enabling_room1[1] = true;
-	event_enabling_room1[2] = true;
-	event_enabling_room1[3] = true;
-	event_enabling_room1[4] = true;
-	event_enabling_room1[5] = true;
-	event_enabling_room1[6] = true;
-	event_enabling_room1[7] = false;
-	event_enabling_room1[8] = false;
-	event_enabling_room1[9] = false;
-	event_enabling_room1[10] = false;
-	event_enabling_room1[11] = false;
-	event_enabling_room1[12] = false;
-	event_enabling_room1[13] = false;
-	event_enabling_room1[14] = false;
-	event_enabling_room1[15] = false;
-	event_enabling_room1[16] = false;
-	event_enabling_room1[17] = false;
-	event_enabling_room1[18] = false;
-	event_enabling_room1[19] = false;
-	event_enabling_room1[20] = false;
-	event_enabling_room1[21] = false;
-	event_enabling_room1[22] = false;
-	event_enabling_room1[23] = false;
-	event_enabling_room1[24] = false;
-	event_enabling_room1[25] = false;
-	event_enabling_room1[26] = false;
-	event_enabling_room1[27] = false;
-	event_enabling_room1[28] = false;
-	event_enabling_room1[29] = false;
-	event_enabling_room1[30] = false;
-	event_enabling_room1[31] = false;
+	map->event_enabling_room1[0] = false;
+	map->event_enabling_room1[1] = true;
+	map->event_enabling_room1[2] = true;
+	map->event_enabling_room1[3] = true;
+	map->event_enabling_room1[4] = true;
+	map->event_enabling_room1[5] = true;
+	map->event_enabling_room1[6] = true;
+	map->event_enabling_room1[7] = false;
+	map->event_enabling_room1[8] = false;
+	map->event_enabling_room1[9] = false;
+	map->event_enabling_room1[10] = false;
+	map->event_enabling_room1[11] = false;
+	map->event_enabling_room1[12] = false;
+	map->event_enabling_room1[13] = false;
+	map->event_enabling_room1[14] = false;
+	map->event_enabling_room1[15] = false;
+	map->event_enabling_room1[16] = false;
+	map->event_enabling_room1[17] = false;
+	map->event_enabling_room1[18] = false;
+	map->event_enabling_room1[19] = false;
+	map->event_enabling_room1[20] = false;
+	map->event_enabling_room1[21] = false;
+	map->event_enabling_room1[22] = false;
+	map->event_enabling_room1[23] = false;
+	map->event_enabling_room1[24] = false;
+	map->event_enabling_room1[25] = false;
+	map->event_enabling_room1[26] = false;
+	map->event_enabling_room1[27] = false;
+	map->event_enabling_room1[28] = false;
+	map->event_enabling_room1[29] = false;
+	map->event_enabling_room1[30] = false;
+	map->event_enabling_room1[31] = false;
 
 	// Update hotspots
-	hotspot_enabling_room2[0] = false;
-	hotspot_enabling_room2[1] = true;
-	hotspot_enabling_room2[2] = true;
-	hotspot_enabling_room2[3] = true;
-	hotspot_enabling_room2[4] = true;
-	hotspot_enabling_room2[5] = true;
-	hotspot_enabling_room2[6] = true;
-	hotspot_enabling_room2[7] = true;
-	hotspot_enabling_room2[8] = true;
-	hotspot_enabling_room2[9] = false;
-	hotspot_enabling_room2[10] = false;
-	hotspot_enabling_room2[11] = false;
-	hotspot_enabling_room2[12] = false;
-	hotspot_enabling_room2[13] = false;
-	hotspot_enabling_room2[14] = false;
-	hotspot_enabling_room2[15] = false;
-	hotspot_enabling_room2[16] = false;
-	hotspot_enabling_room2[17] = false;
-	hotspot_enabling_room2[18] = false;
-	hotspot_enabling_room2[19] = false;
-	hotspot_enabling_room2[20] = false;
-	hotspot_enabling_room2[21] = false;
-	hotspot_enabling_room2[22] = false;
-	hotspot_enabling_room2[23] = false;
-	hotspot_enabling_room2[24] = false;
-	hotspot_enabling_room2[25] = false;
-	hotspot_enabling_room2[26] = false;
-	hotspot_enabling_room2[27] = false;
-	hotspot_enabling_room2[28] = false;
-	hotspot_enabling_room2[29] = false;
-	hotspot_enabling_room2[30] = false;
-	hotspot_enabling_room2[31] = false;
+	map->hotspot_enabling_room2[0] = false;
+	map->hotspot_enabling_room2[1] = true;
+	map->hotspot_enabling_room2[2] = true;
+	map->hotspot_enabling_room2[3] = true;
+	map->hotspot_enabling_room2[4] = true;
+	map->hotspot_enabling_room2[5] = true;
+	map->hotspot_enabling_room2[6] = true;
+	map->hotspot_enabling_room2[7] = true;
+	map->hotspot_enabling_room2[8] = true;
+	map->hotspot_enabling_room2[9] = false;
+	map->hotspot_enabling_room2[10] = false;
+	map->hotspot_enabling_room2[11] = false;
+	map->hotspot_enabling_room2[12] = false;
+	map->hotspot_enabling_room2[13] = false;
+	map->hotspot_enabling_room2[14] = false;
+	map->hotspot_enabling_room2[15] = false;
+	map->hotspot_enabling_room2[16] = false;
+	map->hotspot_enabling_room2[17] = false;
+	map->hotspot_enabling_room2[18] = false;
+	map->hotspot_enabling_room2[19] = false;
+	map->hotspot_enabling_room2[20] = false;
+	map->hotspot_enabling_room2[21] = false;
+	map->hotspot_enabling_room2[22] = false;
+	map->hotspot_enabling_room2[23] = false;
+	map->hotspot_enabling_room2[24] = false;
+	map->hotspot_enabling_room2[25] = false;
+	map->hotspot_enabling_room2[26] = false;
+	map->hotspot_enabling_room2[27] = false;
+	map->hotspot_enabling_room2[28] = false;
+	map->hotspot_enabling_room2[29] = false;
+	map->hotspot_enabling_room2[30] = false;
+	map->hotspot_enabling_room2[31] = false;
 
 	// Update events
-	event_enabling_room2[0] = false;
-	event_enabling_room2[1] = true;// Go back to room 1
-	event_enabling_room2[2] = true;
-	event_enabling_room2[3] = true;
-	event_enabling_room2[4] = true;
-	event_enabling_room2[5] = true;
-	event_enabling_room2[6] = true;
-	event_enabling_room2[7] = true;
-	event_enabling_room2[8] = true;
-	event_enabling_room2[9] = true;
-	event_enabling_room2[10] = true;
-	event_enabling_room2[11] = true;// Sara conversation 1
-	event_enabling_room2[12] = true;
-	event_enabling_room2[13] = true;// Desktop droid
-	event_enabling_room2[14] = true;
-	event_enabling_room2[15] = true;
-	event_enabling_room2[16] = true;
-	event_enabling_room2[17] = false;// Sara conversation 2
-	event_enabling_room2[18] = true;
-	event_enabling_room2[19] = true;
-	event_enabling_room2[20] = true;// Entering speach
-	event_enabling_room2[21] = false;
-	event_enabling_room2[22] = false;
-	event_enabling_room2[23] = false;
-	event_enabling_room2[24] = false;
-	event_enabling_room2[25] = false;
-	event_enabling_room2[26] = false;
-	event_enabling_room2[27] = false;
-	event_enabling_room2[28] = false;
-	event_enabling_room2[29] = false;
-	event_enabling_room2[30] = false;
-	event_enabling_room2[31] = false;
+	map->event_enabling_room2[0] = false;
+	map->event_enabling_room2[1] = true;// Go back to room 1
+	map->event_enabling_room2[2] = true;
+	map->event_enabling_room2[3] = true;
+	map->event_enabling_room2[4] = true;
+	map->event_enabling_room2[5] = true;
+	map->event_enabling_room2[6] = true;
+	map->event_enabling_room2[7] = true;
+	map->event_enabling_room2[8] = true;
+	map->event_enabling_room2[9] = true;
+	map->event_enabling_room2[10] = true;
+	map->event_enabling_room2[11] = true;// Sara conversation 1
+	map->event_enabling_room2[12] = true;
+	map->event_enabling_room2[13] = true;// Desktop droid
+	map->event_enabling_room2[14] = true;
+	map->event_enabling_room2[15] = true;
+	map->event_enabling_room2[16] = true;
+	map->event_enabling_room2[17] = false;// Sara conversation 2
+	map->event_enabling_room2[18] = true;
+	map->event_enabling_room2[19] = true;
+	map->event_enabling_room2[20] = true;// Entering speach
+	map->event_enabling_room2[21] = false;
+	map->event_enabling_room2[22] = false;
+	map->event_enabling_room2[23] = false;
+	map->event_enabling_room2[24] = false;
+	map->event_enabling_room2[25] = false;
+	map->event_enabling_room2[26] = false;
+	map->event_enabling_room2[27] = false;
+	map->event_enabling_room2[28] = false;
+	map->event_enabling_room2[29] = false;
+	map->event_enabling_room2[30] = false;
+	map->event_enabling_room2[31] = false;
 }
 static void Scene1_Loop(void) {
 	bool end_sequence;
@@ -2459,10 +2451,10 @@ static void Scene1_Loop(void) {
 	VIDEO_ClearScreenBuffer();
 	GFX_LoadPalette("PALETTES.DAT", "ISCN1.PCX", 256);
 
-	VIDEO_StringToScreenBuffer(50, 60, ui.txt_file[UI_TXT_SCN1I].line[10], FONT_BIG_WHITE);
-	VIDEO_StringToScreenBuffer(90, 85, ui.txt_file[UI_TXT_SCN1I].line[11], FONT_BIG_WHITE);
-	VIDEO_StringToScreenBuffer(90, 135, ui.txt_file[UI_TXT_SCN1I].line[12], FONT_SLIM_WHITE);
-	VIDEO_StringToScreenBuffer(160, 135, ui.txt_file[UI_TXT_SCN1I].line[13], FONT_SLIM_WHITE);
+	VIDEO_StringToScreenBuffer(50, 60, ui->txt_file[UI_TXT_SCN1I]->line[10], FONT_BIG_BLACK);
+	VIDEO_StringToScreenBuffer(90, 85, ui->txt_file[UI_TXT_SCN1I]->line[11], FONT_BIG_BLACK);
+	VIDEO_StringToScreenBuffer(90, 135, ui->txt_file[UI_TXT_SCN1I]->line[12], FONT_SLIM_WHITE);
+	VIDEO_StringToScreenBuffer(160, 135, ui->txt_file[UI_TXT_SCN1I]->line[13], FONT_SLIM_WHITE);
 
 	VIDEO_VSync();
 	VIDEO_ScreenBufferToVRAM();
@@ -2478,6 +2470,7 @@ static void Scene1_Loop(void) {
 	}
 
 	VIDEO_FadeOut(4);
+	VIDEO_ClearScreenBuffer();
 
 	tutorial = false;
 	scene_step = 0;
@@ -2492,7 +2485,7 @@ static void Scene1_Loop(void) {
 		case 1:// Room 1. Outside doscity
 			Scene1_LoadRoom1();
 			ACTOR_SetPosition(1 << 4, 22 << 4, ACTOR_FACING_RIGHT);
-			CAM_Init(map.width_px, map.height_px, 0 << 4, 18 << 4);// Initialize camera
+			CAM_Init(map->width_px, map->height_px, 0 << 4, 18 << 4);// Initialize camera
 			MAP_DrawMapToMapVideoBuffer();
 			Update(true);
 			Update(true);
@@ -2501,7 +2494,7 @@ static void Scene1_Loop(void) {
 		case 2:// Room 2. Inside police office
 			Scene1_LoadRoom2();
 			ACTOR_SetPosition(46 << 4, 49 << 4, ACTOR_FACING_LEFT);
-			CAM_Init(map.width_px, map.height_px, 30 << 4, 42 << 4);// Initialize camera
+			CAM_Init(map->width_px, map->height_px, 30 << 4, 42 << 4);// Initialize camera
 			MAP_DrawMapToMapVideoBuffer();
 			Update(true);
 			Update(true);
@@ -2518,11 +2511,13 @@ static void Scene1_Loop(void) {
 	// Loop until the game is over
 	while (engine.ingame) {
 
+		if (ui->pause) gdb_checkpoint();
+
 		switch (engine.room) {
 			case 1:// Outside
-				if (!ui.freeze) {
+				if (!ui->freeze) {
 					// Hotspots
-					if (!actor.mode_combat) {
+					if (!actor->mode_combat) {
 						// Check point on object or enemy
 						switch (cursor.point_on & 0xFF) {
 							case ENTITY_ID_HSPOT:// Hotspot
@@ -2530,9 +2525,9 @@ static void Scene1_Loop(void) {
 									case 0:// No hotspot, WTF??
 										break;
 									case 1:// Paint
-										if (hotspot_enabling_room1[1]) {
+										if (map->hotspot_enabling_room1[1]) {
 											if (cursor.left_click) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 101, 102, 103, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 101, 102, 103, false, 100);
 
 											} else {
 												UI_ShowDescription(UI_TXT_SCN1H, 1);
@@ -2540,17 +2535,17 @@ static void Scene1_Loop(void) {
 										}
 										break;
 									case 2:// Cult door
-										if (hotspot_enabling_room1[2]) {
+										if (map->hotspot_enabling_room1[2]) {
 											if (cursor.left_click) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 104, 105, 106, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 104, 105, 106, false, 100);
 												while (!UI_IsSpeechFinished()) {
 													Update(false);
 												}
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 107, 108, 109, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 107, 108, 109, false, 100);
 												while (!UI_IsSpeechFinished()) {
 													Update(false);
 												}
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 110, 111, 112, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 110, 111, 112, false, 100);
 
 											} else {
 												UI_ShowDescription(UI_TXT_SCN1H, 2);
@@ -2558,9 +2553,9 @@ static void Scene1_Loop(void) {
 										}
 										break;
 									case 3:// Container
-										if (hotspot_enabling_room1[3]) {
+										if (map->hotspot_enabling_room1[3]) {
 											if (cursor.left_click) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 113, 114, 115, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 113, 114, 115, false, 100);
 
 											} else {
 												UI_ShowDescription(UI_TXT_SCN1H, 3);
@@ -2568,103 +2563,103 @@ static void Scene1_Loop(void) {
 										}
 										break;
 									case 4:// Bed
-										if (hotspot_enabling_room1[4]) {
+										if (map->hotspot_enabling_room1[4]) {
 											if (cursor.left_click) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 116, 117, 118, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 116, 117, 118, false, 100);
 											} else {
 												UI_ShowDescription(UI_TXT_SCN1H, 4);
 											}
 										}
 										break;
 									case 5:// Garbage
-										if (hotspot_enabling_room1[5]) {
+										if (map->hotspot_enabling_room1[5]) {
 											if (cursor.left_click) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 119, 120, 121, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 119, 120, 121, false, 100);
 											} else {
 												UI_ShowDescription(UI_TXT_SCN1H, 5);
 											}
 										}
 										break;
 									case 6:// Police office
-										if (hotspot_enabling_room1[6]) {
+										if (map->hotspot_enabling_room1[6]) {
 											if (cursor.left_click) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 122, 123, 124, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 122, 123, 124, false, 100);
 											} else {
 												UI_ShowDescription(UI_TXT_SCN1H, 6);
 											}
 										}
 										break;
 									case 7:// Accident
-										if (hotspot_enabling_room1[7]) {
+										if (map->hotspot_enabling_room1[7]) {
 											if (cursor.left_click) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 125, 126, 127, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 125, 126, 127, false, 100);
 												while (!UI_IsSpeechFinished()) {
 													Update(false);
 												}
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 128, 129, 130, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 128, 129, 130, false, 100);
 											} else {
 												UI_ShowDescription(UI_TXT_SCN1H, 7);
 											}
 										}
 										break;
 									case 8:// Paint
-										if (hotspot_enabling_room1[8]) {
+										if (map->hotspot_enabling_room1[8]) {
 											if (cursor.left_click) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 131, 132, 133, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 131, 132, 133, false, 100);
 											} else {
 												UI_ShowDescription(UI_TXT_SCN1H, 8);
 											}
 										}
 										break;
 									case 9:// Paint
-										if (hotspot_enabling_room1[9]) {
+										if (map->hotspot_enabling_room1[9]) {
 											if (cursor.left_click) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 134, 135, 136, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 134, 135, 136, false, 100);
 												while (!UI_IsSpeechFinished()) {
 													Update(false);
 												}
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 137, 138, 139, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 137, 138, 139, false, 100);
 											} else {
 												UI_ShowDescription(UI_TXT_SCN1H, 9);
 											}
 										}
 										break;
 									case 10:// Paint
-										if (hotspot_enabling_room1[10]) {
+										if (map->hotspot_enabling_room1[10]) {
 											if (cursor.left_click) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 140, 141, 142, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 140, 141, 142, false, 100);
 											} else {
 												UI_ShowDescription(UI_TXT_SCN1H, 10);
 											}
 										}
 										break;
 									case 11:// XXX
-										if (hotspot_enabling_room1[11]) {
+										if (map->hotspot_enabling_room1[11]) {
 											if (cursor.left_click) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 143, 144, 145, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 143, 144, 145, false, 100);
 											} else {
 												UI_ShowDescription(UI_TXT_SCN1H, 11);
 											}
 										}
 										break;
 									case 12:// Spare
-										if (hotspot_enabling_room1[12]) {
+										if (map->hotspot_enabling_room1[12]) {
 										}
 										break;
 									case 13:// Spare
-										if (hotspot_enabling_room1[13]) {
+										if (map->hotspot_enabling_room1[13]) {
 										}
 										break;
 									case 14:// Spare
-										if (hotspot_enabling_room1[14]) {
+										if (map->hotspot_enabling_room1[14]) {
 										}
 										break;
 									case 15:// Spare
-										if (hotspot_enabling_room1[15]) {
+										if (map->hotspot_enabling_room1[15]) {
 										}
 										break;
 									case 16:// Spare
-										if (hotspot_enabling_room1[16]) {
+										if (map->hotspot_enabling_room1[16]) {
 										}
 										break;
 									default:
@@ -2676,10 +2671,10 @@ static void Scene1_Loop(void) {
 					}
 
 					// Events
-					actor_tile_num = MAP_GetTileNumber(actor.pos_x + (gfx_sprite_stack[actor.sprite_num].width_px >> 1), actor.pos_y + (gfx_sprite_stack[actor.sprite_num].height_px >> 1));
-					switch ((map.layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
+					actor_tile_num = MAP_GetTileNumber(actor->pos_x + (gfx_sprite_stack[actor->sprite_num].width_px >> 1), actor->pos_y + (gfx_sprite_stack[actor->sprite_num].height_px >> 1));
+					switch ((map->layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
 						case 1:// Event 1. Enter door. Go to room 2
-							if (event_enabling_room1[1]) {
+							if (map->event_enabling_room1[1]) {
 								VIDEO_FadeOut(4);
 
 								NPC_UnloadNpcs();
@@ -2694,7 +2689,7 @@ static void Scene1_Loop(void) {
 								Scene1_LoadRoom2();
 
 								ACTOR_SetPosition(46 << 4, 49 << 4, ACTOR_FACING_LEFT);
-								CAM_Init(map.width_px, map.height_px, 30 << 4, 42 << 4);// Initialize camera
+								CAM_Init(map->width_px, map->height_px, 30 << 4, 42 << 4);// Initialize camera
 								MAP_DrawMapToMapVideoBuffer();
 
 								Update(true);
@@ -2704,14 +2699,14 @@ static void Scene1_Loop(void) {
 
 								VIDEO_FadeIn(1);
 
-								ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
+								ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
 								ACTOR_SetCombatMode(false);
-								UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 61, 62, 63, false, 100);
+								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 61, 62, 63, false, 100);
 							}
 							break;
 						case 2:// Event 2. Thugs
-							if (event_enabling_room1[2]) {
-								event_enabling_room1[2] = false;// Clear event 2
+							if (map->event_enabling_room1[2]) {
+								map->event_enabling_room1[2] = false;// Clear event 2
 								sequence_step = 0;
 
 								ACTOR_SetFreeze(true);
@@ -2757,56 +2752,56 @@ static void Scene1_Loop(void) {
 											if (AwaitDelayTime()) sequence_step++;
 											break;
 										case 10://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 37, 38, 39, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 37, 38, 39, true, 100);
 											sequence_step++;
 											break;
 										case 11://
 											if (UI_IsSpeechFinished()) sequence_step++;
 											break;
 										case 12://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 40, 41, 42, true, 60);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 40, 41, 42, true, 60);
 											sequence_step++;
 											break;
 										case 13://
 											if (UI_IsSpeechFinished()) sequence_step++;
 											break;
 										case 14://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 43, 44, 45, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 43, 44, 45, true, 100);
 											sequence_step++;
 											break;
 										case 15://
 											if (UI_IsSpeechFinished()) sequence_step++;
 											break;
 										case 16://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 46, 47, 48, false, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 46, 47, 48, false, 100);
 											sequence_step++;
 											break;
 										case 17://
 											if (UI_IsSpeechFinished()) sequence_step++;
 											break;
 										case 18://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 49, 50, 51, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 49, 50, 51, true, 100);
 											sequence_step++;
 											break;
 										case 19://
 											if (UI_IsSpeechFinished()) sequence_step++;
 											break;
 										case 20://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY4_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 52, 53, 54, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY4_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 52, 53, 54, true, 100);
 											sequence_step++;
 											break;
 										case 21://
 											if (UI_IsSpeechFinished()) sequence_step++;
 											break;
 										case 22://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY5_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 55, 56, 57, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY5_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 55, 56, 57, true, 100);
 											sequence_step++;
 											break;
 										case 23://
 											if (UI_IsSpeechFinished()) sequence_step++;
 											break;
 										case 24://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 58, 59, 60, false, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 58, 59, 60, false, 100);
 											sequence_step++;
 											break;
 										case 25://
@@ -2837,65 +2832,65 @@ static void Scene1_Loop(void) {
 							}
 							break;
 						case 3:// Event 3. Blocked path
-							if (event_enabling_room1[3]) {
+							if (map->event_enabling_room1[3]) {
 								// Clear event 3
-								event_enabling_room1[3] = false;
-								UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 1, 2, 3, false, 100);
+								map->event_enabling_room1[3] = false;
+								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 1, 2, 3, false, 100);
 							}
 							break;
 						case 4:// Event 4. Cultists
-							if (event_enabling_room1[4]) {
+							if (map->event_enabling_room1[4]) {
 								// Clear event 4
-								event_enabling_room1[4] = false;
-								UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 4, 5, 6, true, 100);
+								map->event_enabling_room1[4] = false;
+								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 4, 5, 6, true, 100);
 								while (!UI_IsSpeechFinished()) {
 									Update(false);
 								}
-								UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 7, 8, 9, false, 100);
+								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 7, 8, 9, false, 100);
 								while (!UI_IsSpeechFinished()) {
 									Update(false);
 								}
-								UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 10, 11, 12, true, 100);
+								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 10, 11, 12, true, 100);
 								while (!UI_IsSpeechFinished()) {
 									Update(false);
 								}
-								UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 13, 14, 15, true, 100);
+								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 13, 14, 15, true, 100);
 								while (!UI_IsSpeechFinished()) {
 									Update(false);
 								}
-								UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 16, 17, 18, false, 100);
+								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 16, 17, 18, false, 100);
 								while (!UI_IsSpeechFinished()) {
 									Update(false);
 								}
-								UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 19, 20, 21, false, 100);
+								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 19, 20, 21, false, 100);
 								while (!UI_IsSpeechFinished()) {
 									Update(false);
 								}
-								UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 22, 23, 24, false, 100);
+								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 22, 23, 24, false, 100);
 							}
 							break;
 						case 5:// Event 5. XXX
-							if (event_enabling_room1[5]) {
+							if (map->event_enabling_room1[5]) {
 								// Clear event 5
-								event_enabling_room1[5] = false;
-								UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 25, 26, 27, true, 100);
+								map->event_enabling_room1[5] = false;
+								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 25, 26, 27, true, 100);
 								while (!UI_IsSpeechFinished()) {
 									Update(false);
 								}
-								UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 28, 29, 30, false, 100);
+								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 28, 29, 30, false, 100);
 								while (!UI_IsSpeechFinished()) {
 									Update(false);
 								}
-								UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 31, 32, 33, false, 100);
+								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 31, 32, 33, false, 100);
 								while (!UI_IsSpeechFinished()) {
 									Update(false);
 								}
-								UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 34, 35, 36, true, 100);
+								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 34, 35, 36, true, 100);
 							}
 							break;
 						case 6:// Event 6. Open door
-							if (event_enabling_room1[6]) {
-								event_enabling_room1[6] = false;
+							if (map->event_enabling_room1[6]) {
+								map->event_enabling_room1[6] = false;
 
 								MAP_HideSwapableTile(72 << 4, 1 << 4);
 								MAP_HideSwapableTile(73 << 4, 1 << 4);
@@ -2914,19 +2909,19 @@ static void Scene1_Loop(void) {
 
 					// Disable event 4 if cultist are not at door
 					if ((enemy[0].status_behavior != ENEMY_STATUS_SLEEP) && (enemy[1].status_behavior != ENEMY_STATUS_SLEEP)) {
-						event_enabling_room1[4] = false;
+						map->event_enabling_room1[4] = false;
 					}
 
 					// Disable event 5 if cultist are not at door
 					if (enemy[2].status_behavior != ENEMY_STATUS_SLEEP) {
-						event_enabling_room1[5] = false;
+						map->event_enabling_room1[5] = false;
 					}
 				}
 				break;
 			case 2:// Police office
-				if (!ui.freeze) {
+				if (!ui->freeze) {
 					// Hotspots
-					if (!actor.mode_combat) {
+					if (!actor->mode_combat) {
 						// Check point on object or enemy
 						switch (cursor.point_on & 0xFF) {
 							case ENTITY_ID_HSPOT:// Hotspot
@@ -2934,9 +2929,9 @@ static void Scene1_Loop(void) {
 									case 0:// No hotspot, WTF??
 										break;
 									case 1:// Camera
-										if (hotspot_enabling_room2[1]) {
+										if (map->hotspot_enabling_room2[1]) {
 											if (cursor.left_click) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 146, 147, 148, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 146, 147, 148, false, 100);
 
 											} else {
 												UI_ShowDescription(UI_TXT_SCN1H, 13);
@@ -2944,9 +2939,9 @@ static void Scene1_Loop(void) {
 										}
 										break;
 									case 2:// Computer
-										if (hotspot_enabling_room2[2]) {
+										if (map->hotspot_enabling_room2[2]) {
 											if (cursor.left_click) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 149, 150, 151, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 149, 150, 151, false, 100);
 
 											} else {
 												UI_ShowDescription(UI_TXT_SCN1H, 14);
@@ -2954,9 +2949,9 @@ static void Scene1_Loop(void) {
 										}
 										break;
 									case 3:// Label
-										if (hotspot_enabling_room2[3]) {
+										if (map->hotspot_enabling_room2[3]) {
 											if (cursor.left_click) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 152, 153, 154, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 152, 153, 154, false, 100);
 
 											} else {
 												UI_ShowDescription(UI_TXT_SCN1H, 15);
@@ -2964,9 +2959,9 @@ static void Scene1_Loop(void) {
 										}
 										break;
 									case 4:// Gun
-										if (hotspot_enabling_room2[4]) {
+										if (map->hotspot_enabling_room2[4]) {
 											if (cursor.left_click) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 155, 156, 157, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 155, 156, 157, false, 100);
 
 											} else {
 												UI_ShowDescription(UI_TXT_SCN1H, 16);
@@ -2974,9 +2969,9 @@ static void Scene1_Loop(void) {
 										}
 										break;
 									case 5:// Shootgun
-										if (hotspot_enabling_room2[5]) {
+										if (map->hotspot_enabling_room2[5]) {
 											if (cursor.left_click) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 158, 159, 160, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 158, 159, 160, false, 100);
 
 											} else {
 												UI_ShowDescription(UI_TXT_SCN1H, 17);
@@ -2984,9 +2979,9 @@ static void Scene1_Loop(void) {
 										}
 										break;
 									case 6:// UZI
-										if (hotspot_enabling_room2[6]) {
+										if (map->hotspot_enabling_room2[6]) {
 											if (cursor.left_click) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 161, 162, 163, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 161, 162, 163, false, 100);
 
 											} else {
 												UI_ShowDescription(UI_TXT_SCN1H, 18);
@@ -2994,9 +2989,9 @@ static void Scene1_Loop(void) {
 										}
 										break;
 									case 7:// Rifle
-										if (hotspot_enabling_room2[7]) {
+										if (map->hotspot_enabling_room2[7]) {
 											if (cursor.left_click) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 164, 165, 166, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 164, 165, 166, false, 100);
 
 											} else {
 												UI_ShowDescription(UI_TXT_SCN1H, 19);
@@ -3004,9 +2999,9 @@ static void Scene1_Loop(void) {
 										}
 										break;
 									case 8:// Ring
-										if (hotspot_enabling_room2[8]) {
+										if (map->hotspot_enabling_room2[8]) {
 											if (cursor.left_click) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 167, 168, 169, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 167, 168, 169, false, 100);
 
 											} else {
 												UI_ShowDescription(UI_TXT_SCN1H, 20);
@@ -3014,9 +3009,9 @@ static void Scene1_Loop(void) {
 										}
 										break;
 									case 9:// Spare
-										if (hotspot_enabling_room2[9]) {
+										if (map->hotspot_enabling_room2[9]) {
 											if (cursor.left_click) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 170, 171, 172, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 170, 171, 172, false, 100);
 
 											} else {
 												UI_ShowDescription(UI_TXT_SCN1H, 21);
@@ -3024,31 +3019,31 @@ static void Scene1_Loop(void) {
 										}
 										break;
 									case 10:// Spare
-										if (hotspot_enabling_room2[10]) {
+										if (map->hotspot_enabling_room2[10]) {
 										}
 										break;
 									case 11:// Spare
-										if (hotspot_enabling_room2[11]) {
+										if (map->hotspot_enabling_room2[11]) {
 										}
 										break;
 									case 12:// Spare
-										if (hotspot_enabling_room2[12]) {
+										if (map->hotspot_enabling_room2[12]) {
 										}
 										break;
 									case 13:// Spare
-										if (hotspot_enabling_room2[13]) {
+										if (map->hotspot_enabling_room2[13]) {
 										}
 										break;
 									case 14:// Spare
-										if (hotspot_enabling_room2[14]) {
+										if (map->hotspot_enabling_room2[14]) {
 										}
 										break;
 									case 15:// Spare
-										if (hotspot_enabling_room2[15]) {
+										if (map->hotspot_enabling_room2[15]) {
 										}
 										break;
 									case 16:// Spare
-										if (hotspot_enabling_room2[16]) {
+										if (map->hotspot_enabling_room2[16]) {
 										}
 										break;
 									default:
@@ -3061,7 +3056,7 @@ static void Scene1_Loop(void) {
 										break;
 									case 1:// Sara
 										if (cursor.left_click) {
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 173, 174, 175, false, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 173, 174, 175, false, 100);
 
 										} else {
 											UI_ShowDescription(UI_TXT_SCN1H, 22);
@@ -3069,7 +3064,7 @@ static void Scene1_Loop(void) {
 										break;
 									case 2:// Office droid
 										if (cursor.left_click) {
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 190, 191, 192, false, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 190, 191, 192, false, 100);
 
 										} else {
 											UI_ShowDescription(UI_TXT_SCN1H, 23);
@@ -3078,9 +3073,9 @@ static void Scene1_Loop(void) {
 									case 3:// Agent
 									case 4:// Agent
 										if (cursor.left_click) {
-											if (scene_step == 0) UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 178, 179, 355, false, 100);
+											if (scene_step == 0) UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 178, 179, 355, false, 100);
 											else
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 194, 195, 196, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 194, 195, 196, false, 100);
 
 										} else {
 											if (scene_step == 0) UI_ShowDescription(UI_TXT_SCN1H, 25);
@@ -3090,7 +3085,7 @@ static void Scene1_Loop(void) {
 										break;
 									case 5:// Boss
 										if (cursor.left_click) {
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 176, 177, 355, false, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 176, 177, 355, false, 100);
 
 										} else {
 											UI_ShowDescription(UI_TXT_SCN1H, 24);
@@ -3101,7 +3096,7 @@ static void Scene1_Loop(void) {
 									case 8:// Droid
 									case 9:// Droid
 										if (cursor.left_click) {
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 190, 191, 192, false, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 190, 191, 192, false, 100);
 
 										} else {
 											UI_ShowDescription(UI_TXT_SCN1H, 23);
@@ -3117,10 +3112,10 @@ static void Scene1_Loop(void) {
 					}
 
 					// Events
-					actor_tile_num = MAP_GetTileNumber(actor.pos_x + (gfx_sprite_stack[actor.sprite_num].width_px >> 1), actor.pos_y + (gfx_sprite_stack[actor.sprite_num].height_px >> 1));
-					switch ((map.layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
+					actor_tile_num = MAP_GetTileNumber(actor->pos_x + (gfx_sprite_stack[actor->sprite_num].width_px >> 1), actor->pos_y + (gfx_sprite_stack[actor->sprite_num].height_px >> 1));
+					switch ((map->layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
 						case 1:// Event 1. Go from map 2 to map 1 or end of scene
-							if (event_enabling_room2[1]) {
+							if (map->event_enabling_room2[1]) {
 								VIDEO_FadeOut(4);
 
 								NPC_UnloadNpcs();
@@ -3136,7 +3131,7 @@ static void Scene1_Loop(void) {
 									case 0:// go to map 1
 										Scene1_LoadRoom1();
 										ACTOR_SetPosition(73 << 4, 5 << 4, ACTOR_FACING_DOWN);
-										CAM_Init(map.width_px, map.height_px, 60 << 4, 0 << 4);// Initialize camera
+										CAM_Init(map->width_px, map->height_px, 60 << 4, 0 << 4);// Initialize camera
 										MAP_DrawMapToMapVideoBuffer();
 
 										Update(true);
@@ -3159,8 +3154,8 @@ static void Scene1_Loop(void) {
 							}
 							break;
 						case 2:// Event 18. Bathroom door
-							if (event_enabling_room2[2]) {
-								event_enabling_room2[2] = false;
+							if (map->event_enabling_room2[2]) {
+								map->event_enabling_room2[2] = false;
 
 								MAP_HideSwapableTile(15 << 4, 51 << 4);
 								MAP_HideSwapableTile(16 << 4, 51 << 4);
@@ -3176,8 +3171,8 @@ static void Scene1_Loop(void) {
 							}
 							break;
 						case 3:// Event 3. Private area door
-							if (event_enabling_room2[3]) {
-								event_enabling_room2[3] = false;
+							if (map->event_enabling_room2[3]) {
+								map->event_enabling_room2[3] = false;
 
 								MAP_HideSwapableTile(21 << 4, 41 << 4);
 								MAP_HideSwapableTile(22 << 4, 41 << 4);
@@ -3193,8 +3188,8 @@ static void Scene1_Loop(void) {
 							}
 							break;
 						case 4:// Event 4. Boss room door
-							if (event_enabling_room2[4]) {
-								event_enabling_room2[4] = false;
+							if (map->event_enabling_room2[4]) {
+								map->event_enabling_room2[4] = false;
 
 								MAP_HideSwapableTile(7 << 4, 35 << 4);
 								MAP_HideSwapableTile(8 << 4, 35 << 4);
@@ -3210,8 +3205,8 @@ static void Scene1_Loop(void) {
 							}
 							break;
 						case 5:// Event 5. Practice room door
-							if (event_enabling_room2[5]) {
-								event_enabling_room2[5] = false;
+							if (map->event_enabling_room2[5]) {
+								map->event_enabling_room2[5] = false;
 
 								if (tutorial) {
 									tutorial = false;
@@ -3232,8 +3227,8 @@ static void Scene1_Loop(void) {
 							}
 							break;
 						case 6:// Event 6. Practice room pistol
-							if (event_enabling_room2[6]) {
-								event_enabling_room2[6] = false;
+							if (map->event_enabling_room2[6]) {
+								map->event_enabling_room2[6] = false;
 
 								if (!OBJECT_IsLoaded(1)) OBJECT_LoadObject("OBJECT3.DAT", 1, ENTITY_ID_TARGET, SPRITE_GRAPHICS_ID_OBJECT2, SPRITE_GRAPHICS_ID_OBJECT2_PORTAIT, (4 << 4) + 8, 7 << 4);
 
@@ -3242,40 +3237,34 @@ static void Scene1_Loop(void) {
 								while (!end_sequence) {
 									switch (sequence_step) {
 										case 0://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 252, 253, 254, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 252, 253, 254, true, 100);
 											sequence_step++;
 											break;
 										case 1://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 255, 256, 257, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 255, 256, 257, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 2://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 258, 259, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 258, 259, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 3://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 260, 261, 262, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 263, 264, 265, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 4://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 263, 264, 265, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 310, 355, 355, false, 100);
 												sequence_step++;
 											}
 											break;
 										case 5://
-											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 310, 355, 355, false, 100);
-												sequence_step++;
-											}
-											break;
-										case 6://
 											if (UI_IsSpeechFinished()) {
 												end_sequence = true;
 											}
@@ -3288,15 +3277,15 @@ static void Scene1_Loop(void) {
 								}
 
 								// Set pistol
-								ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_PISTOL);
+								ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_PISTOL);
 								ACTOR_SetCombatMode(true);
 								ACTOR_SetBulletStatus(99, 0, 0, 0, 0);
 								ACTOR_Reload();
 							}
 							break;
 						case 7:// Event 7. Practice room shotgun
-							if (event_enabling_room2[7]) {
-								event_enabling_room2[7] = false;
+							if (map->event_enabling_room2[7]) {
+								map->event_enabling_room2[7] = false;
 
 								if (!OBJECT_IsLoaded(2)) OBJECT_LoadObject("OBJECT3.DAT", 2, ENTITY_ID_TARGET, SPRITE_GRAPHICS_ID_OBJECT2, SPRITE_GRAPHICS_ID_OBJECT2_PORTAIT, (9 << 4) + 8, 9 << 4);
 
@@ -3305,24 +3294,24 @@ static void Scene1_Loop(void) {
 								while (!end_sequence) {
 									switch (sequence_step) {
 										case 0://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 266, 267, 268, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 266, 267, 268, true, 100);
 											sequence_step++;
 											break;
 										case 1://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 269, 270, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 269, 270, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 2://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 264, 271, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 264, 271, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 3://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 309, 355, 355, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 309, 355, 355, false, 100);
 												sequence_step++;
 											}
 											break;
@@ -3340,15 +3329,15 @@ static void Scene1_Loop(void) {
 
 
 								// Set shotgun
-								ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_SHOTGUN);
+								ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_SHOTGUN);
 								ACTOR_SetCombatMode(true);
 								ACTOR_SetBulletStatus(0, 99, 0, 0, 0);
 								ACTOR_Reload();
 							}
 							break;
 						case 8:// Event 8. Practice room uzi
-							if (event_enabling_room2[8]) {
-								event_enabling_room2[8] = false;
+							if (map->event_enabling_room2[8]) {
+								map->event_enabling_room2[8] = false;
 
 								if (!OBJECT_IsLoaded(3)) OBJECT_LoadObject("OBJECT3.DAT", 3, ENTITY_ID_TARGET, SPRITE_GRAPHICS_ID_OBJECT2, SPRITE_GRAPHICS_ID_OBJECT2_PORTAIT, (14 << 4) + 8, 7 << 4);
 
@@ -3357,24 +3346,24 @@ static void Scene1_Loop(void) {
 								while (!end_sequence) {
 									switch (sequence_step) {
 										case 0://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 272, 273, 274, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 272, 273, 274, true, 100);
 											sequence_step++;
 											break;
 										case 1://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 275, 276, 277, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 275, 276, 277, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 2://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 264, 278, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 264, 278, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 3://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 310, 355, 355, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 310, 355, 355, false, 100);
 												sequence_step++;
 											}
 											break;
@@ -3391,15 +3380,15 @@ static void Scene1_Loop(void) {
 								}
 
 								// Set uzi
-								ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_UZI);
+								ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_UZI);
 								ACTOR_SetCombatMode(true);
 								ACTOR_SetBulletStatus(0, 0, 999, 0, 0);
 								ACTOR_Reload();
 							}
 							break;
 						case 9:// Event 9. Practice room rifle
-							if (event_enabling_room2[9]) {
-								event_enabling_room2[9] = false;
+							if (map->event_enabling_room2[9]) {
+								map->event_enabling_room2[9] = false;
 
 								if (!OBJECT_IsLoaded(4)) OBJECT_LoadObject("OBJECT3.DAT", 4, ENTITY_ID_TARGET, SPRITE_GRAPHICS_ID_OBJECT2, SPRITE_GRAPHICS_ID_OBJECT2_PORTAIT, (19 << 4) + 8, 6 << 4);
 
@@ -3408,30 +3397,30 @@ static void Scene1_Loop(void) {
 								while (!end_sequence) {
 									switch (sequence_step) {
 										case 0://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 279, 280, 281, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 279, 280, 281, true, 100);
 											sequence_step++;
 											break;
 										case 1://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 282, 283, 284, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 282, 283, 284, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 2://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 285, 286, 287, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 285, 286, 287, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 3://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 264, 288, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 264, 288, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 4://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 309, 355, 355, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 309, 355, 355, false, 100);
 												sequence_step++;
 											}
 											break;
@@ -3448,73 +3437,85 @@ static void Scene1_Loop(void) {
 								}
 
 								// Set snipper rifle
-								ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_SNIPPER);
+								ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_SNIPPER);
 								ACTOR_SetCombatMode(true);
 								ACTOR_SetBulletStatus(0, 0, 0, 99, 0);
 								ACTOR_Reload();
 							}
 							break;
 						case 10:// Event 10. Practice room ring
-							if (event_enabling_room2[10]) {
-								event_enabling_room2[10] = false;
+							if (map->event_enabling_room2[10]) {
+								map->event_enabling_room2[10] = false;
 
 								sequence_step = 0;
 								end_sequence = false;
 								while (!end_sequence) {
 									switch (sequence_step) {
 										case 0://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 289, 290, 291, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 289, 290, 291, true, 100);
 											sequence_step++;
 											break;
 										case 1://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 292, 293, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 292, 293, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 2://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 294, 295, 296, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 294, 295, 296, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 3://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 297, 298, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 297, 298, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 4://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 299, 300, 301, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 299, 300, 301, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 5://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 302, 303, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 302, 303, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 6://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 304, 305, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 304, 305, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 7://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 306, 307, 308, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 306, 307, 308, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 8://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 311, 355, 355, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 332, 333, 334, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 9://
+											if (UI_IsSpeechFinished()) {
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 335, 336, 337, true, 100);
+												sequence_step++;
+											}
+											break;
+										case 10://
+											if (UI_IsSpeechFinished()) {
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 311, 355, 355, false, 100);
+												sequence_step++;
+											}
+											break;
+										case 11://
 											if (UI_IsSpeechFinished()) {
 												end_sequence = true;
 											}
@@ -3529,164 +3530,164 @@ static void Scene1_Loop(void) {
 								ENEMY_SetBehavior(4, ENEMY_STATUS_CHASE);
 
 								// Set pistol
-								ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
+								ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
 								ACTOR_SetCombatMode(true);
 								ACTOR_SetBulletStatus(0, 0, 0, 0, 0);
 							}
 							break;
 						case 11:// Event 11. Sara conversation 1
-							if (event_enabling_room2[11]) {
-								event_enabling_room2[11] = false;
+							if (map->event_enabling_room2[11]) {
+								map->event_enabling_room2[11] = false;
 
 								sequence_step = 0;
 								end_sequence = false;
 								while (!end_sequence) {
 									switch (sequence_step) {
 										case 0://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 80, 355, 355, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 80, 355, 355, true, 100);
 											sequence_step++;
 											break;
 										case 1://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 81, 355, 355, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 81, 355, 355, false, 100);
 												sequence_step++;
 											}
 											break;
 										case 2://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 82, 355, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 82, 355, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 3://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 83, 355, 355, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 83, 355, 355, false, 100);
 												sequence_step++;
 											}
 											break;
 										case 4://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 84, 85, 86, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 84, 85, 86, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 5://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 87, 88, 355, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 87, 88, 355, false, 100);
 												sequence_step++;
 											}
 											break;
 										case 6://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 89, 90, 91, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 89, 90, 91, false, 100);
 												sequence_step++;
 											}
 											break;
 										case 7://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 92, 93, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 92, 93, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 8://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 94, 95, 96, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 94, 95, 96, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 9://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 97, 98, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 97, 98, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 10://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 99, 100, 101, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 99, 100, 101, false, 100);
 												sequence_step++;
 											}
 											break;
 										case 11://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 102, 103, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 102, 103, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 12://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 104, 105, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 104, 105, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 13://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 106, 107, 108, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 106, 107, 108, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 14://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 109, 355, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 109, 355, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 15://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 110, 111, 112, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 110, 111, 112, false, 100);
 												sequence_step++;
 											}
 											break;
 										case 16://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 113, 114, 115, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 113, 114, 115, false, 100);
 												sequence_step++;
 											}
 											break;
 										case 17://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 116, 117, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 116, 117, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 18://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 118, 119, 120, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 118, 119, 120, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 19://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 121, 122, 123, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 121, 122, 123, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 20://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 124, 125, 126, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 124, 125, 126, false, 100);
 												sequence_step++;
 											}
 											break;
 										case 21://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 127, 128, 129, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 127, 128, 129, false, 100);
 												sequence_step++;
 											}
 											break;
 										case 22://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 130, 131, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 130, 131, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 23://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 132, 133, 134, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_SARA_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 132, 133, 134, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 24://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 135, 136, 137, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 135, 136, 137, false, 100);
 												sequence_step++;
 											}
 											break;
@@ -3704,38 +3705,38 @@ static void Scene1_Loop(void) {
 							}
 							break;
 						case 12:// Event 12. Boss room
-							if (event_enabling_room2[12]) {
-								event_enabling_room2[12] = false;
+							if (map->event_enabling_room2[12]) {
+								map->event_enabling_room2[12] = false;
 
 								sequence_step = 0;
 								end_sequence = false;
 								while (!end_sequence) {
 									switch (sequence_step) {
 										case 0://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 140, 141, 142, false, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 140, 141, 142, false, 100);
 											sequence_step++;
 											break;
 										case 1://
 											if (UI_IsSpeechFinished()) {
 												sequence_step++;
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 143, 144, 145, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 143, 144, 145, false, 100);
 											}
 											break;
 										case 2://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_BOSS_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 146, 147, 148, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_BOSS_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 146, 147, 148, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 3://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 149, 355, 355, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 149, 355, 355, false, 100);
 												sequence_step++;
 											}
 											break;
 										case 4://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_BOSS_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 150, 151, 152, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_BOSS_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 150, 151, 152, true, 100);
 												sequence_step++;
 											}
 											break;
@@ -3754,43 +3755,43 @@ static void Scene1_Loop(void) {
 							}
 							break;
 						case 13:// Event 13. Droid conversation
-							if (event_enabling_room2[13]) {
-								event_enabling_room2[13] = false;
+							if (map->event_enabling_room2[13]) {
+								map->event_enabling_room2[13] = false;
 								sequence_step = 0;
 								end_sequence = false;
 								while (!end_sequence) {
 									switch (sequence_step) {
 										case 0://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 65, 66, 67, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 65, 66, 67, true, 100);
 											sequence_step++;
 											break;
 										case 1://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 68, 355, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 68, 355, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 2://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 69, 70, 71, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 69, 70, 71, false, 100);
 												sequence_step++;
 											}
 											break;
 										case 3://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 72, 73, 74, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 72, 73, 74, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 4://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 75, 76, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 75, 76, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 5://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 77, 355, 355, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 77, 355, 355, false, 100);
 												sequence_step++;
 											}
 											break;
@@ -3809,15 +3810,15 @@ static void Scene1_Loop(void) {
 							}
 							break;
 						case 14:// Event 14. Bathroom droid conversation
-							if (event_enabling_room2[14]) {
-								event_enabling_room2[14] = false;
+							if (map->event_enabling_room2[14]) {
+								map->event_enabling_room2[14] = false;
 
 								sequence_step = 0;
 								end_sequence = false;
 								while (!end_sequence) {
 									switch (sequence_step) {
 										case 0://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 312, 313, 314, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 312, 313, 314, true, 100);
 											sequence_step++;
 											break;
 										case 1://
@@ -3835,26 +3836,26 @@ static void Scene1_Loop(void) {
 							}
 							break;
 						case 15:// Event 15. Enemy in jail 1
-							if (event_enabling_room2[15]) {
-								event_enabling_room2[15] = false;
+							if (map->event_enabling_room2[15]) {
+								map->event_enabling_room2[15] = false;
 
 								sequence_step = 0;
 								end_sequence = false;
 								while (!end_sequence) {
 									switch (sequence_step) {
 										case 0://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 315, 316, 355, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 315, 316, 355, true, 100);
 											sequence_step++;
 											break;
 										case 1://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 317, 318, 319, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 317, 318, 319, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 2://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 320, 321, 355, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 320, 321, 355, false, 100);
 												sequence_step++;
 											}
 											break;
@@ -3873,26 +3874,26 @@ static void Scene1_Loop(void) {
 							}
 							break;
 						case 16:// Event 16. Enemy in jail 2
-							if (event_enabling_room2[16]) {
-								event_enabling_room2[16] = false;
+							if (map->event_enabling_room2[16]) {
+								map->event_enabling_room2[16] = false;
 
 								sequence_step = 0;
 								end_sequence = false;
 								while (!end_sequence) {
 									switch (sequence_step) {
 										case 0://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 322, 323, 324, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 322, 323, 324, true, 100);
 											sequence_step++;
 											break;
 										case 1://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 325, 326, 327, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 325, 326, 327, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 2://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 328, 329, 330, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 328, 329, 330, false, 100);
 												sequence_step++;
 											}
 											break;
@@ -3911,151 +3912,151 @@ static void Scene1_Loop(void) {
 							}
 							break;
 						case 17:// Event 17. Sara conversation 2
-							if (event_enabling_room2[17]) {
-								event_enabling_room2[17] = false;
+							if (map->event_enabling_room2[17]) {
+								map->event_enabling_room2[17] = false;
 							}
 							break;
 						case 18:// Event 18. Agent conversation
-							if (event_enabling_room2[18]) {
-								event_enabling_room2[18] = false;
+							if (map->event_enabling_room2[18]) {
+								map->event_enabling_room2[18] = false;
 
 								sequence_step = 0;
 								end_sequence = false;
 								while (!end_sequence) {
 									switch (sequence_step) {
 										case 0://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_BOSS_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 153, 154, 355, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_BOSS_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 153, 154, 355, true, 100);
 											sequence_step++;
 											break;
 										case 1://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_BOSS_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 213, 214, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_BOSS_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 213, 214, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 2://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 156, 157, 158, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 156, 157, 158, false, 100);
 												sequence_step++;
 											}
 											break;
 										case 3://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 159, 160, 161, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 159, 160, 161, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 4://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 162, 163, 355, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 162, 163, 355, false, 100);
 												sequence_step++;
 											}
 											break;
 										case 5://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 164, 165, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 164, 165, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 6://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 166, 167, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 166, 167, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 7://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 168, 355, 355, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 168, 355, 355, false, 100);
 												sequence_step++;
 											}
 											break;
 										case 8://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 169, 170, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 169, 170, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 9://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 171, 172, 173, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 171, 172, 173, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 10://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 174, 175, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 174, 175, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 11://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 176, 177, 355, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 176, 177, 355, false, 100);
 												sequence_step++;
 											}
 											break;
 										case 12://
 											if (UI_IsSpeechFinished()) {
 												sequence_step++;
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 178, 179, 180, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 178, 179, 180, true, 100);
 											}
 											break;
 										case 13://
 											if (UI_IsSpeechFinished()) {
 												sequence_step++;
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 181, 182, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 181, 182, 355, true, 100);
 											}
 											break;
 										case 14://
 											if (UI_IsSpeechFinished()) {
 												sequence_step++;
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 183, 184, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 183, 184, 355, true, 100);
 											}
 											break;
 										case 15://
 											if (UI_IsSpeechFinished()) {
 												sequence_step++;
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 185, 186, 187, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 185, 186, 187, true, 100);
 											}
 											break;
 										case 16://
 											if (UI_IsSpeechFinished()) {
 												sequence_step++;
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 188, 189, 190, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 188, 189, 190, false, 100);
 											}
 											break;
 										case 17://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 191, 355, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 191, 355, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 18://
 											if (UI_IsSpeechFinished()) {
 												sequence_step++;
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 192, 355, 355, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 192, 355, 355, false, 100);
 											}
 											break;
 										case 19://
 											if (UI_IsSpeechFinished()) {
 												sequence_step++;
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 193, 194, 195, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 193, 194, 195, true, 100);
 											}
 											break;
 										case 20://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 196, 197, 198, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 196, 197, 198, false, 100);
 												sequence_step++;
 											}
 											break;
 										case 21://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 199, 200, 201, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 199, 200, 201, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 22://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 202, 203, 204, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_AGENT2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 202, 203, 204, true, 100);
 												sequence_step++;
 											}
 											break;
@@ -4072,18 +4073,18 @@ static void Scene1_Loop(void) {
 											sequence_step++;
 											break;
 										case 25://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 205, 206, 355, false, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 205, 206, 355, false, 100);
 											sequence_step++;
 											break;
 										case 26://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_BOSS_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 207, 208, 209, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_BOSS_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 207, 208, 209, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 27://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_BOSS_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 210, 211, 212, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_BOSS_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 210, 211, 212, true, 100);
 												sequence_step++;
 											}
 											break;
@@ -4106,8 +4107,8 @@ static void Scene1_Loop(void) {
 							}
 							break;
 						case 19:// Event 19. Tutorial start
-							if (event_enabling_room2[19]) {
-								event_enabling_room2[19] = false;
+							if (map->event_enabling_room2[19]) {
+								map->event_enabling_room2[19] = false;
 
 								tutorial = true;
 								sequence_step = 0;
@@ -4115,42 +4116,42 @@ static void Scene1_Loop(void) {
 								while (!end_sequence) {
 									switch (sequence_step) {
 										case 0://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 235, 236, 237, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 235, 236, 237, true, 100);
 											sequence_step++;
 											break;
 										case 1://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 238, 239, 240, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 238, 239, 240, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 2://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 241, 242, 243, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 241, 242, 243, false, 100);
 												sequence_step++;
 											}
 											break;
 										case 4://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 244, 355, 355, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 244, 355, 355, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 5://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 245, 246, 247, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 245, 246, 247, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 6://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 248, 249, 250, true, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_NPC_DROID2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 248, 249, 250, true, 100);
 												sequence_step++;
 											}
 											break;
 										case 7://
 											if (UI_IsSpeechFinished()) {
-												UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 251, 355, 355, false, 100);
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 251, 355, 355, false, 100);
 												sequence_step++;
 											}
 											break;
@@ -4170,8 +4171,8 @@ static void Scene1_Loop(void) {
 							}
 							break;
 						case 20:// Event 20. Entering
-							if (event_enabling_room2[20]) {
-								event_enabling_room2[20] = false;
+							if (map->event_enabling_room2[20]) {
+								map->event_enabling_room2[20] = false;
 							}
 							break;
 						default:
@@ -4180,9 +4181,9 @@ static void Scene1_Loop(void) {
 				}
 
 				// Close bathroom door
-				if (((map.layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) != 2) {
-					if (!event_enabling_room2[2]) {
-						event_enabling_room2[2] = true;
+				if (((map->layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) != 2) {
+					if (!map->event_enabling_room2[2]) {
+						map->event_enabling_room2[2] = true;
 
 						MAP_ShowSwapableTile(15 << 4, 51 << 4);
 						MAP_ShowSwapableTile(16 << 4, 51 << 4);
@@ -4199,9 +4200,9 @@ static void Scene1_Loop(void) {
 				}
 
 				// Close private area door
-				if (((map.layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) != 3) {
-					if (!event_enabling_room2[3]) {
-						event_enabling_room2[3] = true;
+				if (((map->layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) != 3) {
+					if (!map->event_enabling_room2[3]) {
+						map->event_enabling_room2[3] = true;
 
 						MAP_ShowSwapableTile(21 << 4, 41 << 4);
 						MAP_ShowSwapableTile(22 << 4, 41 << 4);
@@ -4218,9 +4219,9 @@ static void Scene1_Loop(void) {
 				}
 
 				// Close boss room door
-				if (((map.layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) != 4) {
-					if (!event_enabling_room2[4]) {
-						event_enabling_room2[4] = true;
+				if (((map->layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) != 4) {
+					if (!map->event_enabling_room2[4]) {
+						map->event_enabling_room2[4] = true;
 
 						MAP_ShowSwapableTile(7 << 4, 35 << 4);
 						MAP_ShowSwapableTile(8 << 4, 35 << 4);
@@ -4237,9 +4238,9 @@ static void Scene1_Loop(void) {
 				}
 
 				// Close practice room door
-				if (((map.layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) != 5) {
-					if (!event_enabling_room2[5]) {
-						event_enabling_room2[5] = true;
+				if (((map->layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) != 5) {
+					if (!map->event_enabling_room2[5]) {
+						map->event_enabling_room2[5] = true;
 
 						MAP_ShowSwapableTile(25 << 4, 21 << 4);
 						MAP_ShowSwapableTile(26 << 4, 21 << 4);
@@ -4256,70 +4257,70 @@ static void Scene1_Loop(void) {
 				}
 
 				// Leave practice pistol area
-				if (((map.layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) != 6) {
-					if (!event_enabling_room2[6]) {
-						event_enabling_room2[6] = true;
+				if (((map->layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) != 6) {
+					if (!map->event_enabling_room2[6]) {
+						map->event_enabling_room2[6] = true;
 
 						OBJECT_UnloadObject(1);
 
 						// Set bare hands
-						ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
+						ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
 						ACTOR_SetCombatMode(false);
 						ACTOR_SetBulletStatus(99, 0, 0, 0, 0);
 					}
 				}
 
 				// Leave practice shotgun area
-				if (((map.layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) != 7) {
-					if (!event_enabling_room2[7]) {
-						event_enabling_room2[7] = true;
+				if (((map->layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) != 7) {
+					if (!map->event_enabling_room2[7]) {
+						map->event_enabling_room2[7] = true;
 
 						OBJECT_UnloadObject(2);
 
 						// Set bare hands
-						ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
+						ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
 						ACTOR_SetCombatMode(false);
 						ACTOR_SetBulletStatus(99, 0, 0, 0, 0);
 					}
 				}
 
 				// Leave practice uzi area
-				if (((map.layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) != 8) {
-					if (!event_enabling_room2[8]) {
-						event_enabling_room2[8] = true;
+				if (((map->layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) != 8) {
+					if (!map->event_enabling_room2[8]) {
+						map->event_enabling_room2[8] = true;
 
 						OBJECT_UnloadObject(3);
 
 						// Set bare hands
-						ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
+						ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
 						ACTOR_SetCombatMode(false);
 						ACTOR_SetBulletStatus(99, 0, 0, 0, 0);
 					}
 				}
 
 				// Leave practice rifle area
-				if (((map.layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) != 9) {
-					if (!event_enabling_room2[9]) {
-						event_enabling_room2[9] = true;
+				if (((map->layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) != 9) {
+					if (!map->event_enabling_room2[9]) {
+						map->event_enabling_room2[9] = true;
 
 						OBJECT_UnloadObject(4);
 
 						// Set bare hands
-						ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
+						ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
 						ACTOR_SetCombatMode(false);
 						ACTOR_SetBulletStatus(99, 0, 0, 0, 0);
 					}
 				}
 
 				// Leave practice fight area
-				if (((map.layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) != 10) {
-					if (!event_enabling_room2[10]) {
-						event_enabling_room2[10] = true;
+				if (((map->layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) != 10) {
+					if (!map->event_enabling_room2[10]) {
+						map->event_enabling_room2[10] = true;
 
 						ENEMY_SetBehavior(4, ENEMY_STATUS_STATIC_NPC);
 
 						// Set bare hands
-						ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
+						ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
 						ACTOR_SetCombatMode(false);
 						ACTOR_SetBulletStatus(99, 0, 0, 0, 0);
 					}
@@ -4329,10 +4330,10 @@ static void Scene1_Loop(void) {
 				break;
 		}
 
-		Update(!actor.action_dead);
+		Update(!actor->action_dead);
 
 		// Finish all if actor is dead
-		if (actor.status_dead) GameOver();
+		if (actor->status_dead) GameOver();
 	}
 
 	VIDEO_FadeOut(4);
@@ -4368,9 +4369,9 @@ static void Scene1_Outro(void) {
 				break;
 			case 1:// Load first outro scene
 				AUDIO_LoadSong(AUDIO_SONG_3);
-				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO1H.PCX", 266 * 165, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO2H.PCX", 140 * 140, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO3H.PCX", 140 * 100, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO1H.PCX", 266 * 165, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO2H.PCX", 140 * 140, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO3H.PCX", 140 * 100, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				step++;
 				break;
 			case 2:// Hide loading screen
@@ -4380,8 +4381,8 @@ static void Scene1_Outro(void) {
 			case 3:/// Scene 1 :: Agents waiting outside
 				VIDEO_ClearScreenBuffer();
 				GFX_LoadPalette("PALETTES.DAT", "OSCN1.PCX", 256);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 272, 171, 13, 11, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 16, 14);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 272, 171, 13, 11, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 16, 14);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				VIDEO_FadeIn(4);
@@ -4408,8 +4409,8 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 5://Sara speech
-				VIDEO_StringToScreenBuffer(116, 55, ui.txt_file[UI_TXT_SCN1I].line[35], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(116, 70, ui.txt_file[UI_TXT_SCN1I].line[36], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(116, 55, ui->txt_file[UI_TXT_SCN1I]->line[35], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(116, 70, ui->txt_file[UI_TXT_SCN1I]->line[36], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -4421,8 +4422,8 @@ static void Scene1_Outro(void) {
 				break;
 			case 6:// Just wait
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 272, 171, 13, 11, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 16, 14);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 272, 171, 13, 11, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 16, 14);
 				SetDelayTime(500);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -4437,8 +4438,8 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 8://Actor speech
-				VIDEO_StringToScreenBuffer(36, 10, ui.txt_file[UI_TXT_SCN1I].line[37], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(36, 25, ui.txt_file[UI_TXT_SCN1I].line[38], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(36, 10, ui->txt_file[UI_TXT_SCN1I]->line[37], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(36, 25, ui->txt_file[UI_TXT_SCN1I]->line[38], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -4450,8 +4451,8 @@ static void Scene1_Outro(void) {
 				break;
 			case 9:// Just wait
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 272, 171, 13, 11, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 16, 14);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 272, 171, 13, 11, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 16, 14);
 
 				SetDelayTime(500);
 				while (!AwaitDelayTime()) {
@@ -4467,8 +4468,8 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 11://Sara speech
-				VIDEO_StringToScreenBuffer(116, 55, ui.txt_file[UI_TXT_SCN1I].line[39], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(116, 70, ui.txt_file[UI_TXT_SCN1I].line[40], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(116, 55, ui->txt_file[UI_TXT_SCN1I]->line[39], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(116, 70, ui->txt_file[UI_TXT_SCN1I]->line[40], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -4480,8 +4481,8 @@ static void Scene1_Outro(void) {
 				break;
 			case 12:// Just wait
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 272, 171, 13, 11, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 16, 14);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 272, 171, 13, 11, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 16, 14);
 
 				SetDelayTime(500);
 				while (!AwaitDelayTime()) {
@@ -4497,7 +4498,7 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 14://Actor speech
-				VIDEO_StringToScreenBuffer(36, 25, ui.txt_file[UI_TXT_SCN1I].line[41], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(36, 25, ui->txt_file[UI_TXT_SCN1I]->line[41], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -4509,8 +4510,8 @@ static void Scene1_Outro(void) {
 				break;
 			case 15:// Clear screen and show image 2
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 30, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 30, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 13);
 				step++;
 				break;
 			case 16:// Just wait
@@ -4528,8 +4529,8 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 18://Sara speech
-				VIDEO_StringToScreenBuffer(66, 55, ui.txt_file[UI_TXT_SCN1I].line[43], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(66, 70, ui.txt_file[UI_TXT_SCN1I].line[44], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(66, 55, ui->txt_file[UI_TXT_SCN1I]->line[43], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(66, 70, ui->txt_file[UI_TXT_SCN1I]->line[44], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -4541,10 +4542,10 @@ static void Scene1_Outro(void) {
 				break;
 			case 19:// Show images 2 and 3
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 30, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 13);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 106, 160, 60, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 163, 63);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 30, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 106, 160, 60, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 163, 63);
 				step++;
 				break;
 			case 20:// Just wait
@@ -4556,8 +4557,8 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 21://Sara speech
-				VIDEO_StringToScreenBuffer(66, 55, ui.txt_file[UI_TXT_SCN1I].line[45], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(66, 70, ui.txt_file[UI_TXT_SCN1I].line[46], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(66, 55, ui->txt_file[UI_TXT_SCN1I]->line[45], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(66, 70, ui->txt_file[UI_TXT_SCN1I]->line[46], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -4568,10 +4569,10 @@ static void Scene1_Outro(void) {
 				break;
 			case 22:// Just wait
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 30, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 13);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 106, 160, 60, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 163, 63);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 30, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 106, 160, 60, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 163, 63);
 
 				SetDelayTime(500);
 				while (!AwaitDelayTime()) {
@@ -4580,8 +4581,8 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 23://Sara speech
-				VIDEO_StringToScreenBuffer(66, 55, ui.txt_file[UI_TXT_SCN1I].line[47], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(66, 70, ui.txt_file[UI_TXT_SCN1I].line[48], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(66, 55, ui->txt_file[UI_TXT_SCN1I]->line[47], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(66, 70, ui->txt_file[UI_TXT_SCN1I]->line[48], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -4593,10 +4594,10 @@ static void Scene1_Outro(void) {
 				break;
 			case 24:// Just wait
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 30, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 13);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 106, 160, 60, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 163, 63);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 30, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 106, 160, 60, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 163, 63);
 
 				SetDelayTime(500);
 				while (!AwaitDelayTime()) {
@@ -4612,8 +4613,8 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 26://Actor speech
-				VIDEO_StringToScreenBuffer(156, 15, ui.txt_file[UI_TXT_SCN1I].line[50], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(156, 30, ui.txt_file[UI_TXT_SCN1I].line[51], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(156, 15, ui->txt_file[UI_TXT_SCN1I]->line[50], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(156, 30, ui->txt_file[UI_TXT_SCN1I]->line[51], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -4624,10 +4625,10 @@ static void Scene1_Outro(void) {
 				break;
 			case 27:// Just wait
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 30, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 13);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 106, 160, 60, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 163, 63);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 30, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 106, 160, 60, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 163, 63);
 
 				SetDelayTime(500);
 				while (!AwaitDelayTime()) {
@@ -4636,8 +4637,8 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 28://Actor speech
-				VIDEO_StringToScreenBuffer(156, 15, ui.txt_file[UI_TXT_SCN1I].line[52], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(156, 30, ui.txt_file[UI_TXT_SCN1I].line[53], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(156, 15, ui->txt_file[UI_TXT_SCN1I]->line[52], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(156, 30, ui->txt_file[UI_TXT_SCN1I]->line[53], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -4648,10 +4649,10 @@ static void Scene1_Outro(void) {
 				break;
 			case 29:// Just wait
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 30, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 13);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 106, 160, 60, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 163, 63);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 30, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 106, 160, 60, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 163, 63);
 
 				SetDelayTime(500);
 				while (!AwaitDelayTime()) {
@@ -4660,7 +4661,7 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 30://Actor speech
-				VIDEO_StringToScreenBuffer(156, 30, ui.txt_file[UI_TXT_SCN1I].line[54], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(156, 30, ui->txt_file[UI_TXT_SCN1I]->line[54], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -4672,10 +4673,10 @@ static void Scene1_Outro(void) {
 				break;
 			case 31:// Just wait
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 30, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 13);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 106, 160, 60, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 163, 63);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 30, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 106, 160, 60, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 163, 63);
 
 				SetDelayTime(500);
 				while (!AwaitDelayTime()) {
@@ -4691,7 +4692,7 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 33://Sara speech
-				VIDEO_StringToScreenBuffer(66, 70, ui.txt_file[UI_TXT_SCN1I].line[56], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(66, 70, ui->txt_file[UI_TXT_SCN1I]->line[56], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -4703,10 +4704,10 @@ static void Scene1_Outro(void) {
 				break;
 			case 34:// Just wait
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 30, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 13);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 106, 160, 60, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 163, 63);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 30, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 106, 160, 60, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 163, 63);
 				step++;
 				break;
 			case 35:// actor Speech
@@ -4717,7 +4718,7 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 36://Actor speech
-				VIDEO_StringToScreenBuffer(156, 30, ui.txt_file[UI_TXT_SCN1I].line[58], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(156, 30, ui->txt_file[UI_TXT_SCN1I]->line[58], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -4740,7 +4741,7 @@ static void Scene1_Outro(void) {
 				break;
 			case 39:// Load image 4
 				VIDEO_ClearScreenBuffer();
-				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO4H.PCX", 266 * 165, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO4H.PCX", 266 * 165, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
 				step++;
 				break;
 			case 40:// Just wait
@@ -4748,22 +4749,22 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 41://Show chat case
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 272, 171, 20, 8, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 23, 11);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 272, 171, 20, 8, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 23, 11);
 
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 141, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 143, 82);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 141, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 143, 208);
 				step++;
 				break;
 			case 42:// Speech
-				VIDEO_StringToScreenBuffer(28, 148, ui.txt_file[UI_TXT_SCN1I].line[15], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 158, ui.txt_file[UI_TXT_SCN1I].line[16], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 148, ui->txt_file[UI_TXT_SCN1I]->line[15], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 158, ui->txt_file[UI_TXT_SCN1I]->line[16], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 43:// Just wait
-				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO5H.PCX", 300 * 80, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO5L.PCX", 300 * 80, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO6H.PCX", 100 * 100, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO5H.PCX", 300 * 80, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO5L.PCX", 300 * 80, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO6H.PCX", 100 * 100, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				SetDelayTime(2000);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -4773,8 +4774,8 @@ static void Scene1_Outro(void) {
 				break;
 			case 44:// On the way
 				VIDEO_ClearScreen();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 304, 84, 8, 8, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 10, 10);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 304, 84, 8, 8, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 10, 10);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				VIDEO_FadeIn(4);
@@ -4788,13 +4789,13 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 46:// Show chat case
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 60, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 62, 82);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 60, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 62, 208);
 				step++;
 				break;
 			case 47:// Speech
-				VIDEO_StringToScreenBuffer(28, 64, ui.txt_file[UI_TXT_SCN1I].line[17], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 74, ui.txt_file[UI_TXT_SCN1I].line[18], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 64, ui->txt_file[UI_TXT_SCN1I]->line[17], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 74, ui->txt_file[UI_TXT_SCN1I]->line[18], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 48:// Just wait
@@ -4805,7 +4806,7 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 49:// Hide chat box
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 10, 10);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 10, 10);
 				SetDelayTime(500);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -4813,8 +4814,8 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 50:// Show second image
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 104, 104, 23, 60, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 25, 62);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 104, 104, 23, 60, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 25, 62);
 				step++;
 				break;
 			case 51:// Just wait
@@ -4825,9 +4826,9 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 52:// Hide first image and show again second
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 10, 10);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 104, 104, 23, 60, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 25, 62);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 10, 10);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 104, 104, 23, 60, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 25, 62);
 				step++;
 				break;
 			case 53:// Just wait
@@ -4838,13 +4839,13 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 54:// Show chat case
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 168, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 170, 82);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 168, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 170, 208);
 				step++;
 				break;
 			case 55:// Speech
-				VIDEO_StringToScreenBuffer(28, 172, ui.txt_file[UI_TXT_SCN1I].line[19], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 182, ui.txt_file[UI_TXT_SCN1I].line[20], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 172, ui->txt_file[UI_TXT_SCN1I]->line[19], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 182, ui->txt_file[UI_TXT_SCN1I]->line[20], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 56:// Just wait
@@ -4855,8 +4856,8 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 57:
-				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO6L.PCX", 100 * 100, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO7H.PCX", 100 * 100, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
+				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO6L.PCX", 100 * 100, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO7H.PCX", 100 * 100, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
 				SetDelayTime(1000);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -4864,8 +4865,8 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 58:// Show third image image
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 104, 104, 163, 60, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 165, 62);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 104, 104, 163, 60, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 165, 62);
 				SetDelayTime(500);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -4873,17 +4874,17 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 59:// Hide second image
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 25, 62);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 25, 62);
 				step++;
 				break;
 			case 60:// Show chat case
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 168, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 170, 82);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 168, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 170, 208);
 				step++;
 				break;
 			case 61:// Speech
-				VIDEO_StringToScreenBuffer(28, 172, ui.txt_file[UI_TXT_SCN1I].line[21], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 182, ui.txt_file[UI_TXT_SCN1I].line[22], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 172, ui->txt_file[UI_TXT_SCN1I]->line[21], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 182, ui->txt_file[UI_TXT_SCN1I]->line[22], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 62:// Wait
@@ -4894,13 +4895,13 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 63:// Show chat case
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 168, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 170, 82);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 168, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 170, 208);
 				step++;
 				break;
 			case 64:// Speech
-				VIDEO_StringToScreenBuffer(28, 172, ui.txt_file[UI_TXT_SCN1I].line[23], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 182, ui.txt_file[UI_TXT_SCN1I].line[24], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 172, ui->txt_file[UI_TXT_SCN1I]->line[23], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 182, ui->txt_file[UI_TXT_SCN1I]->line[24], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 65:// Wait
@@ -4911,13 +4912,13 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 66:// Show chat case
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 168, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 170, 82);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 168, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 170, 208);
 				step++;
 				break;
 			case 67:// Speech
-				VIDEO_StringToScreenBuffer(28, 172, ui.txt_file[UI_TXT_SCN1I].line[25], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 182, ui.txt_file[UI_TXT_SCN1I].line[26], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 172, ui->txt_file[UI_TXT_SCN1I]->line[25], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 182, ui->txt_file[UI_TXT_SCN1I]->line[26], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 68:// Wait
@@ -4936,13 +4937,13 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 71:/// Draw square
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 85, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 87, 82);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 85, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 87, 208);
 				VIDEO_FadeIn(4);
 				step++;
 				break;
 			case 72:
-				VIDEO_StringToScreenBuffer(28, 95, ui.txt_file[UI_TXT_SCN1I].line[28], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 95, ui->txt_file[UI_TXT_SCN1I]->line[28], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 73:// Wait
@@ -4954,26 +4955,26 @@ static void Scene1_Outro(void) {
 				break;
 			case 74:// Load hangar
 				VIDEO_ClearScreen();
-				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO8H.PCX", 320 * 140, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO9H.PCX", 120 * 140, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO8L.PCX", 120 * 140, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 124, 144, 10, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, 120, 140, 12, 52);
+				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO8H.PCX", 320 * 140, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO9H.PCX", 120 * 140, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO8L.PCX", 120 * 140, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 124, 144, 10, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, 120, 140, 12, 52);
 				horizontal_scroll = 0;
 				max_scroll = 200;
 				step++;
 				break;
 			case 75:// Chat
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 10, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 12, 82);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 10, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 12, 208);
 				step++;
 				break;
 			case 76:// Scroll hangar
 				src_index = horizontal_scroll;
 				dst_index = 52 * CAM_VISIBLE_WIDTH + 12;
-				for (i = 0; i < gfx.image_buffer1_height; i++) {
-					memcpy(&video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx.image_buffer1[src_index], 120);
-					src_index += gfx.image_buffer1_width;
+				for (i = 0; i < gfx->image_buffer1_height; i++) {
+					memcpy(&video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx->image_buffer1[src_index], 120);
+					src_index += gfx->image_buffer1_width;
 					dst_index += CAM_VISIBLE_WIDTH;
 				}
 				horizontal_scroll += 1;
@@ -4983,8 +4984,8 @@ static void Scene1_Outro(void) {
 				}
 
 				if (horizontal_scroll == 40) {
-					VIDEO_StringToScreenBuffer(28, 16, ui.txt_file[UI_TXT_SCN1I].line[30], FONT_SLIM_BLACK);
-					VIDEO_StringToScreenBuffer(28, 26, ui.txt_file[UI_TXT_SCN1I].line[31], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(28, 16, ui->txt_file[UI_TXT_SCN1I]->line[30], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(28, 26, ui->txt_file[UI_TXT_SCN1I]->line[31], FONT_SLIM_BLACK);
 				}
 
 				if (horizontal_scroll >= max_scroll) scroll_end = true;
@@ -4998,27 +4999,27 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 78:// Show lavoratory
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 124, 144, 160, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, 120, 140, 162, 52);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 124, 144, 160, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, 120, 140, 162, 52);
 				step++;
 				break;
 			case 79:// Chat
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 10, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 12, 82);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 10, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 12, 208);
 				step++;
 				break;
 			case 80:// Hide picture 1
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, 120, 140, 12, 52);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, 120, 140, 12, 52);
 				step++;
 				break;
 			case 81:// Chat
-				VIDEO_StringToScreenBuffer(28, 16, ui.txt_file[UI_TXT_SCN1I].line[32], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 26, ui.txt_file[UI_TXT_SCN1I].line[33], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 16, ui->txt_file[UI_TXT_SCN1I]->line[32], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 26, ui->txt_file[UI_TXT_SCN1I]->line[33], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 82://
-				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO10H.PCX", 270 * 170, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO11H.PCX", 270 * 170, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
+				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO10H.PCX", 270 * 170, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN1.DAT", "OUTRO11H.PCX", 270 * 170, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
 				SetDelayTime(2000);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -5033,8 +5034,8 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 84:// Draw last picture
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 264, 164, 16, 16, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, 260, 160, 18, 18);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 264, 164, 16, 16, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, 260, 160, 18, 18);
 				step++;
 				break;
 			case 85:
@@ -5051,18 +5052,18 @@ static void Scene1_Outro(void) {
 				step++;
 				break;
 			case 87:
-				i = (rand() % 2 * gfx.image_buffer1_width) + rand() % 2;
-				VIDEO_BufferToScreenBuffer(&gfx.image_buffer1[i], gfx.image_buffer1_width, gfx.image_buffer1_height, 260, 160, 18, 18);
+				i = (rand() % 2 * gfx->image_buffer1_width) + rand() % 2;
+				VIDEO_BufferToScreenBuffer(&gfx->image_buffer1[i], gfx->image_buffer1_width, gfx->image_buffer1_height, 260, 160, 18, 18);
 				if (AUDIO_GetCurrentLine() == 200) step++;
 				break;
 			case 88:
-				i = (rand() % 4 * gfx.image_buffer1_width) + rand() % 4;
-				VIDEO_BufferToScreenBuffer(&gfx.image_buffer1[i], gfx.image_buffer1_width, gfx.image_buffer1_height, 260, 160, 18, 18);
+				i = (rand() % 4 * gfx->image_buffer1_width) + rand() % 4;
+				VIDEO_BufferToScreenBuffer(&gfx->image_buffer1[i], gfx->image_buffer1_width, gfx->image_buffer1_height, 260, 160, 18, 18);
 				if (AUDIO_GetCurrentLine() == 550) step++;
 				break;
 			case 89:
-				i = (rand() % 2 * gfx.image_buffer1_width) + rand() % 2;
-				VIDEO_BufferToScreenBuffer(&gfx.image_buffer1[i], gfx.image_buffer1_width, gfx.image_buffer1_height, 260, 160, 18, 18);
+				i = (rand() % 2 * gfx->image_buffer1_width) + rand() % 2;
+				VIDEO_BufferToScreenBuffer(&gfx->image_buffer1[i], gfx->image_buffer1_width, gfx->image_buffer1_height, 260, 160, 18, 18);
 				SetDelayTime(10);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -5070,8 +5071,8 @@ static void Scene1_Outro(void) {
 				if (AUDIO_GetCurrentLine() == 750) step++;
 				break;
 			case 90:
-				i = (rand() % 5 * gfx.image_buffer2_width) + rand() % 5;
-				VIDEO_BufferToScreenBuffer(&gfx.image_buffer2[i], gfx.image_buffer2_width, gfx.image_buffer2_height, 260, 160, 18, 18);
+				i = (rand() % 5 * gfx->image_buffer2_width) + rand() % 5;
+				VIDEO_BufferToScreenBuffer(&gfx->image_buffer2[i], gfx->image_buffer2_width, gfx->image_buffer2_height, 260, 160, 18, 18);
 				if (AUDIO_GetCurrentLine() == 1100) step++;
 				break;
 			case 91://
@@ -5136,9 +5137,9 @@ static void Scene2_Intro(void) {
 				step++;
 				break;
 			case 1:// Load first outro scene
-				GFX_PCXImageToBuffer("ISCN2.DAT", "INTRO1H.PCX", 90 * 180, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("ISCN2.DAT", "INTRO3H.PCX", 280 * 180, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("ISCN2.DAT", "INTRO2H.PCX", 90 * 180, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("ISCN2.DAT", "INTRO1H.PCX", 90 * 180, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("ISCN2.DAT", "INTRO3H.PCX", 280 * 180, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("ISCN2.DAT", "INTRO2H.PCX", 90 * 180, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				AUDIO_LoadSong(AUDIO_SONG_3);
 				step++;
 				break;
@@ -5162,7 +5163,7 @@ static void Scene2_Intro(void) {
 			case 4:// Opening eyes 1
 				scanline_scroll++;
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 320, scanline_scroll, 0, 100 - scanline_scroll, 222);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 320, scanline_scroll, 0, 100 - scanline_scroll, 222);
 				SetDelayTime(100);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -5174,7 +5175,7 @@ static void Scene2_Intro(void) {
 			case 5:// Opening eyes 2
 				scanline_scroll--;
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 320, scanline_scroll, 0, 100 - scanline_scroll, 222);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 320, scanline_scroll, 0, 100 - scanline_scroll, 222);
 				SetDelayTime(100);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -5186,7 +5187,7 @@ static void Scene2_Intro(void) {
 			case 6:// Opening eyes 3
 				scanline_scroll++;
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 320, scanline_scroll, 0, 100 - scanline_scroll, 222);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 320, scanline_scroll, 0, 100 - scanline_scroll, 222);
 				SetDelayTime(100);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -5198,7 +5199,7 @@ static void Scene2_Intro(void) {
 			case 7:// Opening eyes 4
 				scanline_scroll--;
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 320, scanline_scroll, 0, 100 - scanline_scroll, 222);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 320, scanline_scroll, 0, 100 - scanline_scroll, 222);
 				SetDelayTime(100);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -5217,9 +5218,9 @@ static void Scene2_Intro(void) {
 				step++;
 				break;
 			case 9:// Show Jenny progressive
-				i = ((gfx.image_buffer1_height / 2) - scanline_scroll) * gfx.image_buffer1_width;
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 94, scanline_scroll * 2, 10, (90 - scanline_scroll + 12), 222);
-				VIDEO_BufferToScreenBuffer(&gfx.image_buffer1[i], gfx.image_buffer1_width, gfx.image_buffer1_height, 90, scanline_scroll * 2, 12, (90 - scanline_scroll + 12));
+				i = ((gfx->image_buffer1_height / 2) - scanline_scroll) * gfx->image_buffer1_width;
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 94, scanline_scroll * 2, 10, (90 - scanline_scroll + 12), 222);
+				VIDEO_BufferToScreenBuffer(&gfx->image_buffer1[i], gfx->image_buffer1_width, gfx->image_buffer1_height, 90, scanline_scroll * 2, 12, (90 - scanline_scroll + 12));
 				scanline_scroll++;
 				SetDelayTime(20);
 				while (!AwaitDelayTime()) {
@@ -5228,8 +5229,8 @@ static void Scene2_Intro(void) {
 				if (scanline_scroll >= 90) step++;
 				break;
 			case 10:
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 94, 184, 10, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, 90, 180, 12, 12);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 94, 184, 10, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, 90, 180, 12, 12);
 				step++;
 				break;
 			case 11:
@@ -5256,9 +5257,9 @@ static void Scene2_Intro(void) {
 				step++;
 				break;
 			case 13://Sara's chat
-				VIDEO_StringToScreenBuffer(106, 30, ui.txt_file[UI_TXT_SCN2I].line[1], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 45, ui.txt_file[UI_TXT_SCN2I].line[2], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 60, ui.txt_file[UI_TXT_SCN2I].line[3], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 30, ui->txt_file[UI_TXT_SCN2I]->line[1], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 45, ui->txt_file[UI_TXT_SCN2I]->line[2], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 60, ui->txt_file[UI_TXT_SCN2I]->line[3], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -5270,8 +5271,8 @@ static void Scene2_Intro(void) {
 			case 14:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 94, 184, 10, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, 90, 180, 12, 12);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 94, 184, 10, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, 90, 180, 12, 12);
 				SetDelayTime(200);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -5279,8 +5280,8 @@ static void Scene2_Intro(void) {
 				step++;
 				break;
 			case 15:// Show actor
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 94, 184, 200, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, 90, 180, 202, 12);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 94, 184, 200, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, 90, 180, 202, 12);
 				step++;
 				break;
 			case 16:
@@ -5297,9 +5298,9 @@ static void Scene2_Intro(void) {
 				step++;
 				break;
 			case 18:
-				VIDEO_StringToScreenBuffer(88, 50, ui.txt_file[UI_TXT_SCN2I].line[4], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(88, 65, ui.txt_file[UI_TXT_SCN2I].line[5], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(88, 80, ui.txt_file[UI_TXT_SCN2I].line[6], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(88, 50, ui->txt_file[UI_TXT_SCN2I]->line[4], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(88, 65, ui->txt_file[UI_TXT_SCN2I]->line[5], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(88, 80, ui->txt_file[UI_TXT_SCN2I]->line[6], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -5311,10 +5312,10 @@ static void Scene2_Intro(void) {
 			case 19:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 94, 184, 10, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, 90, 180, 12, 12);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 94, 184, 200, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, 90, 180, 202, 12);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 94, 184, 10, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, 90, 180, 12, 12);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 94, 184, 200, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, 90, 180, 202, 12);
 				step++;
 				break;
 			case 20:
@@ -5331,9 +5332,9 @@ static void Scene2_Intro(void) {
 				step++;
 				break;
 			case 22:// chat
-				VIDEO_StringToScreenBuffer(104, 30, ui.txt_file[UI_TXT_SCN2I].line[7], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(104, 45, ui.txt_file[UI_TXT_SCN2I].line[8], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(104, 60, ui.txt_file[UI_TXT_SCN2I].line[9], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(104, 30, ui->txt_file[UI_TXT_SCN2I]->line[7], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(104, 45, ui->txt_file[UI_TXT_SCN2I]->line[8], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(104, 60, ui->txt_file[UI_TXT_SCN2I]->line[9], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -5350,8 +5351,8 @@ static void Scene2_Intro(void) {
 				step++;
 				break;
 			case 24:
-				VIDEO_StringToScreenBuffer(104, 30, ui.txt_file[UI_TXT_SCN2I].line[10], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(104, 45, ui.txt_file[UI_TXT_SCN2I].line[11], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(104, 30, ui->txt_file[UI_TXT_SCN2I]->line[10], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(104, 45, ui->txt_file[UI_TXT_SCN2I]->line[11], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -5368,8 +5369,8 @@ static void Scene2_Intro(void) {
 				step++;
 				break;
 			case 26:
-				VIDEO_StringToScreenBuffer(104, 30, ui.txt_file[UI_TXT_SCN2I].line[12], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(104, 45, ui.txt_file[UI_TXT_SCN2I].line[13], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(104, 30, ui->txt_file[UI_TXT_SCN2I]->line[12], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(104, 45, ui->txt_file[UI_TXT_SCN2I]->line[13], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -5386,8 +5387,8 @@ static void Scene2_Intro(void) {
 				step++;
 				break;
 			case 28:
-				VIDEO_StringToScreenBuffer(104, 30, ui.txt_file[UI_TXT_SCN2I].line[14], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(104, 45, ui.txt_file[UI_TXT_SCN2I].line[15], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(104, 30, ui->txt_file[UI_TXT_SCN2I]->line[14], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(104, 45, ui->txt_file[UI_TXT_SCN2I]->line[15], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -5399,10 +5400,10 @@ static void Scene2_Intro(void) {
 			case 29:// Show bed
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreen();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 94, 184, 10, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, 90, 180, 12, 12);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 94, 184, 200, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, 90, 180, 202, 12);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 94, 184, 10, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, 90, 180, 12, 12);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 94, 184, 200, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, 90, 180, 202, 12);
 				step++;
 				break;
 			case 30:// set chat
@@ -5412,9 +5413,9 @@ static void Scene2_Intro(void) {
 				step++;
 				break;
 			case 31:
-				VIDEO_StringToScreenBuffer(88, 50, ui.txt_file[UI_TXT_SCN2I].line[16], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(88, 65, ui.txt_file[UI_TXT_SCN2I].line[17], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(88, 80, ui.txt_file[UI_TXT_SCN2I].line[18], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(88, 50, ui->txt_file[UI_TXT_SCN2I]->line[16], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(88, 65, ui->txt_file[UI_TXT_SCN2I]->line[17], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(88, 80, ui->txt_file[UI_TXT_SCN2I]->line[18], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(3000);
@@ -5426,10 +5427,10 @@ static void Scene2_Intro(void) {
 			case 32:// Show bed
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreen();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 94, 184, 10, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, 90, 180, 12, 12);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 94, 184, 200, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, 90, 180, 202, 12);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 94, 184, 10, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, 90, 180, 12, 12);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 94, 184, 200, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, 90, 180, 202, 12);
 				step++;
 				break;
 			case 33:
@@ -5439,8 +5440,8 @@ static void Scene2_Intro(void) {
 				step++;
 				break;
 			case 34:
-				VIDEO_StringToScreenBuffer(104, 30, ui.txt_file[UI_TXT_SCN2I].line[19], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(104, 45, ui.txt_file[UI_TXT_SCN2I].line[20], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(104, 30, ui->txt_file[UI_TXT_SCN2I]->line[19], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(104, 45, ui->txt_file[UI_TXT_SCN2I]->line[20], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(3000);
@@ -5450,9 +5451,9 @@ static void Scene2_Intro(void) {
 				step++;
 				break;
 			case 35:
-				VIDEO_StringToScreenBuffer(104, 30, ui.txt_file[UI_TXT_SCN2I].line[21], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(104, 45, ui.txt_file[UI_TXT_SCN2I].line[22], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(104, 60, ui.txt_file[UI_TXT_SCN2I].line[23], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(104, 30, ui->txt_file[UI_TXT_SCN2I]->line[21], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(104, 45, ui->txt_file[UI_TXT_SCN2I]->line[22], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(104, 60, ui->txt_file[UI_TXT_SCN2I]->line[23], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(3000);
@@ -5462,9 +5463,9 @@ static void Scene2_Intro(void) {
 				step++;
 				break;
 			case 36:
-				VIDEO_StringToScreenBuffer(104, 30, ui.txt_file[UI_TXT_SCN2I].line[24], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(104, 45, ui.txt_file[UI_TXT_SCN2I].line[25], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(104, 60, ui.txt_file[UI_TXT_SCN2I].line[26], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(104, 30, ui->txt_file[UI_TXT_SCN2I]->line[24], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(104, 45, ui->txt_file[UI_TXT_SCN2I]->line[25], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(104, 60, ui->txt_file[UI_TXT_SCN2I]->line[26], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -5476,8 +5477,8 @@ static void Scene2_Intro(void) {
 			case 37:
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreen();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 94, 184, 200, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, 90, 180, 202, 12);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 94, 184, 200, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, 90, 180, 202, 12);
 				SetDelayTime(4000);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -5487,8 +5488,8 @@ static void Scene2_Intro(void) {
 				break;
 			case 38:
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 284, 184, 10, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, 280, 180, 12, 12);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 284, 184, 10, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, 280, 180, 12, 12);
 				step++;
 				break;
 			case 39:
@@ -5496,13 +5497,13 @@ static void Scene2_Intro(void) {
 				step++;
 				break;
 			case 40://Show chat case
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 141, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 143, 82);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 141, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 143, 208);
 				step++;
 				break;
 			case 41:
-				VIDEO_StringToScreenBuffer(28, 148, ui.txt_file[UI_TXT_SCN2I].line[27], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 158, ui.txt_file[UI_TXT_SCN2I].line[28], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 148, ui->txt_file[UI_TXT_SCN2I]->line[27], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 158, ui->txt_file[UI_TXT_SCN2I]->line[28], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 42:// wait
@@ -5513,13 +5514,13 @@ static void Scene2_Intro(void) {
 				step++;
 				break;
 			case 43://Show chat case
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 141, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 143, 82);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 141, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 143, 208);
 				step++;
 				break;
 			case 44:
-				VIDEO_StringToScreenBuffer(28, 148, ui.txt_file[UI_TXT_SCN2I].line[29], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 158, ui.txt_file[UI_TXT_SCN2I].line[30], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 148, ui->txt_file[UI_TXT_SCN2I]->line[29], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 158, ui->txt_file[UI_TXT_SCN2I]->line[30], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 45:// wait
@@ -5530,19 +5531,19 @@ static void Scene2_Intro(void) {
 				step++;
 				break;
 			case 46://Show chat case
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 141, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 143, 82);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 141, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 143, 208);
 				step++;
 				break;
 			case 47:
-				VIDEO_StringToScreenBuffer(28, 148, ui.txt_file[UI_TXT_SCN2I].line[31], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 158, ui.txt_file[UI_TXT_SCN2I].line[32], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 148, ui->txt_file[UI_TXT_SCN2I]->line[31], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 158, ui->txt_file[UI_TXT_SCN2I]->line[32], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 48:// Load more images
-				GFX_PCXImageToBuffer("ISCN2.DAT", "INTRO4H.PCX", 280 * 140, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("ISCN2.DAT", "INTRO4L.PCX", 140 * 140, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("ISCN2.DAT", "INTRO5H.PCX", 140 * 140, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("ISCN2.DAT", "INTRO4H.PCX", 280 * 140, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("ISCN2.DAT", "INTRO4L.PCX", 140 * 140, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("ISCN2.DAT", "INTRO5H.PCX", 140 * 140, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				step++;
 				break;
 			case 49:
@@ -5556,23 +5557,23 @@ static void Scene2_Intro(void) {
 
 				VIDEO_ClearScreenBuffer();
 				VIDEO_ScreenBufferToVRAM();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 150, 146, 5, 50, 222);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 150, 146, 5, 50, 222);
 				VIDEO_FadeIn(4);
 				while (!scroll_end & engine.sequence) {
 					src_index = horizontal_scroll;
 					dst_index = CAM_VISIBLE_WIDTH * 53 + 7;
 
 					// Draw image with scroll
-					for (i = 0; i < gfx.image_buffer1_height; i++) {
-						memcpy(&video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx.image_buffer1[src_index], 146);
-						src_index += gfx.image_buffer1_width;
+					for (i = 0; i < gfx->image_buffer1_height; i++) {
+						memcpy(&video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx->image_buffer1[src_index], 146);
+						src_index += gfx->image_buffer1_width;
 						dst_index += CAM_VISIBLE_WIDTH;
 					}
 					if (horizontal_scroll > 0) horizontal_scroll--;
 
 					// Draw text background
-					VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 242);
-					VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 8, 4, 208);
+					VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+					VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 
 					// Draw text
 					switch (dialog_step) {
@@ -5582,8 +5583,8 @@ static void Scene2_Intro(void) {
 							dialog_step++;
 							break;
 						case 1:
-							VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN2I].line[33], FONT_SLIM_BLACK);
-							VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN2I].line[34], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN2I]->line[33], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN2I]->line[34], FONT_SLIM_BLACK);
 							dialog_delay_counter++;
 							if (dialog_delay_counter > 100) {
 								dialog_step++;
@@ -5598,8 +5599,8 @@ static void Scene2_Intro(void) {
 							}
 							break;
 						case 3:
-							VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN2I].line[35], FONT_SLIM_BLACK);
-							VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN2I].line[36], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN2I]->line[35], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN2I]->line[36], FONT_SLIM_BLACK);
 							dialog_delay_counter++;
 							if (dialog_delay_counter > 100) {
 								dialog_step++;
@@ -5614,8 +5615,8 @@ static void Scene2_Intro(void) {
 							}
 							break;
 						case 5:
-							VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN2I].line[37], FONT_SLIM_BLACK);
-							VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN2I].line[38], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN2I]->line[37], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN2I]->line[38], FONT_SLIM_BLACK);
 							dialog_delay_counter++;
 							if (dialog_delay_counter > 100) {
 								dialog_step++;
@@ -5648,13 +5649,13 @@ static void Scene2_Intro(void) {
 				break;
 			case 51:
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 8, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 8, 4, 208);
 				step++;
 				break;
 			case 52:
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 150, 146, 165, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, 146, gfx.image_buffer3_height, 168, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 150, 146, 165, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, 146, gfx->image_buffer3_height, 168, 53);
 				SetDelayTime(100);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -5662,16 +5663,16 @@ static void Scene2_Intro(void) {
 				step++;
 				break;
 			case 53:
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, 146, gfx.image_buffer2_height, 8, 53);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, 146, gfx->image_buffer2_height, 8, 53);
 				step++;
 				break;
 			case 54:
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 8, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 8, 4, 208);
 
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN2I].line[43], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN2I].line[44], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN2I]->line[43], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN2I]->line[44], FONT_SLIM_BLACK);
 				dialog_delay_counter++;
 				if (dialog_delay_counter > 100) {
 					step++;
@@ -5687,10 +5688,10 @@ static void Scene2_Intro(void) {
 				break;
 			case 56:
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 8, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN2I].line[45], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN2I].line[46], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 8, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN2I]->line[45], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN2I]->line[46], FONT_SLIM_BLACK);
 				dialog_delay_counter++;
 				if (dialog_delay_counter > 100) {
 					step++;
@@ -5728,8 +5729,6 @@ static void Scene2_Intro(void) {
 }
 static void Scene2_LoadAssets(void) {
 
-	ENEMY_Init();// Initialize enemy system
-
 	// Load and unload enemies just to get graphic resources loaded
 	ENEMY_Load("ENEMY6.DAT", 0, 0 << 4, 0 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
 	ENEMY_UnloadEnemies();
@@ -5737,16 +5736,14 @@ static void Scene2_LoadAssets(void) {
 	ENEMY_UnloadEnemies();
 
 	// Load boss and unload it just to preload graphics
-	BOSS_Load("BOSS1.DAT", 0, 0, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_ENEMY3_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY3_FEET, SPRITE_GRAPHICS_ID_ENEMY3_BODY, SPRITE_GRAPHICS_ID_ENEMY3_HEAD, SPRITE_GRAPHICS_ID_ENEMY3_LARM, SPRITE_GRAPHICS_ID_ENEMY3_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_BULLET3, BOSS_STATUS_CHASE, BOSS_LIFE);
+	BOSS_Load("BOSS1.DAT", 0, 0, BOSS_TYPE_FAST_SPEED, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_ENEMY3_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY3_FEET, SPRITE_GRAPHICS_ID_ENEMY3_BODY, SPRITE_GRAPHICS_ID_ENEMY3_HEAD, SPRITE_GRAPHICS_ID_ENEMY3_LARM, SPRITE_GRAPHICS_ID_ENEMY3_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_BULLET3, BOSS_STATUS_CHASE, BOSS_LIFE);
 	BOSS_Unload();
-	BOSS_Load("BOSS2.DAT", 0, 0, SPRITE_GRAPHICS_ID_ENEMY4_CHAT, SPRITE_GRAPHICS_ID_ENEMY4_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY4_FEET, SPRITE_GRAPHICS_ID_ENEMY4_BODY, SPRITE_GRAPHICS_ID_ENEMY4_HEAD, SPRITE_GRAPHICS_ID_ENEMY4_LARM, SPRITE_GRAPHICS_ID_ENEMY4_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_BULLET3, BOSS_STATUS_CHASE, BOSS_LIFE);
+	BOSS_Load("BOSS2.DAT", 0, 0, BOSS_TYPE_MEDIUM_SPEED, SPRITE_GRAPHICS_ID_ENEMY4_CHAT, SPRITE_GRAPHICS_ID_ENEMY4_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY4_FEET, SPRITE_GRAPHICS_ID_ENEMY4_BODY, SPRITE_GRAPHICS_ID_ENEMY4_HEAD, SPRITE_GRAPHICS_ID_ENEMY4_LARM, SPRITE_GRAPHICS_ID_ENEMY4_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_BULLET3, BOSS_STATUS_CHASE, BOSS_LIFE);
 	BOSS_Unload();
 
-	ACTOR_Init(78 << 4, 3 << 4, SPRITE_GRAPHICS_ID_ACTOR_FEET, SPRITE_GRAPHICS_ID_ACTOR_BODY, SPRITE_GRAPHICS_ID_ACTOR_HEAD, SPRITE_GRAPHICS_ID_ACTOR_LARM, SPRITE_GRAPHICS_ID_ACTOR_RARM_BARE_HANDS, ACTOR_FACING_LEFT);
-	ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
+	ACTOR_Load(78 << 4, 3 << 4, SPRITE_GRAPHICS_ID_ACTOR_FEET, SPRITE_GRAPHICS_ID_ACTOR_BODY, SPRITE_GRAPHICS_ID_ACTOR_HEAD, SPRITE_GRAPHICS_ID_ACTOR_LARM, SPRITE_GRAPHICS_ID_ACTOR_RARM_BARE_HANDS, ACTOR_FACING_LEFT);
+	ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
 	ACTOR_SetBulletStatus(99, 19, 199, 9, 9);
-
-	NPC_Init();
 
 	UI_SetStatusPanels();// Set status panels
 
@@ -5811,90 +5808,94 @@ static void Scene2_LoadRoom1(void) {
 	ITEM_LoadItem(9, ENTITY_ID_ITEM_AMMO3, SPRITE_GRAPHICS_ID_ITEM_AMMO3, 46 << 4, 4 << 4);
 
 	ITEM_LoadItem(10, ENTITY_ID_ITEM_GRENADE, SPRITE_GRAPHICS_ID_ITEM_GRENADE, 60 << 4, 18 << 4);
+
+	ITEM_LoadItem(11, ENTITY_ID_ITEM_AMMO2, SPRITE_GRAPHICS_ID_ITEM_AMMO2, 20 << 4, 17 << 4);
+	ITEM_LoadItem(12, ENTITY_ID_ITEM_AMMO3, SPRITE_GRAPHICS_ID_ITEM_AMMO3, 27 << 4, 39 << 4);
 }
 static void Scene2_SetHotspotsAndEvents(void) {
 
 	// Update hotspots
-	hotspot_enabling_room1[0] = false;
-	hotspot_enabling_room1[1] = false;
-	hotspot_enabling_room1[2] = false;
-	hotspot_enabling_room1[3] = false;
-	hotspot_enabling_room1[4] = false;
-	hotspot_enabling_room1[5] = false;
-	hotspot_enabling_room1[6] = false;
-	hotspot_enabling_room1[7] = false;
-	hotspot_enabling_room1[8] = false;
-	hotspot_enabling_room1[9] = false;
-	hotspot_enabling_room1[10] = false;
-	hotspot_enabling_room1[11] = false;
-	hotspot_enabling_room1[12] = false;
-	hotspot_enabling_room1[13] = false;
-	hotspot_enabling_room1[14] = false;
-	hotspot_enabling_room1[15] = false;
-	hotspot_enabling_room1[16] = false;
-	hotspot_enabling_room1[17] = false;
-	hotspot_enabling_room1[18] = false;
-	hotspot_enabling_room1[19] = false;
-	hotspot_enabling_room1[20] = false;
-	hotspot_enabling_room1[21] = false;
-	hotspot_enabling_room1[22] = false;
-	hotspot_enabling_room1[23] = false;
-	hotspot_enabling_room1[24] = false;
-	hotspot_enabling_room1[25] = false;
-	hotspot_enabling_room1[26] = false;
-	hotspot_enabling_room1[27] = false;
-	hotspot_enabling_room1[28] = false;
-	hotspot_enabling_room1[29] = false;
-	hotspot_enabling_room1[30] = false;
-	hotspot_enabling_room1[31] = false;
+	map->hotspot_enabling_room1[0] = false;
+	map->hotspot_enabling_room1[1] = false;
+	map->hotspot_enabling_room1[2] = false;
+	map->hotspot_enabling_room1[3] = false;
+	map->hotspot_enabling_room1[4] = false;
+	map->hotspot_enabling_room1[5] = false;
+	map->hotspot_enabling_room1[6] = false;
+	map->hotspot_enabling_room1[7] = false;
+	map->hotspot_enabling_room1[8] = false;
+	map->hotspot_enabling_room1[9] = false;
+	map->hotspot_enabling_room1[10] = false;
+	map->hotspot_enabling_room1[11] = false;
+	map->hotspot_enabling_room1[12] = false;
+	map->hotspot_enabling_room1[13] = false;
+	map->hotspot_enabling_room1[14] = false;
+	map->hotspot_enabling_room1[15] = false;
+	map->hotspot_enabling_room1[16] = false;
+	map->hotspot_enabling_room1[17] = false;
+	map->hotspot_enabling_room1[18] = false;
+	map->hotspot_enabling_room1[19] = false;
+	map->hotspot_enabling_room1[20] = false;
+	map->hotspot_enabling_room1[21] = false;
+	map->hotspot_enabling_room1[22] = false;
+	map->hotspot_enabling_room1[23] = false;
+	map->hotspot_enabling_room1[24] = false;
+	map->hotspot_enabling_room1[25] = false;
+	map->hotspot_enabling_room1[26] = false;
+	map->hotspot_enabling_room1[27] = false;
+	map->hotspot_enabling_room1[28] = false;
+	map->hotspot_enabling_room1[29] = false;
+	map->hotspot_enabling_room1[30] = false;
+	map->hotspot_enabling_room1[31] = false;
 
 	// Update events
-	event_enabling_room1[0] = false;
-	event_enabling_room1[1] = true;
-	event_enabling_room1[2] = true;
-	event_enabling_room1[3] = true;
-	event_enabling_room1[4] = true;
-	event_enabling_room1[5] = true;
-	event_enabling_room1[6] = true;
-	event_enabling_room1[7] = true;
-	event_enabling_room1[8] = true;
-	event_enabling_room1[9] = true;
-	event_enabling_room1[10] = true;
-	event_enabling_room1[11] = true;
-	event_enabling_room1[12] = true;
-	event_enabling_room1[13] = true;
-	event_enabling_room1[14] = true;
-	event_enabling_room1[15] = true;
-	event_enabling_room1[16] = true;
-	event_enabling_room1[17] = true;
-	event_enabling_room1[18] = true;
-	event_enabling_room1[19] = true;
-	event_enabling_room1[20] = false;
-	event_enabling_room1[21] = false;
-	event_enabling_room1[22] = false;
-	event_enabling_room1[23] = false;
-	event_enabling_room1[24] = false;
-	event_enabling_room1[25] = false;
-	event_enabling_room1[26] = false;
-	event_enabling_room1[27] = false;
-	event_enabling_room1[28] = false;
-	event_enabling_room1[29] = false;
-	event_enabling_room1[30] = false;
-	event_enabling_room1[31] = false;
+	map->event_enabling_room1[0] = false;
+	map->event_enabling_room1[1] = true;
+	map->event_enabling_room1[2] = true;
+	map->event_enabling_room1[3] = true;
+	map->event_enabling_room1[4] = true;
+	map->event_enabling_room1[5] = true;
+	map->event_enabling_room1[6] = true;
+	map->event_enabling_room1[7] = true;
+	map->event_enabling_room1[8] = true;
+	map->event_enabling_room1[9] = true;
+	map->event_enabling_room1[10] = true;
+	map->event_enabling_room1[11] = true;
+	map->event_enabling_room1[12] = true;
+	map->event_enabling_room1[13] = true;
+	map->event_enabling_room1[14] = true;
+	map->event_enabling_room1[15] = true;
+	map->event_enabling_room1[16] = true;
+	map->event_enabling_room1[17] = true;
+	map->event_enabling_room1[18] = true;
+	map->event_enabling_room1[19] = true;
+	map->event_enabling_room1[20] = false;
+	map->event_enabling_room1[21] = false;
+	map->event_enabling_room1[22] = false;
+	map->event_enabling_room1[23] = false;
+	map->event_enabling_room1[24] = false;
+	map->event_enabling_room1[25] = false;
+	map->event_enabling_room1[26] = false;
+	map->event_enabling_room1[27] = false;
+	map->event_enabling_room1[28] = false;
+	map->event_enabling_room1[29] = false;
+	map->event_enabling_room1[30] = false;
+	map->event_enabling_room1[31] = false;
 }
 static void Scene2_Loop(void) {
 	bool end_sequence;
 	int actor_tile_num;
 	int sequence_step;
 	int scene_step;
+	int scene_counter;
 
 	VIDEO_ClearScreenBuffer();
 	GFX_LoadPalette("PALETTES.DAT", "SCN21.PCX", 256);
 
-	VIDEO_StringToScreenBuffer(50, 60, ui.txt_file[UI_TXT_SCN2I].line[40], FONT_BIG_WHITE);
-	VIDEO_StringToScreenBuffer(90, 85, ui.txt_file[UI_TXT_SCN2I].line[41], FONT_BIG_WHITE);
-	VIDEO_StringToScreenBuffer(90, 135, ui.txt_file[UI_TXT_SCN2I].line[48], FONT_SLIM_WHITE);
-	VIDEO_StringToScreenBuffer(160, 135, ui.txt_file[UI_TXT_SCN2I].line[49], FONT_SLIM_WHITE);
+	VIDEO_StringToScreenBuffer(50, 60, ui->txt_file[UI_TXT_SCN2I]->line[40], FONT_BIG_BLACK);
+	VIDEO_StringToScreenBuffer(90, 85, ui->txt_file[UI_TXT_SCN2I]->line[41], FONT_BIG_BLACK);
+	VIDEO_StringToScreenBuffer(90, 135, ui->txt_file[UI_TXT_SCN2I]->line[48], FONT_SLIM_WHITE);
+	VIDEO_StringToScreenBuffer(160, 135, ui->txt_file[UI_TXT_SCN2I]->line[49], FONT_SLIM_WHITE);
 
 	VIDEO_VSync();
 	VIDEO_ScreenBufferToVRAM();
@@ -5913,6 +5914,7 @@ static void Scene2_Loop(void) {
 
 	scene_step = 0;
 	sequence_step = 0;
+	scene_counter = 0;
 	end_sequence = false;
 	engine.ingame = true;
 
@@ -5923,8 +5925,8 @@ static void Scene2_Loop(void) {
 		case 1:// Room 1. Sewer
 			Scene2_LoadRoom1();
 
-			ACTOR_SetPosition(78 << 4, 3 << 4, ACTOR_FACING_LEFT); // Set actor position
-			CAM_Init(map.width_px, map.height_px, 60 << 4, 0 << 4);// Initialize camera
+			ACTOR_SetPosition(78 << 4, 3 << 4, ACTOR_FACING_LEFT);   // Set actor position
+			CAM_Init(map->width_px, map->height_px, 60 << 4, 0 << 4);// Initialize camera
 			MAP_DrawMapToMapVideoBuffer();
 
 			Update(true);
@@ -5938,6 +5940,7 @@ static void Scene2_Loop(void) {
 
 	// Loop until the game is over
 	while (engine.ingame) {
+
 		switch (engine.room) {
 			case 1:// Room 1. Sewer
 				// Scene steps
@@ -5956,8 +5959,14 @@ static void Scene2_Loop(void) {
 				// - Boss 2 dead >> Step 13 - Unlock exit door
 				// - Event 12: End level >> Step 14
 
+				// Scene counter
+				scene_counter++;
+				if (scene_counter > 64) scene_counter = 0;
+
+				//scene_counter = 0;
+
 				// Hotspots
-				if (!actor.mode_combat) {
+				if (!actor->mode_combat) {
 					// Check point on object or enemy
 					switch (cursor.point_on & 0xFF) {
 						case ENTITY_ID_HSPOT:// Hotspot
@@ -5991,30 +6000,30 @@ static void Scene2_Loop(void) {
 				}
 
 				// Events
-				actor_tile_num = MAP_GetTileNumber(actor.pos_x + (gfx_sprite_stack[actor.sprite_num].width_px >> 1), actor.pos_y + (gfx_sprite_stack[actor.sprite_num].height_px >> 1));
+				actor_tile_num = MAP_GetTileNumber(actor->pos_x + (gfx_sprite_stack[actor->sprite_num].width_px >> 1), actor->pos_y + (gfx_sprite_stack[actor->sprite_num].height_px >> 1));
 
-				switch ((map.layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
+				switch ((map->layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
 					case 1:// Event 1. Spare
-						if (event_enabling_room1[1]) {
-							event_enabling_room1[1] = false;
+						if (map->event_enabling_room1[1]) {
+							map->event_enabling_room1[1] = false;
 						}
 						break;
 					case 2:// Event 2. Getting in
-						if (event_enabling_room1[2]) {
-							event_enabling_room1[2] = false;
+						if (map->event_enabling_room1[2]) {
+							map->event_enabling_room1[2] = false;
 
 							sequence_step = 0;
 							end_sequence = false;
 							while (!end_sequence) {
 								switch (sequence_step) {
 									case 0://
-										UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN2D, 30, 31, 355, false, 100);
+										UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN2D, 30, 31, 355, false, 100);
 										sequence_step++;
 										break;
 									case 1://
 										if (UI_IsSpeechFinished()) {
 											ACTOR_SetCombatMode(true);
-											ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_PISTOL);
+											ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_PISTOL);
 											ACTOR_Reload();
 											end_sequence = true;
 										}
@@ -6029,16 +6038,16 @@ static void Scene2_Loop(void) {
 						}
 						break;
 					case 3:// Event 3. Starts the rat party!
-						if (event_enabling_room1[3]) {
-							event_enabling_room1[3] = false;
+						if (map->event_enabling_room1[3]) {
+							map->event_enabling_room1[3] = false;
 							scene_step = 1;
 						}
 						break;
 					case 4:// Event 4. Red Door, access to water
-						if (event_enabling_room1[4]) {
-							event_enabling_room1[4] = false;
+						if (map->event_enabling_room1[4]) {
+							map->event_enabling_room1[4] = false;
 
-							if (actor.key_entity_id != ENTITY_ID_ITEM_KEYRED) {
+							if (actor->key_entity_id != ENTITY_ID_ITEM_KEYRED) {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 1);
 							} else {
 
@@ -6056,20 +6065,20 @@ static void Scene2_Loop(void) {
 						}
 						break;
 					case 5:// Event 5. Water 2
-						if (event_enabling_room1[5]) {
-							event_enabling_room1[5] = false;
+						if (map->event_enabling_room1[5]) {
+							map->event_enabling_room1[5] = false;
 						}
 						break;
 					case 6:// Event 6. Get green key
-						if (event_enabling_room1[6]) {
-							event_enabling_room1[6] = false;
+						if (map->event_enabling_room1[6]) {
+							map->event_enabling_room1[6] = false;
 
 							scene_step = 3;
 						}
 						break;
 					case 7:// Event 7. BIG Surprise
-						if (event_enabling_room1[7]) {
-							event_enabling_room1[7] = false;
+						if (map->event_enabling_room1[7]) {
+							map->event_enabling_room1[7] = false;
 							scene_step = 5;
 
 							MAP_ShowSwapableTile(45 << 4, 40 << 4);
@@ -6079,19 +6088,19 @@ static void Scene2_Loop(void) {
 							MAP_ShowSwapableTile(46 << 4, 41 << 4);
 							MAP_ShowSwapableTile(47 << 4, 41 << 4);
 
-							BOSS_Load("BOSS1.DAT", 47 << 4, 27 << 4, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_ENEMY3_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY3_FEET, SPRITE_GRAPHICS_ID_ENEMY3_BODY, SPRITE_GRAPHICS_ID_ENEMY3_HEAD, SPRITE_GRAPHICS_ID_ENEMY3_LARM, SPRITE_GRAPHICS_ID_ENEMY3_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUKE, BOSS_STATUS_STATIC, BOSS_LIFE);
+							BOSS_Load("BOSS1.DAT", 47 << 4, 27 << 4, BOSS_TYPE_FAST_SPEED, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_ENEMY3_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY3_FEET, SPRITE_GRAPHICS_ID_ENEMY3_BODY, SPRITE_GRAPHICS_ID_ENEMY3_HEAD, SPRITE_GRAPHICS_ID_ENEMY3_LARM, SPRITE_GRAPHICS_ID_ENEMY3_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUKE, BOSS_STATUS_STATIC, BOSS_LIFE);
 
 							sequence_step = 0;
 							end_sequence = false;
 							while (!end_sequence) {
 								switch (sequence_step) {
 									case 0://
-										UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN2D, 1, 355, 355, true, 100);
+										UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN2D, 1, 355, 355, true, 100);
 										sequence_step++;
 										break;
 									case 1://
 										if (UI_IsSpeechFinished()) {
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN2D, 3, 4, 355, false, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN2D, 3, 4, 355, false, 100);
 											sequence_step++;
 										}
 										break;
@@ -6113,14 +6122,14 @@ static void Scene2_Loop(void) {
 						}
 						break;
 					case 8:// Event 8. Bye bye rats
-						if (event_enabling_room1[8]) {
-							event_enabling_room1[8] = false;
+						if (map->event_enabling_room1[8]) {
+							map->event_enabling_room1[8] = false;
 							scene_step = 7;
 						}
 						break;
 					case 9:// Event 9. Spiders everywhere!
-						if (event_enabling_room1[9]) {
-							event_enabling_room1[9] = false;
+						if (map->event_enabling_room1[9]) {
+							map->event_enabling_room1[9] = false;
 
 							if (!enemy[0].is_loaded) {
 								ENEMY_Load("ENEMY7.DAT", 0, 41 << 4, 7 << 4, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_PISTOL, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_WEBS, ENEMY_STATUS_STATIC_SHOOTER, 10);
@@ -6136,14 +6145,14 @@ static void Scene2_Loop(void) {
 						}
 						break;
 					case 10:// Event 10. End spiders!
-						if (event_enabling_room1[10]) {
-							event_enabling_room1[10] = false;
+						if (map->event_enabling_room1[10]) {
+							map->event_enabling_room1[10] = false;
 							scene_step = 10;
 						}
 						break;
 					case 11:// Event 11. The big one!
-						if (event_enabling_room1[11]) {
-							event_enabling_room1[11] = false;
+						if (map->event_enabling_room1[11]) {
+							map->event_enabling_room1[11] = false;
 							scene_step = 12;
 
 							MAP_ShowSwapableTile(9 << 4, 41 << 4);
@@ -6153,19 +6162,19 @@ static void Scene2_Loop(void) {
 							MAP_ShowSwapableTile(10 << 4, 42 << 4);
 							MAP_ShowSwapableTile(11 << 4, 42 << 4);
 
-							BOSS_Load("BOSS2.DAT", 5 << 4, 28 << 4, SPRITE_GRAPHICS_ID_ENEMY4_CHAT, SPRITE_GRAPHICS_ID_ENEMY4_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY4_FEET, SPRITE_GRAPHICS_ID_ENEMY4_BODY, SPRITE_GRAPHICS_ID_ENEMY4_HEAD, SPRITE_GRAPHICS_ID_ENEMY4_LARM, SPRITE_GRAPHICS_ID_ENEMY4_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_WEB, BOSS_STATUS_STATIC, BOSS_LIFE);//
+							BOSS_Load("BOSS2.DAT", 5 << 4, 28 << 4, BOSS_TYPE_MEDIUM_SPEED, SPRITE_GRAPHICS_ID_ENEMY4_CHAT, SPRITE_GRAPHICS_ID_ENEMY4_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY4_FEET, SPRITE_GRAPHICS_ID_ENEMY4_BODY, SPRITE_GRAPHICS_ID_ENEMY4_HEAD, SPRITE_GRAPHICS_ID_ENEMY4_LARM, SPRITE_GRAPHICS_ID_ENEMY4_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_WEB, BOSS_STATUS_STATIC, BOSS_LIFE);//
 
 							sequence_step = 0;
 							end_sequence = false;
 							while (!end_sequence) {
 								switch (sequence_step) {
 									case 0://
-										UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN2D, 7, 355, 355, true, 100);
+										UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN2D, 7, 355, 355, true, 100);
 										sequence_step++;
 										break;
 									case 1://
 										if (UI_IsSpeechFinished()) {
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN2D, 9, 10, 355, false, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN2D, 9, 10, 355, false, 100);
 											sequence_step++;
 										}
 										break;
@@ -6187,16 +6196,16 @@ static void Scene2_Loop(void) {
 						}
 						break;
 					case 12:// Event 12: End of scene
-						if (event_enabling_room1[12]) {
-							event_enabling_room1[12] = false;
+						if (map->event_enabling_room1[12]) {
+							map->event_enabling_room1[12] = false;
 							scene_step = 15;
 						}
 						break;
 					case 13:// Event 13. Green Door to boss 1
-						if (event_enabling_room1[13]) {
-							event_enabling_room1[13] = false;
+						if (map->event_enabling_room1[13]) {
+							map->event_enabling_room1[13] = false;
 
-							if (actor.key_entity_id != ENTITY_ID_ITEM_KEYGREEN) {
+							if (actor->key_entity_id != ENTITY_ID_ITEM_KEYGREEN) {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 1);
 							} else {
 								ENEMY_UnloadEnemies();
@@ -6216,8 +6225,8 @@ static void Scene2_Loop(void) {
 						}
 						break;
 					case 16:// Event 16. Enter building
-						if (event_enabling_room1[16]) {
-							event_enabling_room1[16] = false;
+						if (map->event_enabling_room1[16]) {
+							map->event_enabling_room1[16] = false;
 
 							VIDEO_FadeOut(4);
 							engine.ingame = false;
@@ -6226,10 +6235,10 @@ static void Scene2_Loop(void) {
 						}
 						break;
 					case 18:// Event 18. Blue door
-						if (event_enabling_room1[18]) {
-							event_enabling_room1[18] = false;
+						if (map->event_enabling_room1[18]) {
+							map->event_enabling_room1[18] = false;
 
-							if (actor.key_entity_id != ENTITY_ID_ITEM_KEYBLUE) {
+							if (actor->key_entity_id != ENTITY_ID_ITEM_KEYBLUE) {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 1);
 							} else {
 								ACTOR_LeaveKey();
@@ -6247,10 +6256,10 @@ static void Scene2_Loop(void) {
 						}
 						break;
 					case 19:// Event 19. Yellow door
-						if (event_enabling_room1[19]) {
-							event_enabling_room1[19] = false;
+						if (map->event_enabling_room1[19]) {
+							map->event_enabling_room1[19] = false;
 
-							if (actor.key_entity_id != ENTITY_ID_ITEM_KEYYELLOW) {
+							if (actor->key_entity_id != ENTITY_ID_ITEM_KEYYELLOW) {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 1);
 							} else {
 								ACTOR_LeaveKey();
@@ -6269,80 +6278,109 @@ static void Scene2_Loop(void) {
 						break;
 					default:
 						// Reenable red door event if actor did not have key
-						if (!event_enabling_room1[4] && (scene_step < 2)) {
-							event_enabling_room1[4] = true;
+						if (!map->event_enabling_room1[4] && (scene_step < 2)) {
+							map->event_enabling_room1[4] = true;
 						}
 
 						// Reenable green door event if actor did not have key
-						if (!event_enabling_room1[13] && (scene_step < 4)) {
-							event_enabling_room1[13] = true;
+						if (!map->event_enabling_room1[13] && (scene_step < 4)) {
+							map->event_enabling_room1[13] = true;
 						}
 
 						// Reenable blue door event if actor did not have key
-						if (!event_enabling_room1[18] && (scene_step < 9)) {
-							event_enabling_room1[18] = true;
+						if (!map->event_enabling_room1[18] && (scene_step < 9)) {
+							map->event_enabling_room1[18] = true;
 						}
 
 						// Reenable yellow door event if actor did not have key
-						if (!event_enabling_room1[19] && (scene_step < 11)) {
-							event_enabling_room1[19] = true;
+						if (!map->event_enabling_room1[19] && (scene_step < 11)) {
+							map->event_enabling_room1[19] = true;
 						}
 
 						break;
 				}
 
 				switch (scene_step) {
-					case 1:// more rats!!
-						if (!enemy[0].is_loaded) {
-							ENEMY_Load("ENEMY6.DAT", 0, 57 << 4, 2 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
-
-						} else if (!enemy[1].is_loaded) {
-							ENEMY_Load("ENEMY6.DAT", 1, 58 << 4, 2 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
-
-						} else if (!enemy[2].is_loaded) {
-							ENEMY_Load("ENEMY6.DAT", 2, 67 << 4, 8 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
-
-						} else if (!enemy[3].is_loaded) {
-							ENEMY_Load("ENEMY6.DAT", 3, 70 << 4, 15 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
-
-						} else if (!enemy[4].is_loaded) {
-							ENEMY_Load("ENEMY6.DAT", 4, 73 << 4, 21 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
-
-						} else if (!enemy[5].is_loaded) {
-							ENEMY_Load("ENEMY6.DAT", 5, 72 << 4, 33 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
-
-						} else if (!enemy[6].is_loaded) {
-							ENEMY_Load("ENEMY6.DAT", 6, 73 << 4, 33 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
+					case 1:// Rats!!!!
+						switch (scene_counter) {
+							case 0:
+								if (!enemy[0].is_loaded) {
+									ENEMY_Load("ENEMY6.DAT", 0, 57 << 4, 2 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
+								}
+								break;
+							case 12:
+								if (!enemy[1].is_loaded) {
+									ENEMY_Load("ENEMY6.DAT", 1, 58 << 4, 2 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
+								}
+								break;
+							case 24:
+								if (!enemy[2].is_loaded) {
+									ENEMY_Load("ENEMY6.DAT", 2, 67 << 4, 8 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
+								}
+								break;
+							case 36:
+								if (!enemy[3].is_loaded) {
+									ENEMY_Load("ENEMY6.DAT", 3, 70 << 4, 15 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
+								}
+								break;
+							case 47:
+								if (!enemy[4].is_loaded) {
+									ENEMY_Load("ENEMY6.DAT", 4, 73 << 4, 21 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
+								}
+								break;
+							case 58:
+								if (!enemy[5].is_loaded) {
+									ENEMY_Load("ENEMY6.DAT", 5, 72 << 4, 33 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
+								}
+								break;
+							case 64:
+								if (!enemy[6].is_loaded) {
+									ENEMY_Load("ENEMY6.DAT", 6, 73 << 4, 33 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
+								}
+								break;
+							default:
+								break;
 						}
 						break;
 					case 2:
-
 						break;
 					case 3:// more rats!!
-						if (!enemy[7].is_loaded) {
-							ENEMY_Load("ENEMY6.DAT", 7, 61 << 4, 44 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_LEFT, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
-
-						} else if (!enemy[8].is_loaded) {
-							ENEMY_Load("ENEMY6.DAT", 8, 61 << 4, 45 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_LEFT, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
-
-						} else if (!enemy[9].is_loaded) {
-							ENEMY_Load("ENEMY6.DAT", 9, 63 << 4, 44 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_LEFT, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
-
-						} else if (!enemy[10].is_loaded) {
-							ENEMY_Load("ENEMY6.DAT", 10, 63 << 4, 45 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_LEFT, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
+						switch (scene_counter) {
+							case 16:
+								if (!enemy[7].is_loaded) {
+									ENEMY_Load("ENEMY6.DAT", 7, 62 << 4, 43 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_LEFT, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
+								}
+								break;
+							case 32:
+								if (!enemy[8].is_loaded) {
+									ENEMY_Load("ENEMY6.DAT", 8, 63 << 4, 43 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_LEFT, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
+								}
+								break;
+							default:
+								break;
 						}
 						break;
-
-					case 4:// kill all rats
+					case 4:// kill all rats (on event)
 						break;
 					case 5:
-						if (!enemy[0].is_loaded) {
-							ENEMY_Load("ENEMY6.DAT", 0, 50 << 4, 26 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_LEFT, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
-						} else if (!enemy[1].is_loaded) {
-							ENEMY_Load("ENEMY6.DAT", 1, 51 << 4, 26 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_LEFT, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
+						if (boss->is_loaded) {
+							switch (scene_counter) {
+								case 16:
+									if (!enemy[0].is_loaded) {
+										ENEMY_Load("ENEMY6.DAT", 0, 50 << 4, 26 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_LEFT, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
+									}
+									break;
+								case 32:
+									if (!enemy[1].is_loaded) {
+										ENEMY_Load("ENEMY6.DAT", 1, 51 << 4, 26 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_LEFT, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_CHASE, 1);
+									}
+									break;
+								default:
+									break;
+							}
 						}
 
-						if (!boss.is_loaded) {
+						if (!boss->is_loaded && !enemy[0].is_loaded && !enemy[1].is_loaded) {
 							MAP_HideSwapableTile(56 << 4, 23 << 4);
 							MAP_HideSwapableTile(57 << 4, 23 << 4);
 							MAP_HideSwapableTile(56 << 4, 24 << 4);
@@ -6359,20 +6397,34 @@ static void Scene2_Loop(void) {
 					case 7:
 						break;
 					case 8:// more spiders
-						if (!enemy[4].is_loaded) {
-							ENEMY_Load("ENEMY7.DAT", 4, 47 << 4, 4 << 4, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_PISTOL, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_WEBS, ENEMY_STATUS_CHASE, 10);
-
-						} else if (!enemy[5].is_loaded) {
-							ENEMY_Load("ENEMY7.DAT", 5, 14 << 4, 4 << 4, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_PISTOL, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_WEBS, ENEMY_STATUS_CHASE, 10);
-
-						} else if (!enemy[6].is_loaded) {
-							ENEMY_Load("ENEMY7.DAT", 6, 11 << 4, 13 << 4, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_PISTOL, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_WEBS, ENEMY_STATUS_CHASE, 10);
-
-						} else if (!enemy[7].is_loaded) {
-							ENEMY_Load("ENEMY7.DAT", 7, 19 << 4, 17 << 4, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_PISTOL, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_WEBS, ENEMY_STATUS_CHASE, 10);
-
-						} else if (!enemy[8].is_loaded) {
-							ENEMY_Load("ENEMY7.DAT", 8, 27 << 4, 28 << 4, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_PISTOL, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_WEBS, ENEMY_STATUS_CHASE, 10);
+						switch (scene_counter) {
+							case 8:
+								if (!enemy[4].is_loaded) {
+									ENEMY_Load("ENEMY7.DAT", 4, 47 << 4, 4 << 4, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_PISTOL, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_WEBS, ENEMY_STATUS_CHASE, 10);
+								}
+								break;
+							case 16:
+								if (!enemy[5].is_loaded) {
+									ENEMY_Load("ENEMY7.DAT", 5, 14 << 4, 4 << 4, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_PISTOL, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_WEBS, ENEMY_STATUS_CHASE, 10);
+								}
+								break;
+							case 24:
+								if (!enemy[6].is_loaded) {
+									ENEMY_Load("ENEMY7.DAT", 6, 11 << 4, 13 << 4, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_PISTOL, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_WEBS, ENEMY_STATUS_CHASE, 10);
+								}
+								break;
+							case 32:
+								if (!enemy[7].is_loaded) {
+									ENEMY_Load("ENEMY7.DAT", 7, 19 << 4, 17 << 4, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_PISTOL, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_WEBS, ENEMY_STATUS_CHASE, 10);
+								}
+								break;
+							case 48:
+								if (!enemy[8].is_loaded) {
+									ENEMY_Load("ENEMY7.DAT", 8, 27 << 4, 28 << 4, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_PISTOL, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_WEBS, ENEMY_STATUS_CHASE, 10);
+								}
+								break;
+							default:
+								break;
 						}
 						break;
 					case 9:
@@ -6383,14 +6435,24 @@ static void Scene2_Loop(void) {
 						ENEMY_UnloadEnemies();
 						break;
 					case 12:
-						if (!enemy[9].is_loaded) {
-							ENEMY_Load("ENEMY7.DAT", 9, 3 << 4, 29 << 4, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_PISTOL, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_WEBS, ENEMY_STATUS_CHASE, 10);
-
-						} else if (!enemy[10].is_loaded) {
-							ENEMY_Load("ENEMY7.DAT", 10, 4 << 4, 29 << 4, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_PISTOL, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_WEBS, ENEMY_STATUS_CHASE, 10);
+						if (boss->is_loaded) {
+							switch (scene_counter) {
+								case 16:
+									if (!enemy[9].is_loaded) {
+										ENEMY_Load("ENEMY7.DAT", 9, 3 << 4, 29 << 4, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_PISTOL, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_WEBS, ENEMY_STATUS_CHASE, 10);
+									}
+									break;
+								case 32:
+									if (!enemy[10].is_loaded) {
+										ENEMY_Load("ENEMY7.DAT", 10, 4 << 4, 29 << 4, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_PISTOL, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_WEBS, ENEMY_STATUS_CHASE, 10);
+									}
+									break;
+								default:
+									break;
+							}
 						}
 
-						if (!boss.is_loaded) {
+						if (!boss->is_loaded && !enemy[9].is_loaded && !enemy[10].is_loaded) {
 							MAP_HideSwapableTile(9 << 4, 26 << 4);
 							MAP_HideSwapableTile(10 << 4, 26 << 4);
 							MAP_HideSwapableTile(9 << 4, 27 << 4);
@@ -6415,7 +6477,7 @@ static void Scene2_Loop(void) {
 		Update(true);
 
 		// Finish all if actor is dead
-		if (actor.status_dead) GameOver();
+		if (actor->status_dead) GameOver();
 	}
 
 	VIDEO_FadeOut(4);
@@ -6449,9 +6511,9 @@ static void Scene2_Outro(void) {
 				break;
 			case 1:// Load first outro scene
 				AUDIO_LoadSong(AUDIO_SONG_3);
-				GFX_PCXImageToBuffer("OSCN2.DAT", "OUTRO1H.PCX", 140 * 140, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("OSCN2.DAT", "OUTRO1L.PCX", 140 * 140, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("OSCN2.DAT", "OUTRO2H.PCX", 160 * 160, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("OSCN2.DAT", "OUTRO1H.PCX", 140 * 140, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN2.DAT", "OUTRO1L.PCX", 140 * 140, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("OSCN2.DAT", "OUTRO2H.PCX", 160 * 160, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 
 				step++;
 				break;
@@ -6462,8 +6524,8 @@ static void Scene2_Outro(void) {
 			case 3:/// Scene 1 :: Agents waiting outside
 				VIDEO_ClearScreenBuffer();
 				GFX_LoadPalette("PALETTES.DAT", "OSCN2.PCX", 256);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 10, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 13, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 10, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 13, 43);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				VIDEO_FadeIn(4);
@@ -6481,15 +6543,15 @@ static void Scene2_Outro(void) {
 				step++;
 				break;
 			case 5://Show chat case
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 250);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 242);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 250);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				step++;
 				break;
 			case 6:// Speech
-				VIDEO_StringToScreenBuffer(28, 13, ui.txt_file[UI_TXT_SCN2I].line[60], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 25, ui.txt_file[UI_TXT_SCN2I].line[61], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN2I]->line[60], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN2I]->line[61], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				step++;
@@ -6502,10 +6564,10 @@ static void Scene2_Outro(void) {
 				step++;
 				break;
 			case 8:// Second frame
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 166, 166, 150, 30, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 153, 33);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 250);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 166, 166, 150, 30, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 153, 33);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 242);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 250);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				step++;
@@ -6518,24 +6580,24 @@ static void Scene2_Outro(void) {
 				step++;
 				break;
 			case 10:// Hide first frame
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 10, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 13, 43);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 166, 166, 150, 30, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 153, 33);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 250);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 10, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 13, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 166, 166, 150, 30, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 153, 33);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 242);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 250);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				step++;
 				break;
 			case 11://Show chat case
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 250);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 242);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 250);
 				step++;
 				break;
 			case 12:// Speech
-				VIDEO_StringToScreenBuffer(28, 13, ui.txt_file[UI_TXT_SCN2I].line[62], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 25, ui.txt_file[UI_TXT_SCN2I].line[63], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN2I]->line[62], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN2I]->line[63], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 13:// Just wait
@@ -6588,9 +6650,9 @@ static void Scene3_Intro(void) {
 				step++;
 				break;
 			case 1:// Load first intro scene
-				GFX_PCXImageToBuffer("ISCN3.DAT", "INTRO1H.PCX", 260 * 70, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("ISCN3.DAT", "INTRO1L.PCX", 200 * 70, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("ISCN3.DAT", "INTRO2H.PCX", 260 * 70, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("ISCN3.DAT", "INTRO1H.PCX", 260 * 70, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("ISCN3.DAT", "INTRO1L.PCX", 200 * 70, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("ISCN3.DAT", "INTRO2H.PCX", 260 * 70, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				AUDIO_LoadSong(AUDIO_SONG_3);
 				step++;
 				break;
@@ -6611,8 +6673,8 @@ static void Scene3_Intro(void) {
 				step++;
 				break;
 			case 4:// Draw frame
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 206, 76, 30, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, 200, gfx.image_buffer1_height, 33, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 206, 76, 30, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, 200, gfx->image_buffer1_height, 33, 53);
 
 				step++;
 				break;
@@ -6626,16 +6688,16 @@ static void Scene3_Intro(void) {
 					dst_index = CAM_VISIBLE_WIDTH * 53 + 33;
 
 					// Draw image with scroll
-					for (i = 0; i < gfx.image_buffer1_height; i++) {
-						memcpy(&video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx.image_buffer1[src_index], 200);
-						src_index += gfx.image_buffer1_width;
+					for (i = 0; i < gfx->image_buffer1_height; i++) {
+						memcpy(&video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx->image_buffer1[src_index], 200);
+						src_index += gfx->image_buffer1_width;
 						dst_index += CAM_VISIBLE_WIDTH;
 					}
 					if (horizontal_scroll < 59) horizontal_scroll++;
 
 					// Draw text background
-					VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 239);
-					VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 8, 4, 208);
+					VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 239);
+					VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 
 					// Draw text
 					switch (dialog_step) {
@@ -6645,8 +6707,8 @@ static void Scene3_Intro(void) {
 							dialog_step++;
 							break;
 						case 1:
-							VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN3I].line[80], FONT_SLIM_BLACK);
-							VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN3I].line[81], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN3I]->line[80], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN3I]->line[81], FONT_SLIM_BLACK);
 							dialog_delay_counter++;
 							if (dialog_delay_counter > 100) {
 								dialog_step++;
@@ -6661,8 +6723,8 @@ static void Scene3_Intro(void) {
 							}
 							break;
 						case 3:
-							VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN3I].line[82], FONT_SLIM_BLACK);
-							VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN3I].line[83], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN3I]->line[82], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN3I]->line[83], FONT_SLIM_BLACK);
 							dialog_delay_counter++;
 							if (dialog_delay_counter > 100) {
 								dialog_step++;
@@ -6706,23 +6768,23 @@ static void Scene3_Intro(void) {
 				dialog_step = 0;
 				scroll_end = false;
 
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 206, 76, 60, 120, 222);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 206, 76, 60, 120, 222);
 
 				while (!scroll_end & engine.sequence) {
 					src_index = horizontal_scroll;
 					dst_index = CAM_VISIBLE_WIDTH * 123 + 63;
 
 					// Draw image with scroll
-					for (i = 0; i < gfx.image_buffer3_height; i++) {
-						memcpy(&video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx.image_buffer3[src_index], 200);
-						src_index += gfx.image_buffer3_width;
+					for (i = 0; i < gfx->image_buffer3_height; i++) {
+						memcpy(&video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx->image_buffer3[src_index], 200);
+						src_index += gfx->image_buffer3_width;
 						dst_index += CAM_VISIBLE_WIDTH;
 					}
 					if (horizontal_scroll > 0) horizontal_scroll--;
 
 					// Draw text background
-					VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 239);
-					VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 8, 4, 208);
+					VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 239);
+					VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 					// Draw text
 					switch (dialog_step) {
 						case 0:
@@ -6731,8 +6793,8 @@ static void Scene3_Intro(void) {
 							dialog_step++;
 							break;
 						case 1:
-							VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN3I].line[84], FONT_SLIM_BLACK);
-							VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN3I].line[85], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN3I]->line[84], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN3I]->line[85], FONT_SLIM_BLACK);
 							dialog_delay_counter++;
 							if (dialog_delay_counter > 100) {
 								dialog_step++;
@@ -6747,8 +6809,8 @@ static void Scene3_Intro(void) {
 							}
 							break;
 						case 3:
-							VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN3I].line[86], FONT_SLIM_BLACK);
-							VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN3I].line[87], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN3I]->line[86], FONT_SLIM_BLACK);
+							VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN3I]->line[87], FONT_SLIM_BLACK);
 							dialog_delay_counter++;
 							if (dialog_delay_counter > 100) {
 								dialog_step++;
@@ -6810,7 +6872,6 @@ static void Scene3_Intro(void) {
 	AUDIO_UnloadSong();
 }
 static void Scene3_LoadAssets(void) {
-	ENEMY_Init();// Initialize enemy system
 
 	// Load enemies and unload them just to get graphics
 	ENEMY_Load("ENEMY1.DAT", 0, 0, 0, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_GUN0, SPRITE_GRAPHICS_ID_EMPTY, ENEMY_STATUS_STATIC_NPC, 1);
@@ -6822,8 +6883,8 @@ static void Scene3_LoadAssets(void) {
 	OBJECT_LoadObject("OBJECT2.DAT", 0, ENTITY_ID_BARREL, SPRITE_GRAPHICS_ID_OBJECT2, SPRITE_GRAPHICS_ID_OBJECT2_PORTAIT, 0, 0);
 	OBJECT_UnloadObjects();
 
-	ACTOR_Init(1 << 4, 22 << 4, SPRITE_GRAPHICS_ID_ACTOR_FEET, SPRITE_GRAPHICS_ID_ACTOR_BODY, SPRITE_GRAPHICS_ID_ACTOR_HEAD, SPRITE_GRAPHICS_ID_ACTOR_LARM, SPRITE_GRAPHICS_ID_ACTOR_RARM_BARE_HANDS, ACTOR_FACING_RIGHT);
-	ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
+	ACTOR_Load(1 << 4, 22 << 4, SPRITE_GRAPHICS_ID_ACTOR_FEET, SPRITE_GRAPHICS_ID_ACTOR_BODY, SPRITE_GRAPHICS_ID_ACTOR_HEAD, SPRITE_GRAPHICS_ID_ACTOR_LARM, SPRITE_GRAPHICS_ID_ACTOR_RARM_BARE_HANDS, ACTOR_FACING_RIGHT);
+	ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
 	ACTOR_SetBulletStatus(99, 19, 199, 9, 9);
 
 	NPC_Init();
@@ -7022,140 +7083,140 @@ static void Scene3_SetHotspotsAndEvents(void) {
 
 	// Initialize hotspots and events
 	// Update hotspots
-	hotspot_enabling_room1[0] = false;
-	hotspot_enabling_room1[1] = true;
-	hotspot_enabling_room1[2] = true;
-	hotspot_enabling_room1[3] = false;
-	hotspot_enabling_room1[4] = false;
-	hotspot_enabling_room1[5] = false;
-	hotspot_enabling_room1[6] = false;
-	hotspot_enabling_room1[7] = false;
-	hotspot_enabling_room1[8] = false;
-	hotspot_enabling_room1[9] = false;
-	hotspot_enabling_room1[10] = false;
-	hotspot_enabling_room1[11] = false;
-	hotspot_enabling_room1[12] = false;
-	hotspot_enabling_room1[13] = false;
-	hotspot_enabling_room1[14] = false;
-	hotspot_enabling_room1[15] = false;
-	hotspot_enabling_room1[16] = false;
-	hotspot_enabling_room1[17] = false;
-	hotspot_enabling_room1[18] = false;
-	hotspot_enabling_room1[19] = false;
-	hotspot_enabling_room1[20] = false;
-	hotspot_enabling_room1[21] = false;
-	hotspot_enabling_room1[22] = false;
-	hotspot_enabling_room1[23] = false;
-	hotspot_enabling_room1[24] = false;
-	hotspot_enabling_room1[25] = false;
-	hotspot_enabling_room1[26] = false;
-	hotspot_enabling_room1[27] = false;
-	hotspot_enabling_room1[28] = false;
-	hotspot_enabling_room1[29] = false;
-	hotspot_enabling_room1[30] = false;
-	hotspot_enabling_room1[31] = false;
+	map->hotspot_enabling_room1[0] = false;
+	map->hotspot_enabling_room1[1] = true;
+	map->hotspot_enabling_room1[2] = true;
+	map->hotspot_enabling_room1[3] = false;
+	map->hotspot_enabling_room1[4] = false;
+	map->hotspot_enabling_room1[5] = false;
+	map->hotspot_enabling_room1[6] = false;
+	map->hotspot_enabling_room1[7] = false;
+	map->hotspot_enabling_room1[8] = false;
+	map->hotspot_enabling_room1[9] = false;
+	map->hotspot_enabling_room1[10] = false;
+	map->hotspot_enabling_room1[11] = false;
+	map->hotspot_enabling_room1[12] = false;
+	map->hotspot_enabling_room1[13] = false;
+	map->hotspot_enabling_room1[14] = false;
+	map->hotspot_enabling_room1[15] = false;
+	map->hotspot_enabling_room1[16] = false;
+	map->hotspot_enabling_room1[17] = false;
+	map->hotspot_enabling_room1[18] = false;
+	map->hotspot_enabling_room1[19] = false;
+	map->hotspot_enabling_room1[20] = false;
+	map->hotspot_enabling_room1[21] = false;
+	map->hotspot_enabling_room1[22] = false;
+	map->hotspot_enabling_room1[23] = false;
+	map->hotspot_enabling_room1[24] = false;
+	map->hotspot_enabling_room1[25] = false;
+	map->hotspot_enabling_room1[26] = false;
+	map->hotspot_enabling_room1[27] = false;
+	map->hotspot_enabling_room1[28] = false;
+	map->hotspot_enabling_room1[29] = false;
+	map->hotspot_enabling_room1[30] = false;
+	map->hotspot_enabling_room1[31] = false;
 
 	// Update events
-	event_enabling_room1[0] = false;
-	event_enabling_room1[1] = true;
-	event_enabling_room1[2] = true;
-	event_enabling_room1[3] = true;
-	event_enabling_room1[4] = true;
-	event_enabling_room1[5] = true;
-	event_enabling_room1[6] = true;
-	event_enabling_room1[7] = false;
-	event_enabling_room1[8] = false;
-	event_enabling_room1[9] = false;
-	event_enabling_room1[10] = false;
-	event_enabling_room1[11] = false;
-	event_enabling_room1[12] = false;
-	event_enabling_room1[13] = false;
-	event_enabling_room1[14] = false;
-	event_enabling_room1[15] = true;
-	event_enabling_room1[16] = true;
-	event_enabling_room1[17] = false;
-	event_enabling_room1[18] = false;
-	event_enabling_room1[19] = false;
-	event_enabling_room1[20] = false;
-	event_enabling_room1[21] = false;
-	event_enabling_room1[22] = false;
-	event_enabling_room1[23] = false;
-	event_enabling_room1[24] = false;
-	event_enabling_room1[25] = false;
-	event_enabling_room1[26] = false;
-	event_enabling_room1[27] = false;
-	event_enabling_room1[28] = false;
-	event_enabling_room1[29] = false;
-	event_enabling_room1[30] = false;
-	event_enabling_room1[31] = false;
+	map->event_enabling_room1[0] = false;
+	map->event_enabling_room1[1] = true;
+	map->event_enabling_room1[2] = true;
+	map->event_enabling_room1[3] = true;
+	map->event_enabling_room1[4] = true;
+	map->event_enabling_room1[5] = true;
+	map->event_enabling_room1[6] = true;
+	map->event_enabling_room1[7] = false;
+	map->event_enabling_room1[8] = false;
+	map->event_enabling_room1[9] = false;
+	map->event_enabling_room1[10] = false;
+	map->event_enabling_room1[11] = false;
+	map->event_enabling_room1[12] = false;
+	map->event_enabling_room1[13] = false;
+	map->event_enabling_room1[14] = false;
+	map->event_enabling_room1[15] = true;
+	map->event_enabling_room1[16] = true;
+	map->event_enabling_room1[17] = false;
+	map->event_enabling_room1[18] = false;
+	map->event_enabling_room1[19] = false;
+	map->event_enabling_room1[20] = false;
+	map->event_enabling_room1[21] = false;
+	map->event_enabling_room1[22] = false;
+	map->event_enabling_room1[23] = false;
+	map->event_enabling_room1[24] = false;
+	map->event_enabling_room1[25] = false;
+	map->event_enabling_room1[26] = false;
+	map->event_enabling_room1[27] = false;
+	map->event_enabling_room1[28] = false;
+	map->event_enabling_room1[29] = false;
+	map->event_enabling_room1[30] = false;
+	map->event_enabling_room1[31] = false;
 
 	// Update hotspots
-	hotspot_enabling_room2[0] = false;
-	hotspot_enabling_room2[1] = false;
-	hotspot_enabling_room2[2] = false;
-	hotspot_enabling_room2[3] = false;
-	hotspot_enabling_room2[4] = false;
-	hotspot_enabling_room2[5] = false;
-	hotspot_enabling_room2[6] = false;
-	hotspot_enabling_room2[7] = false;
-	hotspot_enabling_room2[8] = false;
-	hotspot_enabling_room2[9] = false;
-	hotspot_enabling_room2[10] = false;
-	hotspot_enabling_room2[11] = false;
-	hotspot_enabling_room2[12] = false;
-	hotspot_enabling_room2[13] = false;
-	hotspot_enabling_room2[14] = false;
-	hotspot_enabling_room2[15] = false;
-	hotspot_enabling_room2[16] = false;
-	hotspot_enabling_room2[17] = false;
-	hotspot_enabling_room2[18] = false;
-	hotspot_enabling_room2[19] = false;
-	hotspot_enabling_room2[20] = false;
-	hotspot_enabling_room2[21] = false;
-	hotspot_enabling_room2[22] = false;
-	hotspot_enabling_room2[23] = false;
-	hotspot_enabling_room2[24] = false;
-	hotspot_enabling_room2[25] = false;
-	hotspot_enabling_room2[26] = false;
-	hotspot_enabling_room2[27] = false;
-	hotspot_enabling_room2[28] = false;
-	hotspot_enabling_room2[29] = false;
-	hotspot_enabling_room2[30] = false;
-	hotspot_enabling_room2[31] = false;
+	map->hotspot_enabling_room2[0] = false;
+	map->hotspot_enabling_room2[1] = false;
+	map->hotspot_enabling_room2[2] = false;
+	map->hotspot_enabling_room2[3] = false;
+	map->hotspot_enabling_room2[4] = false;
+	map->hotspot_enabling_room2[5] = false;
+	map->hotspot_enabling_room2[6] = false;
+	map->hotspot_enabling_room2[7] = false;
+	map->hotspot_enabling_room2[8] = false;
+	map->hotspot_enabling_room2[9] = false;
+	map->hotspot_enabling_room2[10] = false;
+	map->hotspot_enabling_room2[11] = false;
+	map->hotspot_enabling_room2[12] = false;
+	map->hotspot_enabling_room2[13] = false;
+	map->hotspot_enabling_room2[14] = false;
+	map->hotspot_enabling_room2[15] = false;
+	map->hotspot_enabling_room2[16] = false;
+	map->hotspot_enabling_room2[17] = false;
+	map->hotspot_enabling_room2[18] = false;
+	map->hotspot_enabling_room2[19] = false;
+	map->hotspot_enabling_room2[20] = false;
+	map->hotspot_enabling_room2[21] = false;
+	map->hotspot_enabling_room2[22] = false;
+	map->hotspot_enabling_room2[23] = false;
+	map->hotspot_enabling_room2[24] = false;
+	map->hotspot_enabling_room2[25] = false;
+	map->hotspot_enabling_room2[26] = false;
+	map->hotspot_enabling_room2[27] = false;
+	map->hotspot_enabling_room2[28] = false;
+	map->hotspot_enabling_room2[29] = false;
+	map->hotspot_enabling_room2[30] = false;
+	map->hotspot_enabling_room2[31] = false;
 
 	// Update events
-	event_enabling_room2[0] = false;
-	event_enabling_room2[1] = true;
-	event_enabling_room2[2] = true;
-	event_enabling_room2[3] = true;
-	event_enabling_room2[4] = true;
-	event_enabling_room2[5] = false;
-	event_enabling_room2[6] = false;
-	event_enabling_room2[7] = false;
-	event_enabling_room2[8] = false;
-	event_enabling_room2[9] = false;
-	event_enabling_room2[10] = false;
-	event_enabling_room2[11] = false;
-	event_enabling_room2[12] = false;
-	event_enabling_room2[13] = false;
-	event_enabling_room2[14] = false;
-	event_enabling_room2[15] = false;
-	event_enabling_room2[16] = true;
-	event_enabling_room2[17] = false;
-	event_enabling_room2[18] = false;
-	event_enabling_room2[19] = false;
-	event_enabling_room2[20] = false;
-	event_enabling_room2[21] = false;
-	event_enabling_room2[22] = false;
-	event_enabling_room2[23] = false;
-	event_enabling_room2[24] = false;
-	event_enabling_room2[25] = false;
-	event_enabling_room2[26] = false;
-	event_enabling_room2[27] = false;
-	event_enabling_room2[28] = false;
-	event_enabling_room2[29] = false;
-	event_enabling_room2[30] = false;
-	event_enabling_room2[31] = false;
+	map->event_enabling_room2[0] = false;
+	map->event_enabling_room2[1] = true;
+	map->event_enabling_room2[2] = true;
+	map->event_enabling_room2[3] = true;
+	map->event_enabling_room2[4] = true;
+	map->event_enabling_room2[5] = false;
+	map->event_enabling_room2[6] = false;
+	map->event_enabling_room2[7] = false;
+	map->event_enabling_room2[8] = false;
+	map->event_enabling_room2[9] = false;
+	map->event_enabling_room2[10] = false;
+	map->event_enabling_room2[11] = false;
+	map->event_enabling_room2[12] = false;
+	map->event_enabling_room2[13] = false;
+	map->event_enabling_room2[14] = false;
+	map->event_enabling_room2[15] = false;
+	map->event_enabling_room2[16] = true;
+	map->event_enabling_room2[17] = false;
+	map->event_enabling_room2[18] = false;
+	map->event_enabling_room2[19] = false;
+	map->event_enabling_room2[20] = false;
+	map->event_enabling_room2[21] = false;
+	map->event_enabling_room2[22] = false;
+	map->event_enabling_room2[23] = false;
+	map->event_enabling_room2[24] = false;
+	map->event_enabling_room2[25] = false;
+	map->event_enabling_room2[26] = false;
+	map->event_enabling_room2[27] = false;
+	map->event_enabling_room2[28] = false;
+	map->event_enabling_room2[29] = false;
+	map->event_enabling_room2[30] = false;
+	map->event_enabling_room2[31] = false;
 }
 static void Scene3_Loop(void) {
 	bool end_sequence;
@@ -7166,10 +7227,10 @@ static void Scene3_Loop(void) {
 	VIDEO_ClearScreenBuffer();
 	GFX_LoadPalette("PALETTES.DAT", "SCN31.PCX", 256);
 
-	VIDEO_StringToScreenBuffer(50, 60, ui.txt_file[UI_TXT_SCN3I].line[40], FONT_BIG_WHITE);
-	VIDEO_StringToScreenBuffer(80, 85, ui.txt_file[UI_TXT_SCN3I].line[41], FONT_BIG_WHITE);
-	VIDEO_StringToScreenBuffer(90, 135, ui.txt_file[UI_TXT_SCN3I].line[42], FONT_SLIM_WHITE);
-	VIDEO_StringToScreenBuffer(160, 135, ui.txt_file[UI_TXT_SCN3I].line[43], FONT_SLIM_WHITE);
+	VIDEO_StringToScreenBuffer(50, 60, ui->txt_file[UI_TXT_SCN3I]->line[40], FONT_BIG_WHITE);
+	VIDEO_StringToScreenBuffer(80, 85, ui->txt_file[UI_TXT_SCN3I]->line[41], FONT_BIG_WHITE);
+	VIDEO_StringToScreenBuffer(90, 135, ui->txt_file[UI_TXT_SCN3I]->line[42], FONT_SLIM_WHITE);
+	VIDEO_StringToScreenBuffer(160, 135, ui->txt_file[UI_TXT_SCN3I]->line[43], FONT_SLIM_WHITE);
 
 	VIDEO_VSync();
 	VIDEO_ScreenBufferToVRAM();
@@ -7201,7 +7262,7 @@ static void Scene3_Loop(void) {
 			ACTOR_SetPosition(65 << 4, 8 << 4, ACTOR_FACING_LEFT);// Set actor position
 			ACTOR_SetCombatMode(true);
 
-			CAM_Init(map.width_px, map.height_px, 46 << 4, 0 << 4);// Initialize camera
+			CAM_Init(map->width_px, map->height_px, 46 << 4, 0 << 4);// Initialize camera
 			MAP_DrawMapToMapVideoBuffer();
 
 			Update(true);
@@ -7216,7 +7277,7 @@ static void Scene3_Loop(void) {
 			ACTOR_SetPosition(27 << 4, 23 << 4, ACTOR_FACING_UP);// Set actor position
 			ACTOR_SetCombatMode(true);
 
-			CAM_Init(map.width_px, map.height_px, 17 << 4, 14 << 4);// Initialize camera
+			CAM_Init(map->width_px, map->height_px, 17 << 4, 14 << 4);// Initialize camera
 			MAP_DrawMapToMapVideoBuffer();
 
 			Update(true);
@@ -7231,8 +7292,6 @@ static void Scene3_Loop(void) {
 	// Loop until the game is over
 	while (engine.ingame) {
 
-		engine.debug1_INT = scene_step;
-
 		switch (engine.room) {
 			case 1:// Room 1. Lower floor
 				   // Scene steps
@@ -7246,7 +7305,7 @@ static void Scene3_Loop(void) {
 				// - Event 15: Exit building
 
 				// Hotspots
-				if (!actor.mode_combat) {
+				if (!actor->mode_combat) {
 					// Check point on object or enemy
 					switch (cursor.point_on & 0xFF) {
 						case ENTITY_ID_HSPOT:// Hotspot
@@ -7255,7 +7314,7 @@ static void Scene3_Loop(void) {
 									break;
 								case 1:// Garbage bin
 									if (cursor.left_click) {
-										UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3H, 101, 102, 103, false, 100);
+										UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3H, 101, 102, 103, false, 100);
 
 									} else {
 										UI_ShowDescription(UI_TXT_SCN3H, 1);
@@ -7263,7 +7322,7 @@ static void Scene3_Loop(void) {
 									break;
 								case 2:// Garbage
 									if (cursor.left_click) {
-										UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3H, 101, 102, 103, false, 100);
+										UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3H, 101, 102, 103, false, 100);
 
 									} else {
 										UI_ShowDescription(UI_TXT_SCN3H, 2);
@@ -7271,7 +7330,7 @@ static void Scene3_Loop(void) {
 									break;
 								case 3:// Sewer
 									if (cursor.left_click) {
-										UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3H, 104, 105, 106, false, 100);
+										UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3H, 104, 105, 106, false, 100);
 
 									} else {
 										UI_ShowDescription(UI_TXT_SCN3H, 3);
@@ -7279,7 +7338,7 @@ static void Scene3_Loop(void) {
 									break;
 								case 4:// Chef
 									if (cursor.left_click) {
-										UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3H, 107, 108, 109, false, 100);
+										UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3H, 107, 108, 109, false, 100);
 
 									} else {
 										UI_ShowDescription(UI_TXT_SCN3H, 4);
@@ -7298,29 +7357,29 @@ static void Scene3_Loop(void) {
 				}
 
 				// Events
-				actor_tile_num = MAP_GetTileNumber(actor.pos_x + (gfx_sprite_stack[actor.sprite_num].width_px >> 1), actor.pos_y + (gfx_sprite_stack[actor.sprite_num].height_px >> 1));
-				switch ((map.layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
+				actor_tile_num = MAP_GetTileNumber(actor->pos_x + (gfx_sprite_stack[actor->sprite_num].width_px >> 1), actor->pos_y + (gfx_sprite_stack[actor->sprite_num].height_px >> 1));
+				switch ((map->layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
 					case 1:// Event 1. Kitchen entry
-						if (event_enabling_room1[1]) {
-							event_enabling_room1[1] = false;
+						if (map->event_enabling_room1[1]) {
+							map->event_enabling_room1[1] = false;
 
 							sequence_step = 0;
 							end_sequence = false;
 							while (!end_sequence) {
 								switch (sequence_step) {
 									case 0://
-										UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 1, 2, 355, false, 100);
+										UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 1, 2, 355, false, 100);
 										sequence_step++;
 										break;
 									case 1://
 										if (UI_IsSpeechFinished()) {
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 3, 4, 355, false, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 3, 4, 355, false, 100);
 											sequence_step++;
 										}
 										break;
 									case 2://
 										if (UI_IsSpeechFinished()) {
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 5, 6, 355, false, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 5, 6, 355, false, 100);
 											sequence_step++;
 										}
 										break;
@@ -7340,37 +7399,37 @@ static void Scene3_Loop(void) {
 						}
 						break;
 					case 2:// Event 2. Chef
-						if (event_enabling_room1[2]) {
-							event_enabling_room1[2] = false;
+						if (map->event_enabling_room1[2]) {
+							map->event_enabling_room1[2] = false;
 							sequence_step = 0;
 							end_sequence = false;
 							while (!end_sequence) {
 								switch (sequence_step) {
 									case 0://
-										UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 12, 13, 14, true, 100);
+										UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 12, 13, 14, true, 100);
 										sequence_step++;
 										break;
 									case 1://
 										if (UI_IsSpeechFinished()) {
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 15, 16, 17, false, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 15, 16, 17, false, 100);
 											sequence_step++;
 										}
 										break;
 									case 2://
 										if (UI_IsSpeechFinished()) {
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 18, 19, 20, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 18, 19, 20, true, 100);
 											sequence_step++;
 										}
 										break;
 									case 3://
 										if (UI_IsSpeechFinished()) {
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 21, 355, 355, false, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 21, 355, 355, false, 100);
 											sequence_step++;
 										}
 										break;
 									case 4://
 										if (UI_IsSpeechFinished()) {
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 22, 355, 355, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 22, 355, 355, true, 100);
 											sequence_step++;
 										}
 										break;
@@ -7378,7 +7437,7 @@ static void Scene3_Loop(void) {
 										if (UI_IsSpeechFinished()) {
 
 											ACTOR_SetCombatMode(true);
-											ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_PISTOL);
+											ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_PISTOL);
 											ACTOR_Reload();
 
 											ENEMY_SetBehavior(0, ENEMY_STATUS_CHASE);
@@ -7408,10 +7467,10 @@ static void Scene3_Loop(void) {
 						}
 						break;
 					case 3:// Event 3. Entry storeroom. Red key
-						if (event_enabling_room1[3]) {
-							event_enabling_room1[3] = false;
+						if (map->event_enabling_room1[3]) {
+							map->event_enabling_room1[3] = false;
 
-							if (actor.key_entity_id != ENTITY_ID_ITEM_KEYRED) {
+							if (actor->key_entity_id != ENTITY_ID_ITEM_KEYRED) {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 1);
 							} else {
 
@@ -7427,10 +7486,10 @@ static void Scene3_Loop(void) {
 						}
 						break;
 					case 4:// Event 4. Entry blue door. Blue key
-						if (event_enabling_room1[4]) {
-							event_enabling_room1[4] = false;
+						if (map->event_enabling_room1[4]) {
+							map->event_enabling_room1[4] = false;
 
-							if (actor.key_entity_id != ENTITY_ID_ITEM_KEYBLUE) {
+							if (actor->key_entity_id != ENTITY_ID_ITEM_KEYBLUE) {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 1);
 							} else {
 
@@ -7446,10 +7505,10 @@ static void Scene3_Loop(void) {
 						}
 						break;
 					case 5:// Event 5. Entry yellow door. Yellow key
-						if (event_enabling_room1[5]) {
-							event_enabling_room1[5] = false;
+						if (map->event_enabling_room1[5]) {
+							map->event_enabling_room1[5] = false;
 
-							if (actor.key_entity_id != ENTITY_ID_ITEM_KEYYELLOW) {
+							if (actor->key_entity_id != ENTITY_ID_ITEM_KEYYELLOW) {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 1);
 							} else {
 
@@ -7465,10 +7524,10 @@ static void Scene3_Loop(void) {
 						}
 						break;
 					case 6:// Event 6. Entry green door. Green key
-						if (event_enabling_room1[6]) {
-							event_enabling_room1[6] = false;
+						if (map->event_enabling_room1[6]) {
+							map->event_enabling_room1[6] = false;
 
-							if (actor.key_entity_id != ENTITY_ID_ITEM_KEYGREEN) {
+							if (actor->key_entity_id != ENTITY_ID_ITEM_KEYGREEN) {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 1);
 							} else {
 
@@ -7484,8 +7543,8 @@ static void Scene3_Loop(void) {
 						}
 						break;
 					case 15:// Event 15. Exit building
-						if (event_enabling_room1[15]) {
-							event_enabling_room1[15] = false;
+						if (map->event_enabling_room1[15]) {
+							map->event_enabling_room1[15] = false;
 
 							if (scene_step < 32) {
 
@@ -7494,7 +7553,7 @@ static void Scene3_Loop(void) {
 								while (!end_sequence) {
 									switch (sequence_step) {
 										case 0://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 24, 25, 355, false, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 24, 25, 355, false, 100);
 											sequence_step++;
 											break;
 										case 1://
@@ -7518,8 +7577,8 @@ static void Scene3_Loop(void) {
 						}
 						break;
 					case 16:// Event 16. Go to second floor
-						if (event_enabling_room1[16]) {
-							event_enabling_room1[16] = false;
+						if (map->event_enabling_room1[16]) {
+							map->event_enabling_room1[16] = false;
 							VIDEO_FadeOut(4);
 							ENEMY_UnloadEnemies();
 							ITEM_UnloadItems();
@@ -7532,8 +7591,8 @@ static void Scene3_Loop(void) {
 							MAP_UnloadMap();
 
 							Scene3_LoadRoom2();
-							ACTOR_SetPosition(27 << 4, 24 << 4, ACTOR_FACING_UP);   // Set actor position
-							CAM_Init(map.width_px, map.height_px, 17 << 4, 12 << 4);// Initialize camera
+							ACTOR_SetPosition(27 << 4, 24 << 4, ACTOR_FACING_UP);     // Set actor position
+							CAM_Init(map->width_px, map->height_px, 17 << 4, 12 << 4);// Initialize camera
 							MAP_DrawMapToMapVideoBuffer();
 
 							Update(false);
@@ -7551,7 +7610,7 @@ static void Scene3_Loop(void) {
 							while (!end_sequence) {
 								switch (sequence_step) {
 									case 0://
-										UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 34, 35, 36, false, 100);
+										UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 34, 35, 36, false, 100);
 										sequence_step++;
 										break;
 									case 1://
@@ -7593,33 +7652,33 @@ static void Scene3_Loop(void) {
 						break;
 					default:
 						// Reenable red door event if actor did not have key
-						if (!event_enabling_room1[3] && (scene_step < 3)) {
-							event_enabling_room1[3] = true;
+						if (!map->event_enabling_room1[3] && (scene_step < 3)) {
+							map->event_enabling_room1[3] = true;
 						}
 
 						// Reenable blue door event if actor did not have key
-						if (!event_enabling_room1[4] && (scene_step < 4)) {
-							event_enabling_room1[4] = true;
+						if (!map->event_enabling_room1[4] && (scene_step < 4)) {
+							map->event_enabling_room1[4] = true;
 						}
 
 						// Reenable yellow door event if actor did not have key
-						if (!event_enabling_room1[5] && (scene_step < 5)) {
-							event_enabling_room1[5] = true;
+						if (!map->event_enabling_room1[5] && (scene_step < 5)) {
+							map->event_enabling_room1[5] = true;
 						}
 
 						// Reenable green door event if actor did not have key
-						if (!event_enabling_room1[6] && (scene_step < 6)) {
-							event_enabling_room1[6] = true;
+						if (!map->event_enabling_room1[6] && (scene_step < 6)) {
+							map->event_enabling_room1[6] = true;
 						}
 
 						// Reenable end of level event if actor leave event
-						if (!event_enabling_room1[15] && (scene_step != 32)) {
-							event_enabling_room1[15] = true;
+						if (!map->event_enabling_room1[15] && (scene_step != 32)) {
+							map->event_enabling_room1[15] = true;
 						}
 
 						// Reenable go to second floor event if actor leave event
-						if (!event_enabling_room1[16] && (scene_step == 32)) {
-							event_enabling_room1[16] = true;
+						if (!map->event_enabling_room1[16] && (scene_step == 32)) {
+							map->event_enabling_room1[16] = true;
 						}
 						break;
 				}
@@ -7634,7 +7693,7 @@ static void Scene3_Loop(void) {
 				// - Take documents >> Step = 31
 
 				// Hotspots
-				if (!actor.mode_combat) {
+				if (!actor->mode_combat) {
 					// Check point on object or enemy
 					switch (cursor.point_on & 0xFF) {
 						case ENTITY_ID_HSPOT:// Hotspot
@@ -7668,13 +7727,13 @@ static void Scene3_Loop(void) {
 				}
 
 				// Events
-				actor_tile_num = MAP_GetTileNumber(actor.pos_x + (gfx_sprite_stack[actor.sprite_num].width_px >> 1), actor.pos_y + (gfx_sprite_stack[actor.sprite_num].height_px >> 1));
-				switch ((map.layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
+				actor_tile_num = MAP_GetTileNumber(actor->pos_x + (gfx_sprite_stack[actor->sprite_num].width_px >> 1), actor->pos_y + (gfx_sprite_stack[actor->sprite_num].height_px >> 1));
+				switch ((map->layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
 					case 1:// Event 1. Red door
-						if (event_enabling_room2[1]) {
-							event_enabling_room2[1] = false;
+						if (map->event_enabling_room2[1]) {
+							map->event_enabling_room2[1] = false;
 
-							if (actor.key_entity_id != ENTITY_ID_ITEM_KEYRED) {
+							if (actor->key_entity_id != ENTITY_ID_ITEM_KEYRED) {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 1);
 							} else {
 
@@ -7691,10 +7750,10 @@ static void Scene3_Loop(void) {
 
 						break;
 					case 2:// Event 2. Green door
-						if (event_enabling_room2[2]) {
-							event_enabling_room2[2] = false;
+						if (map->event_enabling_room2[2]) {
+							map->event_enabling_room2[2] = false;
 
-							if (actor.key_entity_id != ENTITY_ID_ITEM_KEYGREEN) {
+							if (actor->key_entity_id != ENTITY_ID_ITEM_KEYGREEN) {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 1);
 							} else {
 
@@ -7710,10 +7769,10 @@ static void Scene3_Loop(void) {
 						}
 						break;
 					case 3:// Event 3. Yellow door
-						if (event_enabling_room2[3]) {
-							event_enabling_room2[3] = false;
+						if (map->event_enabling_room2[3]) {
+							map->event_enabling_room2[3] = false;
 
-							if (actor.key_entity_id != ENTITY_ID_ITEM_KEYYELLOW) {
+							if (actor->key_entity_id != ENTITY_ID_ITEM_KEYYELLOW) {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 1);
 							} else {
 
@@ -7729,10 +7788,10 @@ static void Scene3_Loop(void) {
 						}
 						break;
 					case 4:// Event 4. Blue door
-						if (event_enabling_room2[4]) {
-							event_enabling_room2[4] = false;
+						if (map->event_enabling_room2[4]) {
+							map->event_enabling_room2[4] = false;
 
-							if (actor.key_entity_id != ENTITY_ID_ITEM_KEYBLUE) {
+							if (actor->key_entity_id != ENTITY_ID_ITEM_KEYBLUE) {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 1);
 							} else {
 
@@ -7748,8 +7807,8 @@ static void Scene3_Loop(void) {
 						}
 						break;
 					case 16:// Event 16. Go to first floor
-						if (event_enabling_room2[16]) {
-							event_enabling_room2[16] = false;
+						if (map->event_enabling_room2[16]) {
+							map->event_enabling_room2[16] = false;
 
 							if (scene_step < 31) {
 								sequence_step = 0;
@@ -7757,7 +7816,7 @@ static void Scene3_Loop(void) {
 								while (!end_sequence) {
 									switch (sequence_step) {
 										case 0://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 24, 25, 355, false, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 24, 25, 355, false, 100);
 											sequence_step++;
 											break;
 										case 1://
@@ -7785,8 +7844,8 @@ static void Scene3_Loop(void) {
 								MAP_UnloadMap();
 
 								Scene3_LoadRoom3();
-								ACTOR_SetPosition(27 << 4, 32 << 4, ACTOR_FACING_DOWN); // Set actor position
-								CAM_Init(map.width_px, map.height_px, 17 << 4, 28 << 4);// Initialize camera
+								ACTOR_SetPosition(27 << 4, 32 << 4, ACTOR_FACING_DOWN);   // Set actor position
+								CAM_Init(map->width_px, map->height_px, 17 << 4, 28 << 4);// Initialize camera
 								MAP_DrawMapToMapVideoBuffer();
 
 								Update(false);
@@ -7803,7 +7862,7 @@ static void Scene3_Loop(void) {
 								while (!end_sequence) {
 									switch (sequence_step) {
 										case 0://
-											UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 31, 32, 355, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 31, 32, 355, true, 100);
 											sequence_step++;
 											break;
 										case 1://
@@ -7825,34 +7884,34 @@ static void Scene3_Loop(void) {
 						break;
 					default:
 						// Reenable red door event if actor did not have key
-						if (!event_enabling_room2[1] && (scene_step < 17)) {
-							event_enabling_room2[1] = true;
+						if (!map->event_enabling_room2[1] && (scene_step < 17)) {
+							map->event_enabling_room2[1] = true;
 						}
 
 						// Reenable green door event if actor did not have key
-						if (!event_enabling_room2[2] && (scene_step < 18)) {
-							event_enabling_room2[2] = true;
+						if (!map->event_enabling_room2[2] && (scene_step < 18)) {
+							map->event_enabling_room2[2] = true;
 						}
 
 						// Reenable yellow door event if actor did not have key
-						if (!event_enabling_room2[3] && (scene_step < 19)) {
-							event_enabling_room2[3] = true;
+						if (!map->event_enabling_room2[3] && (scene_step < 19)) {
+							map->event_enabling_room2[3] = true;
 						}
 
 						// Reenable blue door event if actor did not have key
-						if (!event_enabling_room2[4] && (scene_step < 20)) {
-							event_enabling_room2[4] = true;
+						if (!map->event_enabling_room2[4] && (scene_step < 20)) {
+							map->event_enabling_room2[4] = true;
 						}
 
 						// Reenable go to back to first floor event if actor leave event
-						if (!event_enabling_room2[16] && (scene_step < 31)) {
-							event_enabling_room2[16] = true;
+						if (!map->event_enabling_room2[16] && (scene_step < 31)) {
+							map->event_enabling_room2[16] = true;
 						}
 						break;
 				}
 
 				// If actor find documents. End of level
-				if ((actor.key_entity_id == ENTITY_ID_ITEM_DOCU) && (scene_step < 31)) {
+				if ((actor->key_entity_id == ENTITY_ID_ITEM_DOCU) && (scene_step < 31)) {
 					scene_step = 31;
 
 					sequence_step = 0;
@@ -7860,12 +7919,12 @@ static void Scene3_Loop(void) {
 					while (!end_sequence) {
 						switch (sequence_step) {
 							case 0://
-								UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 26, 27, 355, false, 100);
+								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 26, 27, 355, false, 100);
 								sequence_step++;
 								break;
 							case 1://
 								if (UI_IsSpeechFinished()) {
-									UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 28, 29, 355, false, 100);
+									UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 28, 29, 355, false, 100);
 									sequence_step++;
 								}
 								break;
@@ -7890,7 +7949,7 @@ static void Scene3_Loop(void) {
 		Update(true);
 
 		// Finish all if actor is dead
-		if (actor.status_dead) GameOver();
+		if (actor->status_dead) GameOver();
 	}
 
 	VIDEO_FadeOut(4);
@@ -7928,9 +7987,9 @@ static void Scene3_Outro(void) {
 				break;
 			case 1:// Load first outro scene
 				AUDIO_LoadSong(AUDIO_SONG_3);
-				GFX_PCXImageToBuffer("OSCN3.DAT", "OUTRO1H.PCX", 250 * 135, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("OSCN3.DAT", "OUTRO1L.PCX", 205 * 135, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("OSCN3.DAT", "OUTRO2H.PCX", 150 * 130, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("OSCN3.DAT", "OUTRO1H.PCX", 250 * 135, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN3.DAT", "OUTRO1L.PCX", 205 * 135, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("OSCN3.DAT", "OUTRO2H.PCX", 150 * 130, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 
 				step++;
 				break;
@@ -7941,8 +8000,8 @@ static void Scene3_Outro(void) {
 			case 3:/// Image 1 :: back home
 				VIDEO_ClearScreenBuffer();
 				GFX_LoadPalette("PALETTES.DAT", "OSCN3.PCX", 256);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 211, 141, 10, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, 205, gfx.image_buffer1_height, 13, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 211, 141, 10, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, 205, gfx->image_buffer1_height, 13, 43);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				VIDEO_FadeIn(4);
@@ -7962,9 +8021,9 @@ static void Scene3_Outro(void) {
 					dst_index = CAM_VISIBLE_WIDTH * 43 + 13;
 
 					// Draw image with scroll
-					for (i = 0; i < gfx.image_buffer1_height; i++) {
-						memcpy(&video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx.image_buffer1[src_index], 205);
-						src_index += gfx.image_buffer1_width;
+					for (i = 0; i < gfx->image_buffer1_height; i++) {
+						memcpy(&video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx->image_buffer1[src_index], 205);
+						src_index += gfx->image_buffer1_width;
 						dst_index += CAM_VISIBLE_WIDTH;
 					}
 					if (horizontal_scroll < 45) horizontal_scroll++;
@@ -7972,11 +8031,11 @@ static void Scene3_Outro(void) {
 						scroll_end = true;
 
 					// Draw text background
-					VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 239);
-					VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 208);
+					VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 239);
+					VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 208);
 
-					VIDEO_StringToScreenBuffer(28, 13, ui.txt_file[UI_TXT_SCN3I].line[1], FONT_SLIM_BLACK);
-					VIDEO_StringToScreenBuffer(28, 25, ui.txt_file[UI_TXT_SCN3I].line[2], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN3I]->line[1], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN3I]->line[2], FONT_SLIM_BLACK);
 
 					SetDelayTime(50);
 					while (!AwaitDelayTime()) {
@@ -7997,12 +8056,12 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 6://Image 2
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 156, 136, 150, 60, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 153, 63);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 156, 136, 150, 60, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 153, 63);
 
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 208);
 				step++;
 				break;
 			case 7:// Just wait
@@ -8013,28 +8072,28 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 8:// Fade first image and show second again
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 211, 141, 10, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 13, 43);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 156, 136, 150, 60, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 153, 63);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 211, 141, 10, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 13, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 156, 136, 150, 60, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 153, 63);
 
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 208);
 
-				VIDEO_StringToScreenBuffer(28, 13, ui.txt_file[UI_TXT_SCN3I].line[3], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 25, ui.txt_file[UI_TXT_SCN3I].line[4], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN3I]->line[3], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN3I]->line[4], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 9:// Load new images
 				VIDEO_ClearScreenBuffer();
-				GFX_PCXImageToBuffer("OSCN3.DAT", "OUTRO3H.PCX", 150 * 130, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("OSCN3.DAT", "OUTRO4H.PCX", 251 * 160, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
+				GFX_PCXImageToBuffer("OSCN3.DAT", "OUTRO3H.PCX", 150 * 130, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN3.DAT", "OUTRO4H.PCX", 251 * 160, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
 				step++;
 				break;
 			case 10:// Show image 3
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 156, 136, 160, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 163, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 156, 136, 160, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 163, 43);
 				step++;
 				break;
 			case 11:// Just wait
@@ -8061,9 +8120,9 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 13://Girl's chat
-				VIDEO_StringToScreenBuffer(56, 55, ui.txt_file[UI_TXT_SCN3I].line[6], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(56, 70, ui.txt_file[UI_TXT_SCN3I].line[7], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(56, 85, ui.txt_file[UI_TXT_SCN3I].line[8], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(56, 55, ui->txt_file[UI_TXT_SCN3I]->line[6], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(56, 70, ui->txt_file[UI_TXT_SCN3I]->line[7], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(56, 85, ui->txt_file[UI_TXT_SCN3I]->line[8], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -8075,8 +8134,8 @@ static void Scene3_Outro(void) {
 			case 14:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 156, 136, 160, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 163, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 156, 136, 160, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 163, 43);
 				step++;
 				break;
 			case 15:// Just wait
@@ -8088,8 +8147,8 @@ static void Scene3_Outro(void) {
 				break;
 			case 16:// Show image 4
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				step++;
 				break;
 			case 17:// Just wait
@@ -8107,9 +8166,9 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 19:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 25, ui.txt_file[UI_TXT_SCN3I].line[9], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 40, ui.txt_file[UI_TXT_SCN3I].line[10], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 55, ui.txt_file[UI_TXT_SCN3I].line[11], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 25, ui->txt_file[UI_TXT_SCN3I]->line[9], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 40, ui->txt_file[UI_TXT_SCN3I]->line[10], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 55, ui->txt_file[UI_TXT_SCN3I]->line[11], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -8126,9 +8185,9 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 21:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 25, ui.txt_file[UI_TXT_SCN3I].line[13], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 40, ui.txt_file[UI_TXT_SCN3I].line[14], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 55, ui.txt_file[UI_TXT_SCN3I].line[15], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 25, ui->txt_file[UI_TXT_SCN3I]->line[13], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 40, ui->txt_file[UI_TXT_SCN3I]->line[14], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 55, ui->txt_file[UI_TXT_SCN3I]->line[15], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -8140,8 +8199,8 @@ static void Scene3_Outro(void) {
 			case 22:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				step++;
 				break;
 			case 23:// Just wait
@@ -8159,9 +8218,9 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 25://Girl's chat
-				VIDEO_StringToScreenBuffer(76, 55, ui.txt_file[UI_TXT_SCN3I].line[16], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 70, ui.txt_file[UI_TXT_SCN3I].line[17], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 85, ui.txt_file[UI_TXT_SCN3I].line[18], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 55, ui->txt_file[UI_TXT_SCN3I]->line[16], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 70, ui->txt_file[UI_TXT_SCN3I]->line[17], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 85, ui->txt_file[UI_TXT_SCN3I]->line[18], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -8173,8 +8232,8 @@ static void Scene3_Outro(void) {
 			case 26:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				step++;
 				break;
 			case 27:// Just wait
@@ -8192,9 +8251,9 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 29:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 25, ui.txt_file[UI_TXT_SCN3I].line[19], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 40, ui.txt_file[UI_TXT_SCN3I].line[20], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 55, ui.txt_file[UI_TXT_SCN3I].line[21], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 25, ui->txt_file[UI_TXT_SCN3I]->line[19], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 40, ui->txt_file[UI_TXT_SCN3I]->line[20], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 55, ui->txt_file[UI_TXT_SCN3I]->line[21], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -8206,8 +8265,8 @@ static void Scene3_Outro(void) {
 			case 30:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				step++;
 				break;
 			case 31:// Just wait
@@ -8225,9 +8284,9 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 33://Girl's chat
-				VIDEO_StringToScreenBuffer(76, 55, ui.txt_file[UI_TXT_SCN3I].line[22], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 70, ui.txt_file[UI_TXT_SCN3I].line[23], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 85, ui.txt_file[UI_TXT_SCN3I].line[24], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 55, ui->txt_file[UI_TXT_SCN3I]->line[22], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 70, ui->txt_file[UI_TXT_SCN3I]->line[23], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 85, ui->txt_file[UI_TXT_SCN3I]->line[24], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -8239,8 +8298,8 @@ static void Scene3_Outro(void) {
 			case 34:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				step++;
 				break;
 			case 35:// Just wait
@@ -8258,9 +8317,9 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 37:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 25, ui.txt_file[UI_TXT_SCN3I].line[25], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 40, ui.txt_file[UI_TXT_SCN3I].line[26], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 55, ui.txt_file[UI_TXT_SCN3I].line[27], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 25, ui->txt_file[UI_TXT_SCN3I]->line[25], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 40, ui->txt_file[UI_TXT_SCN3I]->line[26], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 55, ui->txt_file[UI_TXT_SCN3I]->line[27], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -8277,9 +8336,9 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 39:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 25, ui.txt_file[UI_TXT_SCN3I].line[28], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 40, ui.txt_file[UI_TXT_SCN3I].line[29], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 55, ui.txt_file[UI_TXT_SCN3I].line[30], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 25, ui->txt_file[UI_TXT_SCN3I]->line[28], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 40, ui->txt_file[UI_TXT_SCN3I]->line[29], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 55, ui->txt_file[UI_TXT_SCN3I]->line[30], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -8291,8 +8350,8 @@ static void Scene3_Outro(void) {
 			case 40:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				SetDelayTime(200);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -8307,9 +8366,9 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 42://Girl's chat
-				VIDEO_StringToScreenBuffer(76, 55, ui.txt_file[UI_TXT_SCN3I].line[31], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 70, ui.txt_file[UI_TXT_SCN3I].line[32], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 85, ui.txt_file[UI_TXT_SCN3I].line[33], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 55, ui->txt_file[UI_TXT_SCN3I]->line[31], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 70, ui->txt_file[UI_TXT_SCN3I]->line[32], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 85, ui->txt_file[UI_TXT_SCN3I]->line[33], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -8326,9 +8385,9 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 44://Girl's chat
-				VIDEO_StringToScreenBuffer(76, 55, ui.txt_file[UI_TXT_SCN3I].line[34], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 70, ui.txt_file[UI_TXT_SCN3I].line[35], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 85, ui.txt_file[UI_TXT_SCN3I].line[36], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 55, ui->txt_file[UI_TXT_SCN3I]->line[34], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 70, ui->txt_file[UI_TXT_SCN3I]->line[35], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 85, ui->txt_file[UI_TXT_SCN3I]->line[36], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -8340,8 +8399,8 @@ static void Scene3_Outro(void) {
 			case 45:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				SetDelayTime(200);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -8356,9 +8415,9 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 47:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 25, ui.txt_file[UI_TXT_SCN3I].line[44], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 40, ui.txt_file[UI_TXT_SCN3I].line[45], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 55, ui.txt_file[UI_TXT_SCN3I].line[46], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 25, ui->txt_file[UI_TXT_SCN3I]->line[44], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 40, ui->txt_file[UI_TXT_SCN3I]->line[45], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 55, ui->txt_file[UI_TXT_SCN3I]->line[46], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -8375,9 +8434,9 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 49:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 25, ui.txt_file[UI_TXT_SCN3I].line[47], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 40, ui.txt_file[UI_TXT_SCN3I].line[48], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 55, ui.txt_file[UI_TXT_SCN3I].line[49], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 25, ui->txt_file[UI_TXT_SCN3I]->line[47], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 40, ui->txt_file[UI_TXT_SCN3I]->line[48], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 55, ui->txt_file[UI_TXT_SCN3I]->line[49], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -8396,8 +8455,8 @@ static void Scene3_Outro(void) {
 			case 51:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				SetDelayTime(200);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -8412,9 +8471,9 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 53://Girl's chat
-				VIDEO_StringToScreenBuffer(76, 55, ui.txt_file[UI_TXT_SCN3I].line[50], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 70, ui.txt_file[UI_TXT_SCN3I].line[51], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 85, ui.txt_file[UI_TXT_SCN3I].line[52], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 55, ui->txt_file[UI_TXT_SCN3I]->line[50], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 70, ui->txt_file[UI_TXT_SCN3I]->line[51], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 85, ui->txt_file[UI_TXT_SCN3I]->line[52], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -8431,9 +8490,9 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 55://Girl's chat
-				VIDEO_StringToScreenBuffer(76, 55, ui.txt_file[UI_TXT_SCN3I].line[53], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 70, ui.txt_file[UI_TXT_SCN3I].line[54], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 85, ui.txt_file[UI_TXT_SCN3I].line[55], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 55, ui->txt_file[UI_TXT_SCN3I]->line[53], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 70, ui->txt_file[UI_TXT_SCN3I]->line[54], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 85, ui->txt_file[UI_TXT_SCN3I]->line[55], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -8450,9 +8509,9 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 57://Girl's chat
-				VIDEO_StringToScreenBuffer(76, 55, ui.txt_file[UI_TXT_SCN3I].line[56], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 70, ui.txt_file[UI_TXT_SCN3I].line[57], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 85, ui.txt_file[UI_TXT_SCN3I].line[58], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 55, ui->txt_file[UI_TXT_SCN3I]->line[56], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 70, ui->txt_file[UI_TXT_SCN3I]->line[57], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 85, ui->txt_file[UI_TXT_SCN3I]->line[58], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -8464,8 +8523,8 @@ static void Scene3_Outro(void) {
 			case 58:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				SetDelayTime(200);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -8487,9 +8546,9 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 61:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 25, ui.txt_file[UI_TXT_SCN3I].line[59], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 40, ui.txt_file[UI_TXT_SCN3I].line[60], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 55, ui.txt_file[UI_TXT_SCN3I].line[61], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 25, ui->txt_file[UI_TXT_SCN3I]->line[59], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 40, ui->txt_file[UI_TXT_SCN3I]->line[60], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 55, ui->txt_file[UI_TXT_SCN3I]->line[61], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -8506,9 +8565,9 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 63:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 25, ui.txt_file[UI_TXT_SCN3I].line[62], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 40, ui.txt_file[UI_TXT_SCN3I].line[63], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 55, ui.txt_file[UI_TXT_SCN3I].line[64], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 25, ui->txt_file[UI_TXT_SCN3I]->line[62], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 40, ui->txt_file[UI_TXT_SCN3I]->line[63], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 55, ui->txt_file[UI_TXT_SCN3I]->line[64], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -8519,8 +8578,8 @@ static void Scene3_Outro(void) {
 				break;
 			case 64:// End chat
 				GFX_HideSprite(chat_spr_num);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				SetDelayTime(200);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -8535,9 +8594,9 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 66://Girl's chat
-				VIDEO_StringToScreenBuffer(56, 55, ui.txt_file[UI_TXT_SCN3I].line[65], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(56, 70, ui.txt_file[UI_TXT_SCN3I].line[66], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(56, 85, ui.txt_file[UI_TXT_SCN3I].line[67], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(56, 55, ui->txt_file[UI_TXT_SCN3I]->line[65], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(56, 70, ui->txt_file[UI_TXT_SCN3I]->line[66], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(56, 85, ui->txt_file[UI_TXT_SCN3I]->line[67], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -8549,8 +8608,8 @@ static void Scene3_Outro(void) {
 			case 67:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				SetDelayTime(200);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -8565,7 +8624,7 @@ static void Scene3_Outro(void) {
 				step++;
 				break;
 			case 69:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 25, ui.txt_file[UI_TXT_SCN3I].line[66], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 25, ui->txt_file[UI_TXT_SCN3I]->line[66], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -8577,8 +8636,8 @@ static void Scene3_Outro(void) {
 			case 70:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				SetDelayTime(200);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -8587,15 +8646,15 @@ static void Scene3_Outro(void) {
 				break;
 			case 71:// Load new images
 				VIDEO_ClearScreenBuffer();
-				GFX_PCXImageToBuffer("OSCN3.DAT", "OUTRO5H.PCX", 150 * 130, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("OSCN3.DAT", "OUTRO6H.PCX", 150 * 130, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
+				GFX_PCXImageToBuffer("OSCN3.DAT", "OUTRO5H.PCX", 150 * 130, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN3.DAT", "OUTRO6H.PCX", 150 * 130, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
 				step++;
 				break;
 			case 72:// Show images 5 and 6
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 156, 136, 2, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 5, 43);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 156, 136, 160, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 163, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 156, 136, 2, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 5, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 156, 136, 160, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 163, 43);
 				step++;
 				break;
 			case 73:// Just wait
@@ -8607,17 +8666,17 @@ static void Scene3_Outro(void) {
 				break;
 			case 74:// Clear image 6 and show just 5
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 156, 136, 2, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 5, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 156, 136, 2, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 5, 43);
 				step++;
 				break;
 			case 75:// Show speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 208);
 
-				VIDEO_StringToScreenBuffer(28, 13, ui.txt_file[UI_TXT_SCN3I].line[68], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 25, ui.txt_file[UI_TXT_SCN3I].line[69], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN3I]->line[68], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN3I]->line[69], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 76:// Just wait
@@ -8629,8 +8688,8 @@ static void Scene3_Outro(void) {
 				break;
 			case 77:// Clear speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 208);
 				step++;
 				break;
 			case 78:// Just wait
@@ -8642,10 +8701,10 @@ static void Scene3_Outro(void) {
 				break;
 			case 79:// Show speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 208);
 
-				VIDEO_StringToScreenBuffer(28, 13, ui.txt_file[UI_TXT_SCN3I].line[70], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN3I]->line[70], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 80:// Just wait
@@ -8657,8 +8716,8 @@ static void Scene3_Outro(void) {
 				break;
 			case 81:// Clear speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 208);
 				step++;
 				break;
 			case 82:// Just wait
@@ -8670,11 +8729,11 @@ static void Scene3_Outro(void) {
 				break;
 			case 83:// Show speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 208);
 
-				VIDEO_StringToScreenBuffer(28, 13, ui.txt_file[UI_TXT_SCN3I].line[72], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 25, ui.txt_file[UI_TXT_SCN3I].line[73], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN3I]->line[72], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN3I]->line[73], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 84:// Just wait
@@ -8686,8 +8745,8 @@ static void Scene3_Outro(void) {
 				break;
 			case 85:// Clear speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 208);
 				step++;
 				break;
 			case 86:// Just wait
@@ -8699,11 +8758,11 @@ static void Scene3_Outro(void) {
 				break;
 			case 87:// Show speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 208);
 
-				VIDEO_StringToScreenBuffer(28, 13, ui.txt_file[UI_TXT_SCN3I].line[74], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 25, ui.txt_file[UI_TXT_SCN3I].line[75], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN3I]->line[74], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN3I]->line[75], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 88:// Just wait
@@ -8715,8 +8774,8 @@ static void Scene3_Outro(void) {
 				break;
 			case 89:// Clear speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 208);
 				step++;
 				break;
 			case 90://End sequence
@@ -8762,9 +8821,9 @@ static void Scene4_Intro(void) {
 				step++;
 				break;
 			case 1:// Load first intro scene
-				GFX_PCXImageToBuffer("ISCN4.DAT", "INTRO1H.PCX", 120 * 140, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("ISCN4.DAT", "INTRO1L.PCX", 120 * 140, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("ISCN4.DAT", "INTRO2H.PCX", 120 * 140, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("ISCN4.DAT", "INTRO1H.PCX", 120 * 140, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("ISCN4.DAT", "INTRO1L.PCX", 120 * 140, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("ISCN4.DAT", "INTRO2H.PCX", 120 * 140, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				AUDIO_LoadSong(AUDIO_SONG_3);
 				step++;
 				break;
@@ -8785,8 +8844,8 @@ static void Scene4_Intro(void) {
 				step++;
 				break;
 			case 4:// Draw frame and image 1
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 126, 146, 20, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 23, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 126, 146, 20, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 23, 53);
 				step++;
 				break;
 			case 5:// Just wait
@@ -8798,10 +8857,10 @@ static void Scene4_Intro(void) {
 				break;
 			case 6:// Show text
 				   // Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 8, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN4I].line[1], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN4I].line[2], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN4I]->line[1], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN4I]->line[2], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 7:// Just wait
@@ -8812,11 +8871,11 @@ static void Scene4_Intro(void) {
 				step++;
 				break;
 			case 8:// Hide text Draw frame and image 2
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 9, 4, 208);
 
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 126, 146, 170, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 173, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 126, 146, 170, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 173, 53);
 				step++;
 				break;
 			case 9:// Just wait
@@ -8828,17 +8887,17 @@ static void Scene4_Intro(void) {
 				break;
 			case 10:// Show text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 9, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN4I].line[3], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN4I].line[4], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 9, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN4I]->line[3], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN4I]->line[4], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 11:// Fade image 1 and show 2
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 126, 146, 20, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 23, 53);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 126, 146, 170, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 173, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 126, 146, 20, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 23, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 126, 146, 170, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 173, 53);
 
 				step++;
 				break;
@@ -8851,8 +8910,8 @@ static void Scene4_Intro(void) {
 				break;
 			case 13:// Hide text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 9, 4, 208);
 
 				step++;
 				break;
@@ -8865,10 +8924,10 @@ static void Scene4_Intro(void) {
 				break;
 			case 15:// Show text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 9, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN4I].line[5], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN4I].line[6], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 9, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN4I]->line[5], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN4I]->line[6], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 16:
@@ -8879,16 +8938,16 @@ static void Scene4_Intro(void) {
 				step++;
 				break;
 			case 17:// Just wait
-				GFX_PCXImageToBuffer("ISCN4.DAT", "INTRO3H.PCX", 250 * 135, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
+				GFX_PCXImageToBuffer("ISCN4.DAT", "INTRO3H.PCX", 250 * 135, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
 				step++;
 				break;
 			case 18:// Hide text and Show image 3
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 9, 4, 208);
 
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 256, 141, 40, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 43, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 256, 141, 40, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 43, 53);
 
 				step++;
 				break;
@@ -8901,10 +8960,10 @@ static void Scene4_Intro(void) {
 				break;
 			case 20:// Show text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 46, 5, 1, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 9, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN4I].line[10], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN4I].line[11], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN4I]->line[10], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN4I]->line[11], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 21:// Just wait
@@ -8916,8 +8975,8 @@ static void Scene4_Intro(void) {
 				break;
 			case 22:// Hide text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 46, 5, 1, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
 
 				step++;
 				break;
@@ -8930,10 +8989,10 @@ static void Scene4_Intro(void) {
 				break;
 			case 24:// Show text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 46, 5, 1, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 9, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN4I].line[12], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN4I].line[13], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN4I]->line[12], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN4I]->line[13], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 25:// Just wait
@@ -8945,8 +9004,8 @@ static void Scene4_Intro(void) {
 				break;
 			case 26:// Hide text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 46, 5, 1, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
 
 				step++;
 				break;
@@ -8959,10 +9018,10 @@ static void Scene4_Intro(void) {
 				break;
 			case 28:// Show text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 46, 5, 1, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 9, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN4I].line[15], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN4I].line[16], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN4I]->line[15], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN4I]->line[16], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 29:// Just wait
@@ -8974,8 +9033,8 @@ static void Scene4_Intro(void) {
 				break;
 			case 30:// Hide text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 46, 5, 1, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
 
 				step++;
 				break;
@@ -8988,11 +9047,11 @@ static void Scene4_Intro(void) {
 				break;
 			case 32:// Show text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 46, 5, 1, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 9, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 8, ui.txt_file[UI_TXT_SCN4I].line[17], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 18, ui.txt_file[UI_TXT_SCN4I].line[18], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 28, ui.txt_file[UI_TXT_SCN4I].line[19], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 8, ui->txt_file[UI_TXT_SCN4I]->line[17], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 18, ui->txt_file[UI_TXT_SCN4I]->line[18], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 28, ui->txt_file[UI_TXT_SCN4I]->line[19], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 33:// Just wait
@@ -9026,21 +9085,17 @@ static void Scene4_Intro(void) {
 }
 static void Scene4_LoadAssets(void) {
 
-	ENEMY_Init();// Initialize enemy system
-
 	// Load enemies and unload them just to get graphics
 	ENEMY_Load("ENEMY10.DAT", 0, 0, 0, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_GUN0, SPRITE_GRAPHICS_ID_EMPTY, ENEMY_STATUS_STATIC_NPC, 1);
 	ENEMY_UnloadEnemies();
 
 	// Load boss and unload it just to preload graphics
-	BOSS_Load("BOSS3.DAT", 0, 0, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_ENEMY3_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY3_FEET, SPRITE_GRAPHICS_ID_ENEMY3_BODY, SPRITE_GRAPHICS_ID_ENEMY3_HEAD, SPRITE_GRAPHICS_ID_ENEMY3_LARM, SPRITE_GRAPHICS_ID_ENEMY3_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_BULLET3, BOSS_STATUS_STATIC, BOSS_LIFE);
+	BOSS_Load("BOSS3.DAT", 0, 0, BOSS_TYPE_SLOW, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_ENEMY3_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY3_FEET, SPRITE_GRAPHICS_ID_ENEMY3_BODY, SPRITE_GRAPHICS_ID_ENEMY3_HEAD, SPRITE_GRAPHICS_ID_ENEMY3_LARM, SPRITE_GRAPHICS_ID_ENEMY3_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_BULLET3, BOSS_STATUS_STATIC, BOSS_LIFE);
 	BOSS_Unload();
 
-	ACTOR_Init(9 << 4, 47 << 4, SPRITE_GRAPHICS_ID_ACTOR_FEET, SPRITE_GRAPHICS_ID_ACTOR_BODY, SPRITE_GRAPHICS_ID_ACTOR_HEAD, SPRITE_GRAPHICS_ID_ACTOR_LARM, SPRITE_GRAPHICS_ID_ACTOR_RARM_BARE_HANDS, ACTOR_FACING_RIGHT);
-	ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
+	ACTOR_Load(9 << 4, 47 << 4, SPRITE_GRAPHICS_ID_ACTOR_FEET, SPRITE_GRAPHICS_ID_ACTOR_BODY, SPRITE_GRAPHICS_ID_ACTOR_HEAD, SPRITE_GRAPHICS_ID_ACTOR_LARM, SPRITE_GRAPHICS_ID_ACTOR_RARM_BARE_HANDS, ACTOR_FACING_RIGHT);
+	ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
 	ACTOR_SetBulletStatus(99, 19, 199, 9, 9);
-
-	NPC_Init();
 
 	UI_SetStatusPanels();// Set status panels
 
@@ -9116,140 +9171,140 @@ static void Scene4_LoadRoom2(void) {
 static void Scene4_SetHotspotsAndEvents(void) {
 	// Initialize hotspots and events
 	// Update hotspots
-	hotspot_enabling_room1[0] = false;
-	hotspot_enabling_room1[1] = true;
-	hotspot_enabling_room1[2] = true;
-	hotspot_enabling_room1[3] = false;
-	hotspot_enabling_room1[4] = false;
-	hotspot_enabling_room1[5] = false;
-	hotspot_enabling_room1[6] = false;
-	hotspot_enabling_room1[7] = false;
-	hotspot_enabling_room1[8] = false;
-	hotspot_enabling_room1[9] = false;
-	hotspot_enabling_room1[10] = false;
-	hotspot_enabling_room1[11] = false;
-	hotspot_enabling_room1[12] = false;
-	hotspot_enabling_room1[13] = false;
-	hotspot_enabling_room1[14] = false;
-	hotspot_enabling_room1[15] = false;
-	hotspot_enabling_room1[16] = false;
-	hotspot_enabling_room1[17] = false;
-	hotspot_enabling_room1[18] = false;
-	hotspot_enabling_room1[19] = false;
-	hotspot_enabling_room1[20] = false;
-	hotspot_enabling_room1[21] = false;
-	hotspot_enabling_room1[22] = false;
-	hotspot_enabling_room1[23] = false;
-	hotspot_enabling_room1[24] = false;
-	hotspot_enabling_room1[25] = false;
-	hotspot_enabling_room1[26] = false;
-	hotspot_enabling_room1[27] = false;
-	hotspot_enabling_room1[28] = false;
-	hotspot_enabling_room1[29] = false;
-	hotspot_enabling_room1[30] = false;
-	hotspot_enabling_room1[31] = false;
+	map->hotspot_enabling_room1[0] = false;
+	map->hotspot_enabling_room1[1] = true;
+	map->hotspot_enabling_room1[2] = true;
+	map->hotspot_enabling_room1[3] = false;
+	map->hotspot_enabling_room1[4] = false;
+	map->hotspot_enabling_room1[5] = false;
+	map->hotspot_enabling_room1[6] = false;
+	map->hotspot_enabling_room1[7] = false;
+	map->hotspot_enabling_room1[8] = false;
+	map->hotspot_enabling_room1[9] = false;
+	map->hotspot_enabling_room1[10] = false;
+	map->hotspot_enabling_room1[11] = false;
+	map->hotspot_enabling_room1[12] = false;
+	map->hotspot_enabling_room1[13] = false;
+	map->hotspot_enabling_room1[14] = false;
+	map->hotspot_enabling_room1[15] = false;
+	map->hotspot_enabling_room1[16] = false;
+	map->hotspot_enabling_room1[17] = false;
+	map->hotspot_enabling_room1[18] = false;
+	map->hotspot_enabling_room1[19] = false;
+	map->hotspot_enabling_room1[20] = false;
+	map->hotspot_enabling_room1[21] = false;
+	map->hotspot_enabling_room1[22] = false;
+	map->hotspot_enabling_room1[23] = false;
+	map->hotspot_enabling_room1[24] = false;
+	map->hotspot_enabling_room1[25] = false;
+	map->hotspot_enabling_room1[26] = false;
+	map->hotspot_enabling_room1[27] = false;
+	map->hotspot_enabling_room1[28] = false;
+	map->hotspot_enabling_room1[29] = false;
+	map->hotspot_enabling_room1[30] = false;
+	map->hotspot_enabling_room1[31] = false;
 
 	// Update events
-	event_enabling_room1[0] = false;
-	event_enabling_room1[1] = true;
-	event_enabling_room1[2] = true;
-	event_enabling_room1[3] = false;
-	event_enabling_room1[4] = false;
-	event_enabling_room1[5] = false;
-	event_enabling_room1[6] = false;
-	event_enabling_room1[7] = false;
-	event_enabling_room1[8] = false;
-	event_enabling_room1[9] = false;
-	event_enabling_room1[10] = false;
-	event_enabling_room1[11] = false;
-	event_enabling_room1[12] = false;
-	event_enabling_room1[13] = false;
-	event_enabling_room1[14] = false;
-	event_enabling_room1[15] = false;
-	event_enabling_room1[16] = true;
-	event_enabling_room1[17] = false;
-	event_enabling_room1[18] = false;
-	event_enabling_room1[19] = false;
-	event_enabling_room1[20] = false;
-	event_enabling_room1[21] = false;
-	event_enabling_room1[22] = false;
-	event_enabling_room1[23] = false;
-	event_enabling_room1[24] = false;
-	event_enabling_room1[25] = false;
-	event_enabling_room1[26] = false;
-	event_enabling_room1[27] = false;
-	event_enabling_room1[28] = false;
-	event_enabling_room1[29] = false;
-	event_enabling_room1[30] = false;
-	event_enabling_room1[31] = false;
+	map->event_enabling_room1[0] = false;
+	map->event_enabling_room1[1] = true;
+	map->event_enabling_room1[2] = true;
+	map->event_enabling_room1[3] = false;
+	map->event_enabling_room1[4] = false;
+	map->event_enabling_room1[5] = false;
+	map->event_enabling_room1[6] = false;
+	map->event_enabling_room1[7] = false;
+	map->event_enabling_room1[8] = false;
+	map->event_enabling_room1[9] = false;
+	map->event_enabling_room1[10] = false;
+	map->event_enabling_room1[11] = false;
+	map->event_enabling_room1[12] = false;
+	map->event_enabling_room1[13] = false;
+	map->event_enabling_room1[14] = false;
+	map->event_enabling_room1[15] = false;
+	map->event_enabling_room1[16] = true;
+	map->event_enabling_room1[17] = false;
+	map->event_enabling_room1[18] = false;
+	map->event_enabling_room1[19] = false;
+	map->event_enabling_room1[20] = false;
+	map->event_enabling_room1[21] = false;
+	map->event_enabling_room1[22] = false;
+	map->event_enabling_room1[23] = false;
+	map->event_enabling_room1[24] = false;
+	map->event_enabling_room1[25] = false;
+	map->event_enabling_room1[26] = false;
+	map->event_enabling_room1[27] = false;
+	map->event_enabling_room1[28] = false;
+	map->event_enabling_room1[29] = false;
+	map->event_enabling_room1[30] = false;
+	map->event_enabling_room1[31] = false;
 
 	// Update hotspots
-	hotspot_enabling_room2[0] = false;
-	hotspot_enabling_room2[1] = false;
-	hotspot_enabling_room2[2] = false;
-	hotspot_enabling_room2[3] = false;
-	hotspot_enabling_room2[4] = false;
-	hotspot_enabling_room2[5] = false;
-	hotspot_enabling_room2[6] = false;
-	hotspot_enabling_room2[7] = false;
-	hotspot_enabling_room2[8] = false;
-	hotspot_enabling_room2[9] = false;
-	hotspot_enabling_room2[10] = false;
-	hotspot_enabling_room2[11] = false;
-	hotspot_enabling_room2[12] = false;
-	hotspot_enabling_room2[13] = false;
-	hotspot_enabling_room2[14] = false;
-	hotspot_enabling_room2[15] = false;
-	hotspot_enabling_room2[16] = false;
-	hotspot_enabling_room2[17] = false;
-	hotspot_enabling_room2[18] = false;
-	hotspot_enabling_room2[19] = false;
-	hotspot_enabling_room2[20] = false;
-	hotspot_enabling_room2[21] = false;
-	hotspot_enabling_room2[22] = false;
-	hotspot_enabling_room2[23] = false;
-	hotspot_enabling_room2[24] = false;
-	hotspot_enabling_room2[25] = false;
-	hotspot_enabling_room2[26] = false;
-	hotspot_enabling_room2[27] = false;
-	hotspot_enabling_room2[28] = false;
-	hotspot_enabling_room2[29] = false;
-	hotspot_enabling_room2[30] = false;
-	hotspot_enabling_room2[31] = false;
+	map->hotspot_enabling_room2[0] = false;
+	map->hotspot_enabling_room2[1] = false;
+	map->hotspot_enabling_room2[2] = false;
+	map->hotspot_enabling_room2[3] = false;
+	map->hotspot_enabling_room2[4] = false;
+	map->hotspot_enabling_room2[5] = false;
+	map->hotspot_enabling_room2[6] = false;
+	map->hotspot_enabling_room2[7] = false;
+	map->hotspot_enabling_room2[8] = false;
+	map->hotspot_enabling_room2[9] = false;
+	map->hotspot_enabling_room2[10] = false;
+	map->hotspot_enabling_room2[11] = false;
+	map->hotspot_enabling_room2[12] = false;
+	map->hotspot_enabling_room2[13] = false;
+	map->hotspot_enabling_room2[14] = false;
+	map->hotspot_enabling_room2[15] = false;
+	map->hotspot_enabling_room2[16] = false;
+	map->hotspot_enabling_room2[17] = false;
+	map->hotspot_enabling_room2[18] = false;
+	map->hotspot_enabling_room2[19] = false;
+	map->hotspot_enabling_room2[20] = false;
+	map->hotspot_enabling_room2[21] = false;
+	map->hotspot_enabling_room2[22] = false;
+	map->hotspot_enabling_room2[23] = false;
+	map->hotspot_enabling_room2[24] = false;
+	map->hotspot_enabling_room2[25] = false;
+	map->hotspot_enabling_room2[26] = false;
+	map->hotspot_enabling_room2[27] = false;
+	map->hotspot_enabling_room2[28] = false;
+	map->hotspot_enabling_room2[29] = false;
+	map->hotspot_enabling_room2[30] = false;
+	map->hotspot_enabling_room2[31] = false;
 
 	// Update events
-	event_enabling_room2[0] = false;
-	event_enabling_room2[1] = true;
-	event_enabling_room2[2] = true;
-	event_enabling_room2[3] = true;
-	event_enabling_room2[4] = true;
-	event_enabling_room2[5] = true;
-	event_enabling_room2[6] = false;
-	event_enabling_room2[7] = false;
-	event_enabling_room2[8] = false;
-	event_enabling_room2[9] = false;
-	event_enabling_room2[10] = false;
-	event_enabling_room2[11] = false;
-	event_enabling_room2[12] = false;
-	event_enabling_room2[13] = false;
-	event_enabling_room2[14] = false;
-	event_enabling_room2[15] = false;
-	event_enabling_room2[16] = true;
-	event_enabling_room2[17] = false;
-	event_enabling_room2[18] = false;
-	event_enabling_room2[19] = false;
-	event_enabling_room2[20] = false;
-	event_enabling_room2[21] = false;
-	event_enabling_room2[22] = false;
-	event_enabling_room2[23] = false;
-	event_enabling_room2[24] = false;
-	event_enabling_room2[25] = false;
-	event_enabling_room2[26] = false;
-	event_enabling_room2[27] = false;
-	event_enabling_room2[28] = false;
-	event_enabling_room2[29] = false;
-	event_enabling_room2[30] = false;
-	event_enabling_room2[31] = false;
+	map->event_enabling_room2[0] = false;
+	map->event_enabling_room2[1] = true;
+	map->event_enabling_room2[2] = true;
+	map->event_enabling_room2[3] = true;
+	map->event_enabling_room2[4] = true;
+	map->event_enabling_room2[5] = true;
+	map->event_enabling_room2[6] = false;
+	map->event_enabling_room2[7] = false;
+	map->event_enabling_room2[8] = false;
+	map->event_enabling_room2[9] = false;
+	map->event_enabling_room2[10] = false;
+	map->event_enabling_room2[11] = false;
+	map->event_enabling_room2[12] = false;
+	map->event_enabling_room2[13] = false;
+	map->event_enabling_room2[14] = false;
+	map->event_enabling_room2[15] = false;
+	map->event_enabling_room2[16] = true;
+	map->event_enabling_room2[17] = false;
+	map->event_enabling_room2[18] = false;
+	map->event_enabling_room2[19] = false;
+	map->event_enabling_room2[20] = false;
+	map->event_enabling_room2[21] = false;
+	map->event_enabling_room2[22] = false;
+	map->event_enabling_room2[23] = false;
+	map->event_enabling_room2[24] = false;
+	map->event_enabling_room2[25] = false;
+	map->event_enabling_room2[26] = false;
+	map->event_enabling_room2[27] = false;
+	map->event_enabling_room2[28] = false;
+	map->event_enabling_room2[29] = false;
+	map->event_enabling_room2[30] = false;
+	map->event_enabling_room2[31] = false;
 }
 static void Scene4_Loop(void) {
 	bool end_sequence;
@@ -9260,10 +9315,10 @@ static void Scene4_Loop(void) {
 	VIDEO_ClearScreenBuffer();
 	GFX_LoadPalette("PALETTES.DAT", "SCN41.PCX", 256);
 
-	VIDEO_StringToScreenBuffer(50, 60, ui.txt_file[UI_TXT_SCN4I].line[40], FONT_BIG_WHITE);
-	VIDEO_StringToScreenBuffer(70, 85, ui.txt_file[UI_TXT_SCN4I].line[41], FONT_BIG_WHITE);
-	VIDEO_StringToScreenBuffer(90, 135, ui.txt_file[UI_TXT_SCN4I].line[42], FONT_SLIM_WHITE);
-	VIDEO_StringToScreenBuffer(160, 135, ui.txt_file[UI_TXT_SCN4I].line[43], FONT_SLIM_WHITE);
+	VIDEO_StringToScreenBuffer(50, 60, ui->txt_file[UI_TXT_SCN4I]->line[40], FONT_BIG_WHITE);
+	VIDEO_StringToScreenBuffer(70, 85, ui->txt_file[UI_TXT_SCN4I]->line[41], FONT_BIG_WHITE);
+	VIDEO_StringToScreenBuffer(90, 135, ui->txt_file[UI_TXT_SCN4I]->line[42], FONT_SLIM_WHITE);
+	VIDEO_StringToScreenBuffer(160, 135, ui->txt_file[UI_TXT_SCN4I]->line[43], FONT_SLIM_WHITE);
 
 
 	VIDEO_VSync();
@@ -9296,7 +9351,7 @@ static void Scene4_Loop(void) {
 			ACTOR_SetPosition(9 << 4, 47 << 4, ACTOR_FACING_UP);// Set actor position
 			ACTOR_SetCombatMode(true);
 
-			CAM_Init(map.width_px, map.height_px, 0 << 4, 37 << 4);// Initialize camera
+			CAM_Init(map->width_px, map->height_px, 0 << 4, 37 << 4);// Initialize camera
 			MAP_DrawMapToMapVideoBuffer();
 
 			Update(true);
@@ -9309,7 +9364,7 @@ static void Scene4_Loop(void) {
 			while (!end_sequence) {
 				switch (sequence_step) {
 					case 0://
-						UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN4D, 1, 355, 355, false, 100);
+						UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN4D, 1, 355, 355, false, 100);
 						sequence_step++;
 						break;
 					case 1://
@@ -9326,15 +9381,15 @@ static void Scene4_Loop(void) {
 			end_sequence = false;
 
 			ACTOR_SetCombatMode(true);
-			ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_PISTOL);
+			ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_PISTOL);
 			ACTOR_Reload();
 
 			break;
 		case 2:// Room 2. Church
 			Scene4_LoadRoom2();
 
-			ACTOR_SetPosition(23 << 4, 29 << 4, ACTOR_FACING_UP);   // Set actor position
-			CAM_Init(map.width_px, map.height_px, 13 << 4, 20 << 4);// Initialize camera
+			ACTOR_SetPosition(23 << 4, 29 << 4, ACTOR_FACING_UP);     // Set actor position
+			CAM_Init(map->width_px, map->height_px, 13 << 4, 20 << 4);// Initialize camera
 			MAP_DrawMapToMapVideoBuffer();
 
 			Update(true);
@@ -9355,7 +9410,7 @@ static void Scene4_Loop(void) {
 		switch (engine.room) {
 			case 1:// Room 1. Garden
 				// Hotspots
-				if (!actor.mode_combat) {
+				if (!actor->mode_combat) {
 					// Check point on object or enemy
 					switch (cursor.point_on & 0xFF) {
 						case ENTITY_ID_HSPOT:// Hotspot
@@ -9364,7 +9419,7 @@ static void Scene4_Loop(void) {
 									break;
 								case 1:// Spare
 									if (cursor.left_click) {
-										//UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN4H, 120, 121, 122, false, 100);
+										//UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN4H, 120, 121, 122, false, 100);
 
 									} else {
 										//UI_ShowDescription(UI_TXT_SCN4H, 6);
@@ -9389,26 +9444,26 @@ static void Scene4_Loop(void) {
 				}
 
 				// Events
-				actor_tile_num = MAP_GetTileNumber(actor.pos_x + (gfx_sprite_stack[actor.sprite_num].width_px >> 1), actor.pos_y + (gfx_sprite_stack[actor.sprite_num].height_px >> 1));
-				switch ((map.layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
+				actor_tile_num = MAP_GetTileNumber(actor->pos_x + (gfx_sprite_stack[actor->sprite_num].width_px >> 1), actor->pos_y + (gfx_sprite_stack[actor->sprite_num].height_px >> 1));
+				switch ((map->layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
 					case 1:// Event 1. Spare
-						if (event_enabling_room1[1]) {
-							event_enabling_room1[1] = false;
+						if (map->event_enabling_room1[1]) {
+							map->event_enabling_room1[1] = false;
 						}
 						break;
 					case 2:// Event 2. Spare
-						if (event_enabling_room1[2]) {
-							event_enabling_room1[2] = false;
+						if (map->event_enabling_room1[2]) {
+							map->event_enabling_room1[2] = false;
 						}
 						break;
 					case 15:// Event 15. Spare
-						if (event_enabling_room1[15]) {
-							event_enabling_room1[15] = false;
+						if (map->event_enabling_room1[15]) {
+							map->event_enabling_room1[15] = false;
 						}
 						break;
 					case 16:// Event 16. Go inside church
-						if (event_enabling_room1[16]) {
-							event_enabling_room1[16] = false;
+						if (map->event_enabling_room1[16]) {
+							map->event_enabling_room1[16] = false;
 
 							VIDEO_FadeOut(4);
 							ENEMY_UnloadEnemies();
@@ -9421,8 +9476,8 @@ static void Scene4_Loop(void) {
 							MAP_UnloadMap();
 
 							Scene4_LoadRoom2();
-							ACTOR_SetPosition(23 << 4, 29 << 4, ACTOR_FACING_UP);   // Set actor position
-							CAM_Init(map.width_px, map.height_px, 13 << 4, 20 << 4);// Initialize camera
+							ACTOR_SetPosition(23 << 4, 29 << 4, ACTOR_FACING_UP);     // Set actor position
+							CAM_Init(map->width_px, map->height_px, 13 << 4, 20 << 4);// Initialize camera
 							MAP_DrawMapToMapVideoBuffer();
 
 							Update(true);
@@ -9442,7 +9497,7 @@ static void Scene4_Loop(void) {
 				break;
 			case 2:// Room 2. Inside church
 				   // Hotspots
-				if (!actor.mode_combat) {
+				if (!actor->mode_combat) {
 					// Check point on object or enemy
 					switch (cursor.point_on & 0xFF) {
 						case ENTITY_ID_HSPOT:// Hotspot
@@ -9476,22 +9531,22 @@ static void Scene4_Loop(void) {
 				}
 
 				// Events
-				actor_tile_num = MAP_GetTileNumber(actor.pos_x + (gfx_sprite_stack[actor.sprite_num].width_px >> 1), actor.pos_y + (gfx_sprite_stack[actor.sprite_num].height_px >> 1));
-				switch ((map.layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
+				actor_tile_num = MAP_GetTileNumber(actor->pos_x + (gfx_sprite_stack[actor->sprite_num].width_px >> 1), actor->pos_y + (gfx_sprite_stack[actor->sprite_num].height_px >> 1));
+				switch ((map->layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
 					case 1:// Event 1. Entry
-						if (event_enabling_room2[1]) {
-							event_enabling_room2[1] = false;
+						if (map->event_enabling_room2[1]) {
+							map->event_enabling_room2[1] = false;
 
 							scene_step = 1;
 
-							BOSS_Load("BOSS3.DAT", 23 << 4, 10 << 4, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_ENEMY3_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY3_FEET, SPRITE_GRAPHICS_ID_ENEMY3_BODY, SPRITE_GRAPHICS_ID_ENEMY3_HEAD, SPRITE_GRAPHICS_ID_ENEMY3_LARM, SPRITE_GRAPHICS_ID_ENEMY3_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_RAY, BOSS_STATUS_STATIC, BOSS_LIFE);
+							BOSS_Load("BOSS3.DAT", 23 << 4, 10 << 4, BOSS_TYPE_SLOW, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_ENEMY3_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY3_FEET, SPRITE_GRAPHICS_ID_ENEMY3_BODY, SPRITE_GRAPHICS_ID_ENEMY3_HEAD, SPRITE_GRAPHICS_ID_ENEMY3_LARM, SPRITE_GRAPHICS_ID_ENEMY3_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_RAY, BOSS_STATUS_STATIC, BOSS_LIFE);
 
 							/*sequence_step = 0;
 							end_sequence = false;
 							while (!end_sequence) {
 								switch (sequence_step) {
 									case 0://
-										UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN4D, 24, 25, 355, false, 100);
+										UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN4D, 24, 25, 355, false, 100);
 										sequence_step++;
 										break;
 									case 1://
@@ -9518,32 +9573,32 @@ static void Scene4_Loop(void) {
 						}
 						break;
 					case 2:// Event 2.
-						if (event_enabling_room2[2]) {
-							event_enabling_room2[2] = false;
+						if (map->event_enabling_room2[2]) {
+							map->event_enabling_room2[2] = false;
 						}
 						break;
 					case 3:// Event 3.
-						if (event_enabling_room2[3]) {
-							event_enabling_room2[3] = false;
+						if (map->event_enabling_room2[3]) {
+							map->event_enabling_room2[3] = false;
 						}
 						break;
 					case 4:// Event 4.
-						if (event_enabling_room2[4]) {
-							event_enabling_room2[4] = false;
+						if (map->event_enabling_room2[4]) {
+							map->event_enabling_room2[4] = false;
 						}
 						break;
 					case 5:// Event 5.
-						if (event_enabling_room2[5]) {
+						if (map->event_enabling_room2[5]) {
 						}
 						break;
 					case 6:// Event 6.
-						if (event_enabling_room2[6]) {
-							event_enabling_room2[6] = false;
+						if (map->event_enabling_room2[6]) {
+							map->event_enabling_room2[6] = false;
 						}
 						break;
 					case 16:// Event 16.
-						if (event_enabling_room2[16]) {
-							event_enabling_room2[16] = false;
+						if (map->event_enabling_room2[16]) {
+							map->event_enabling_room2[16] = false;
 						}
 						break;
 					default:
@@ -9558,7 +9613,7 @@ static void Scene4_Loop(void) {
 						if (!enemy[2].is_loaded) ENEMY_Load("ENEMY10.DAT", 2, 45 << 4, 17 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_AK, SPRITE_GRAPHICS_ID_GUN1, SPRITE_GRAPHICS_ID_BULLET1, ENEMY_STATUS_RAMPAGE, 50);
 						if (!enemy[3].is_loaded) ENEMY_Load("ENEMY10.DAT", 3, 45 << 4, 18 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_AK, SPRITE_GRAPHICS_ID_GUN1, SPRITE_GRAPHICS_ID_BULLET1, ENEMY_STATUS_RAMPAGE, 50);
 
-						if (!boss.is_loaded) {
+						if (!boss->is_loaded) {
 							ENEMY_UnloadEnemies();
 							VIDEO_FadeOut(4);
 							engine.ingame = false;
@@ -9576,7 +9631,7 @@ static void Scene4_Loop(void) {
 		Update(true);
 
 		// Finish all if actor is dead
-		if (actor.status_dead) GameOver();
+		if (actor->status_dead) GameOver();
 	}
 
 	VIDEO_FadeOut(4);
@@ -9613,9 +9668,9 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 1:// Load first scene
-				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO1H.PCX", 260 * 100, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO1L.PCX", 260 * 100, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO2H.PCX", 130 * 120, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO1H.PCX", 260 * 100, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO1L.PCX", 260 * 100, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO2H.PCX", 130 * 120, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				AUDIO_LoadSong(AUDIO_SONG_3);
 				step++;
 				break;
@@ -9636,8 +9691,8 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 4:// First image
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 266, 106, 30, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 33, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 266, 106, 30, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 33, 13);
 				step++;
 				break;
 			case 5:// Just wait
@@ -9664,8 +9719,8 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 7://Cult boss chat
-				VIDEO_StringToScreenBuffer(106, 15, ui.txt_file[UI_TXT_SCN4I].line[25], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 30, ui.txt_file[UI_TXT_SCN4I].line[26], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 15, ui->txt_file[UI_TXT_SCN4I]->line[25], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 30, ui->txt_file[UI_TXT_SCN4I]->line[26], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -9682,8 +9737,8 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 9://Cult boss chat
-				VIDEO_StringToScreenBuffer(106, 15, ui.txt_file[UI_TXT_SCN4I].line[27], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 30, ui.txt_file[UI_TXT_SCN4I].line[28], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 15, ui->txt_file[UI_TXT_SCN4I]->line[27], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 30, ui->txt_file[UI_TXT_SCN4I]->line[28], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -9695,8 +9750,8 @@ static void Scene4_Outro(void) {
 			case 10:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 266, 106, 30, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 33, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 266, 106, 30, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 33, 13);
 				step++;
 				break;
 			case 11:// Just wait
@@ -9708,11 +9763,11 @@ static void Scene4_Outro(void) {
 				break;
 			case 12:// Show image 2
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 266, 106, 30, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 33, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 266, 106, 30, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 33, 13);
 
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 136, 126, 20, 70, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 23, 73);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 136, 126, 20, 70, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 23, 73);
 				step++;
 				break;
 			case 13:
@@ -9724,10 +9779,10 @@ static void Scene4_Outro(void) {
 				break;
 			case 14:// Fade first image
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 266, 106, 30, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 13);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 136, 126, 20, 70, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 23, 73);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 266, 106, 30, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 136, 126, 20, 70, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 23, 73);
 				step++;
 				break;
 			case 15:// Actors chat
@@ -9738,8 +9793,8 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 16:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 85, ui.txt_file[UI_TXT_SCN4I].line[29], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 100, ui.txt_file[UI_TXT_SCN4I].line[30], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 85, ui->txt_file[UI_TXT_SCN4I]->line[29], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 100, ui->txt_file[UI_TXT_SCN4I]->line[30], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -9756,9 +9811,9 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 18:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 85, ui.txt_file[UI_TXT_SCN4I].line[31], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 100, ui.txt_file[UI_TXT_SCN4I].line[32], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 115, ui.txt_file[UI_TXT_SCN4I].line[33], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 85, ui->txt_file[UI_TXT_SCN4I]->line[31], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 100, ui->txt_file[UI_TXT_SCN4I]->line[32], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 115, ui->txt_file[UI_TXT_SCN4I]->line[33], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -9768,16 +9823,16 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 19:// End chat
-				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO3H.PCX", 130 * 120, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO3H.PCX", 130 * 120, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
 
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 266, 106, 30, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 13);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 136, 126, 20, 70, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 23, 73);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 136, 126, 170, 70, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 173, 73);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 266, 106, 30, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 136, 126, 20, 70, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 23, 73);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 136, 126, 170, 70, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 173, 73);
 				step++;
 				break;
 			case 20:// Just wait
@@ -9795,9 +9850,9 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 22://Cult boss chat
-				VIDEO_StringToScreenBuffer(86, 85, ui.txt_file[UI_TXT_SCN4I].line[34], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(86, 100, ui.txt_file[UI_TXT_SCN4I].line[35], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(86, 115, ui.txt_file[UI_TXT_SCN4I].line[36], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(86, 85, ui->txt_file[UI_TXT_SCN4I]->line[34], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(86, 100, ui->txt_file[UI_TXT_SCN4I]->line[35], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(86, 115, ui->txt_file[UI_TXT_SCN4I]->line[36], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -9809,12 +9864,12 @@ static void Scene4_Outro(void) {
 			case 23:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 266, 106, 30, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 13);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 136, 126, 20, 70, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 23, 73);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 136, 126, 170, 70, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 173, 73);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 266, 106, 30, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 136, 126, 20, 70, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 23, 73);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 136, 126, 170, 70, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 173, 73);
 				step++;
 				break;
 			case 24:// Actors chat
@@ -9825,8 +9880,8 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 25:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 85, ui.txt_file[UI_TXT_SCN4I].line[45], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 100, ui.txt_file[UI_TXT_SCN4I].line[46], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 85, ui->txt_file[UI_TXT_SCN4I]->line[45], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 100, ui->txt_file[UI_TXT_SCN4I]->line[46], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -9834,19 +9889,19 @@ static void Scene4_Outro(void) {
 					// Just wait
 				}
 
-				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO4H.PCX", 130 * 120, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO4H.PCX", 130 * 120, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 
 				step++;
 				break;
 			case 26:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 266, 106, 30, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 13);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 136, 126, 20, 70, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 23, 73);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 136, 126, 170, 70, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 173, 73);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 266, 106, 30, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 136, 126, 20, 70, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 23, 73);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 136, 126, 170, 70, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 173, 73);
 				step++;
 				break;
 			case 27:// Just wait
@@ -9875,14 +9930,14 @@ static void Scene4_Outro(void) {
 				break;
 			case 31:// Load first outro scene
 				AUDIO_LoadSong(AUDIO_SONG_3);
-				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO5H.PCX", 250 * 135, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO5L.PCX", 205 * 135, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO6H.PCX", 150 * 130, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO5H.PCX", 250 * 135, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO5L.PCX", 205 * 135, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO6H.PCX", 150 * 130, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				step++;
 				break;
 			case 32:/// Image 5 :: back home
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 211, 141, 10, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, 205, gfx.image_buffer1_height, 13, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 211, 141, 10, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, 205, gfx->image_buffer1_height, 13, 43);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				VIDEO_FadeIn(4);
@@ -9902,9 +9957,9 @@ static void Scene4_Outro(void) {
 					dst_index = CAM_VISIBLE_WIDTH * 43 + 13;
 
 					// Draw image with scroll
-					for (i = 0; i < gfx.image_buffer1_height; i++) {
-						memcpy(&video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx.image_buffer1[src_index], 205);
-						src_index += gfx.image_buffer1_width;
+					for (i = 0; i < gfx->image_buffer1_height; i++) {
+						memcpy(&video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx->image_buffer1[src_index], 205);
+						src_index += gfx->image_buffer1_width;
 						dst_index += CAM_VISIBLE_WIDTH;
 					}
 					if (horizontal_scroll < 45) horizontal_scroll++;
@@ -9912,11 +9967,11 @@ static void Scene4_Outro(void) {
 						scroll_end = true;
 
 					// Draw text background
-					VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 242);
-					VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 250);
+					VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 242);
+					VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 250);
 
-					VIDEO_StringToScreenBuffer(28, 13, ui.txt_file[UI_TXT_SCN4I].line[50], FONT_SLIM_BLACK);
-					VIDEO_StringToScreenBuffer(28, 25, ui.txt_file[UI_TXT_SCN4I].line[51], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN4I]->line[50], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN4I]->line[51], FONT_SLIM_BLACK);
 
 					SetDelayTime(50);
 					while (!AwaitDelayTime()) {
@@ -9937,12 +9992,12 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 35://Image 2
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 156, 136, 150, 60, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 153, 63);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 156, 136, 150, 60, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 153, 63);
 
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 250);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 242);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 250);
 				step++;
 				break;
 			case 36:// Just wait
@@ -9953,28 +10008,28 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 37:// Fade first image and show second again
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 211, 141, 10, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 13, 43);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 156, 136, 150, 60, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 153, 63);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 211, 141, 10, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 13, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 156, 136, 150, 60, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 153, 63);
 
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 250);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 242);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 250);
 
-				VIDEO_StringToScreenBuffer(28, 13, ui.txt_file[UI_TXT_SCN4I].line[52], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 25, ui.txt_file[UI_TXT_SCN4I].line[53], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN4I]->line[52], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN4I]->line[53], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 38:// Load new images
 				VIDEO_ClearScreenBuffer();
-				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO7H.PCX", 150 * 130, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO8H.PCX", 251 * 160, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
+				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO7H.PCX", 150 * 130, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO8H.PCX", 251 * 160, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
 				step++;
 				break;
 			case 39:// Show image 7
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 156, 136, 160, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 163, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 156, 136, 160, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 163, 43);
 				step++;
 				break;
 			case 40:// Just wait
@@ -10001,9 +10056,9 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 42://Girl's chat
-				VIDEO_StringToScreenBuffer(56, 55, ui.txt_file[UI_TXT_SCN4I].line[55], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(56, 70, ui.txt_file[UI_TXT_SCN4I].line[56], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(56, 85, ui.txt_file[UI_TXT_SCN4I].line[57], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(56, 55, ui->txt_file[UI_TXT_SCN4I]->line[55], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(56, 70, ui->txt_file[UI_TXT_SCN4I]->line[56], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(56, 85, ui->txt_file[UI_TXT_SCN4I]->line[57], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -10015,8 +10070,8 @@ static void Scene4_Outro(void) {
 			case 43:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 156, 136, 160, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 163, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 156, 136, 160, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 163, 43);
 				step++;
 				break;
 			case 44:// Just wait
@@ -10028,8 +10083,8 @@ static void Scene4_Outro(void) {
 				break;
 			case 45:// Show image 8
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				step++;
 				break;
 			case 46:// Just wait
@@ -10047,7 +10102,7 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 48:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 25, ui.txt_file[UI_TXT_SCN4I].line[58], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 25, ui->txt_file[UI_TXT_SCN4I]->line[58], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -10064,9 +10119,9 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 50:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 25, ui.txt_file[UI_TXT_SCN4I].line[59], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 40, ui.txt_file[UI_TXT_SCN4I].line[60], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 55, ui.txt_file[UI_TXT_SCN4I].line[61], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 25, ui->txt_file[UI_TXT_SCN4I]->line[59], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 40, ui->txt_file[UI_TXT_SCN4I]->line[60], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 55, ui->txt_file[UI_TXT_SCN4I]->line[61], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -10078,8 +10133,8 @@ static void Scene4_Outro(void) {
 			case 51:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				step++;
 				break;
 			case 52:// Just wait
@@ -10097,9 +10152,9 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 54://Girl's chat
-				VIDEO_StringToScreenBuffer(76, 55, ui.txt_file[UI_TXT_SCN4I].line[62], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 70, ui.txt_file[UI_TXT_SCN4I].line[63], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 85, ui.txt_file[UI_TXT_SCN4I].line[64], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 55, ui->txt_file[UI_TXT_SCN4I]->line[62], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 70, ui->txt_file[UI_TXT_SCN4I]->line[63], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 85, ui->txt_file[UI_TXT_SCN4I]->line[64], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -10111,8 +10166,8 @@ static void Scene4_Outro(void) {
 			case 55:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				step++;
 				break;
 			case 56:// Just wait
@@ -10130,9 +10185,9 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 58:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 25, ui.txt_file[UI_TXT_SCN4I].line[65], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 40, ui.txt_file[UI_TXT_SCN4I].line[66], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 55, ui.txt_file[UI_TXT_SCN4I].line[67], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 25, ui->txt_file[UI_TXT_SCN4I]->line[65], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 40, ui->txt_file[UI_TXT_SCN4I]->line[66], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 55, ui->txt_file[UI_TXT_SCN4I]->line[67], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -10149,8 +10204,8 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 60:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 25, ui.txt_file[UI_TXT_SCN4I].line[68], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 40, ui.txt_file[UI_TXT_SCN4I].line[69], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 25, ui->txt_file[UI_TXT_SCN4I]->line[68], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 40, ui->txt_file[UI_TXT_SCN4I]->line[69], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -10162,8 +10217,8 @@ static void Scene4_Outro(void) {
 			case 61:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				step++;
 				break;
 			case 62:// Just wait
@@ -10181,7 +10236,7 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 64://Girl's chat
-				VIDEO_StringToScreenBuffer(76, 70, ui.txt_file[UI_TXT_SCN4I].line[70], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 70, ui->txt_file[UI_TXT_SCN4I]->line[70], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -10198,9 +10253,9 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 66://Girl's chat
-				VIDEO_StringToScreenBuffer(76, 55, ui.txt_file[UI_TXT_SCN4I].line[71], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 70, ui.txt_file[UI_TXT_SCN4I].line[72], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 85, ui.txt_file[UI_TXT_SCN4I].line[73], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 55, ui->txt_file[UI_TXT_SCN4I]->line[71], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 70, ui->txt_file[UI_TXT_SCN4I]->line[72], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 85, ui->txt_file[UI_TXT_SCN4I]->line[73], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -10217,8 +10272,8 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 68://Girl's chat
-				VIDEO_StringToScreenBuffer(76, 55, ui.txt_file[UI_TXT_SCN4I].line[74], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 70, ui.txt_file[UI_TXT_SCN4I].line[75], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 55, ui->txt_file[UI_TXT_SCN4I]->line[74], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 70, ui->txt_file[UI_TXT_SCN4I]->line[75], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -10230,8 +10285,8 @@ static void Scene4_Outro(void) {
 			case 69:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				step++;
 				break;
 			case 70:// Just wait
@@ -10249,9 +10304,9 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 72:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 25, ui.txt_file[UI_TXT_SCN4I].line[76], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 40, ui.txt_file[UI_TXT_SCN4I].line[77], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 55, ui.txt_file[UI_TXT_SCN4I].line[78], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 25, ui->txt_file[UI_TXT_SCN4I]->line[76], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 40, ui->txt_file[UI_TXT_SCN4I]->line[77], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 55, ui->txt_file[UI_TXT_SCN4I]->line[78], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -10263,8 +10318,8 @@ static void Scene4_Outro(void) {
 			case 73:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				SetDelayTime(200);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -10279,9 +10334,9 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 75://Girl's chat
-				VIDEO_StringToScreenBuffer(76, 55, ui.txt_file[UI_TXT_SCN4I].line[79], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 70, ui.txt_file[UI_TXT_SCN4I].line[80], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 85, ui.txt_file[UI_TXT_SCN4I].line[81], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 55, ui->txt_file[UI_TXT_SCN4I]->line[79], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 70, ui->txt_file[UI_TXT_SCN4I]->line[80], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 85, ui->txt_file[UI_TXT_SCN4I]->line[81], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -10298,9 +10353,9 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 77://Girl's chat
-				VIDEO_StringToScreenBuffer(76, 55, ui.txt_file[UI_TXT_SCN4I].line[82], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 70, ui.txt_file[UI_TXT_SCN4I].line[83], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 85, ui.txt_file[UI_TXT_SCN4I].line[84], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 55, ui->txt_file[UI_TXT_SCN4I]->line[82], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 70, ui->txt_file[UI_TXT_SCN4I]->line[83], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 85, ui->txt_file[UI_TXT_SCN4I]->line[84], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -10312,8 +10367,8 @@ static void Scene4_Outro(void) {
 			case 78:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				SetDelayTime(200);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -10328,9 +10383,9 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 80:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 25, ui.txt_file[UI_TXT_SCN4I].line[85], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 40, ui.txt_file[UI_TXT_SCN4I].line[86], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 55, ui.txt_file[UI_TXT_SCN4I].line[87], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 25, ui->txt_file[UI_TXT_SCN4I]->line[85], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 40, ui->txt_file[UI_TXT_SCN4I]->line[86], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 55, ui->txt_file[UI_TXT_SCN4I]->line[87], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -10347,9 +10402,9 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 82:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 25, ui.txt_file[UI_TXT_SCN4I].line[89], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 40, ui.txt_file[UI_TXT_SCN4I].line[90], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 55, ui.txt_file[UI_TXT_SCN4I].line[91], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 25, ui->txt_file[UI_TXT_SCN4I]->line[89], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 40, ui->txt_file[UI_TXT_SCN4I]->line[90], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 55, ui->txt_file[UI_TXT_SCN4I]->line[91], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -10366,8 +10421,8 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 84:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 25, ui.txt_file[UI_TXT_SCN4I].line[92], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 40, ui.txt_file[UI_TXT_SCN4I].line[93], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 25, ui->txt_file[UI_TXT_SCN4I]->line[92], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 40, ui->txt_file[UI_TXT_SCN4I]->line[93], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -10386,8 +10441,8 @@ static void Scene4_Outro(void) {
 			case 86:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				SetDelayTime(200);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -10402,7 +10457,7 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 88://Girl's chat
-				VIDEO_StringToScreenBuffer(76, 70, ui.txt_file[UI_TXT_SCN4I].line[94], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 70, ui->txt_file[UI_TXT_SCN4I]->line[94], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -10419,9 +10474,9 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 90://Girl's chat
-				VIDEO_StringToScreenBuffer(76, 55, ui.txt_file[UI_TXT_SCN4I].line[95], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 70, ui.txt_file[UI_TXT_SCN4I].line[96], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 85, ui.txt_file[UI_TXT_SCN4I].line[97], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 55, ui->txt_file[UI_TXT_SCN4I]->line[95], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 70, ui->txt_file[UI_TXT_SCN4I]->line[96], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 85, ui->txt_file[UI_TXT_SCN4I]->line[97], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -10438,9 +10493,9 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 92://Girl's chat
-				VIDEO_StringToScreenBuffer(76, 55, ui.txt_file[UI_TXT_SCN4I].line[98], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 70, ui.txt_file[UI_TXT_SCN4I].line[99], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(76, 85, ui.txt_file[UI_TXT_SCN4I].line[100], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 55, ui->txt_file[UI_TXT_SCN4I]->line[98], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 70, ui->txt_file[UI_TXT_SCN4I]->line[99], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(76, 85, ui->txt_file[UI_TXT_SCN4I]->line[100], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -10452,8 +10507,8 @@ static void Scene4_Outro(void) {
 			case 93:// End chat
 				GFX_HideSprite(chat_spr_num);
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				SetDelayTime(200);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -10475,8 +10530,8 @@ static void Scene4_Outro(void) {
 				step++;
 				break;
 			case 96:// Actors chat
-				VIDEO_StringToScreenBuffer(106, 25, ui.txt_file[UI_TXT_SCN4I].line[101], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 40, ui.txt_file[UI_TXT_SCN4I].line[102], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 25, ui->txt_file[UI_TXT_SCN4I]->line[101], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 40, ui->txt_file[UI_TXT_SCN4I]->line[102], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -10487,8 +10542,8 @@ static void Scene4_Outro(void) {
 				break;
 			case 97:// End chat
 				GFX_HideSprite(chat_spr_num);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 166, 30, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 166, 30, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 23);
 				SetDelayTime(200);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -10497,15 +10552,15 @@ static void Scene4_Outro(void) {
 				break;
 			case 98:// Load new images
 				VIDEO_ClearScreenBuffer();
-				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO9H.PCX", 150 * 130, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO10H.PCX", 150 * 130, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
+				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO9H.PCX", 150 * 130, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN4.DAT", "OUTRO10H.PCX", 150 * 130, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
 				step++;
 				break;
 			case 99:// Show images 9 and 10
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 156, 136, 2, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 5, 43);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 156, 136, 160, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 163, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 156, 136, 2, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 5, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 156, 136, 160, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 163, 43);
 				step++;
 				break;
 			case 100:// Just wait
@@ -10517,17 +10572,17 @@ static void Scene4_Outro(void) {
 				break;
 			case 101:// Clear image 10 and show just 9
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 156, 136, 2, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 5, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 156, 136, 2, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 5, 43);
 				step++;
 				break;
 			case 102:// Show speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 250);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 242);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 250);
 
-				VIDEO_StringToScreenBuffer(28, 13, ui.txt_file[UI_TXT_SCN4I].line[105], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 25, ui.txt_file[UI_TXT_SCN4I].line[106], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN4I]->line[105], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN4I]->line[106], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 103:// Just wait
@@ -10539,8 +10594,8 @@ static void Scene4_Outro(void) {
 				break;
 			case 104:// Clear speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 250);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 242);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 250);
 				step++;
 				break;
 			case 105:// Just wait
@@ -10552,11 +10607,11 @@ static void Scene4_Outro(void) {
 				break;
 			case 106:// Show speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 250);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 242);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 250);
 
-				VIDEO_StringToScreenBuffer(28, 13, ui.txt_file[UI_TXT_SCN4I].line[107], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 25, ui.txt_file[UI_TXT_SCN4I].line[108], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN4I]->line[107], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN4I]->line[108], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 107:// Just wait
@@ -10568,8 +10623,8 @@ static void Scene4_Outro(void) {
 				break;
 			case 108:// Clear speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 250);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 242);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 250);
 				step++;
 				break;
 			case 109:// Just wait
@@ -10581,11 +10636,11 @@ static void Scene4_Outro(void) {
 				break;
 			case 110:// Show speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 250);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 242);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 250);
 
-				VIDEO_StringToScreenBuffer(28, 13, ui.txt_file[UI_TXT_SCN4I].line[109], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 25, ui.txt_file[UI_TXT_SCN4I].line[110], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN4I]->line[109], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN4I]->line[110], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 111:// Just wait
@@ -10638,9 +10693,9 @@ static void Scene5_Intro(void) {
 				step++;
 				break;
 			case 1:// Load first intro scene
-				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO1H.PCX", 200 * 120, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO2H.PCX", 140 * 140, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO3H.PCX", 110 * 160, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO1H.PCX", 200 * 120, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO2H.PCX", 140 * 140, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO3H.PCX", 110 * 160, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 
 				AUDIO_LoadSong(AUDIO_SONG_3);
 				step++;
@@ -10662,8 +10717,8 @@ static void Scene5_Intro(void) {
 				step++;
 				break;
 			case 4:// Draw frame and image 1
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 206, 126, 30, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 33, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 206, 126, 30, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 33, 53);
 				step++;
 				break;
 			case 5:// Just wait
@@ -10675,10 +10730,10 @@ static void Scene5_Intro(void) {
 				break;
 			case 6:// Show text
 				   // Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 9, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN5I].line[1], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN5I].line[2], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN5I]->line[1], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN5I]->line[2], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 7:// Just wait
@@ -10690,8 +10745,8 @@ static void Scene5_Intro(void) {
 				break;
 			case 8:// Hide text
 				   // Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
 				step++;
 				break;
 			case 9:// Just wait
@@ -10703,10 +10758,10 @@ static void Scene5_Intro(void) {
 				break;
 			case 10:// Show text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 9, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN5I].line[3], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN5I].line[4], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN5I]->line[3], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN5I]->line[4], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 11:// Just wait
@@ -10718,8 +10773,8 @@ static void Scene5_Intro(void) {
 				break;
 			case 12:// Hide text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
 				step++;
 				break;
 			case 13:// Just wait
@@ -10731,10 +10786,10 @@ static void Scene5_Intro(void) {
 				break;
 			case 14:// Show text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 9, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN5I].line[5], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN5I].line[6], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN5I]->line[5], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN5I]->line[6], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 15:// Just wait
@@ -10747,10 +10802,10 @@ static void Scene5_Intro(void) {
 			case 16://  Clear back and Show text
 				VIDEO_ClearScreenBuffer();
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 9, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN5I].line[7], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN5I].line[8], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN5I]->line[7], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN5I]->line[8], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 17:// Just wait
@@ -10762,8 +10817,8 @@ static void Scene5_Intro(void) {
 				break;
 			case 18://Clear back and show image 2
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 20, 30, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 23, 33);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 20, 30, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 23, 33);
 				step++;
 				break;
 			case 19:// Just wait
@@ -10774,10 +10829,10 @@ static void Scene5_Intro(void) {
 				step++;
 				break;
 			case 20:// Show images 2 and 3
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 20, 30, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 23, 33);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 116, 166, 180, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 183, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 20, 30, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 23, 33);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 116, 166, 180, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 183, 23);
 				step++;
 				break;
 			case 21:// Just wait
@@ -10788,15 +10843,15 @@ static void Scene5_Intro(void) {
 				step++;
 				break;
 			case 22:// Load images 4 and 5
-				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO4H.PCX", 120 * 180, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO4L.PCX", 120 * 180, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO5H.PCX", 130 * 130, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO4H.PCX", 120 * 180, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO4L.PCX", 120 * 180, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO5H.PCX", 130 * 130, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				step++;
 				break;
 			case 23:// Hide text box and Show image 4
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 126, 186, 20, 5, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 23, 8);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 126, 186, 20, 5, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 23, 8);
 				step++;
 				break;
 			case 24:
@@ -10807,10 +10862,10 @@ static void Scene5_Intro(void) {
 				step++;
 				break;
 			case 25:// Show image 4 and 5
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 126, 186, 20, 5, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 23, 8);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 136, 136, 160, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 163, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 126, 186, 20, 5, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 23, 8);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 136, 136, 160, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 163, 43);
 				step++;
 				break;
 			case 26:
@@ -10821,22 +10876,22 @@ static void Scene5_Intro(void) {
 				step++;
 				break;
 			case 27:// Fade image 4 and show 5
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 126, 186, 20, 5, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 23, 8);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 136, 136, 160, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 163, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 126, 186, 20, 5, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 23, 8);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 136, 136, 160, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 163, 43);
 				step++;
 				break;
 			case 28:// Load images 6 and 7
-				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO6H.PCX", 100 * 100, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO6L.PCX", 100 * 100, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO7H.PCX", 100 * 100, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO6H.PCX", 100 * 100, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO6L.PCX", 100 * 100, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO7H.PCX", 100 * 100, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				step++;
 				break;
 			case 29:// clear backgound and Show image 6
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 106, 20, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 23, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 106, 20, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 23, 13);
 				step++;
 				break;
 			case 30:
@@ -10847,10 +10902,10 @@ static void Scene5_Intro(void) {
 				step++;
 				break;
 			case 31:// Show image 6 and 7
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 106, 20, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 23, 13);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 106, 120, 90, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 123, 93);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 106, 20, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 23, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 106, 120, 90, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 123, 93);
 				step++;
 				break;
 			case 32:
@@ -10861,37 +10916,37 @@ static void Scene5_Intro(void) {
 				step++;
 				break;
 			case 33:// Fade image 6 and show 7
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 106, 20, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 23, 13);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 106, 120, 90, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 123, 93);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 106, 20, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 23, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 106, 120, 90, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 123, 93);
 				step++;
 				break;
 			case 34:// Load image 8
-				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO8H.PCX", 100 * 100, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO7L.PCX", 100 * 100, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO8H.PCX", 100 * 100, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO7L.PCX", 100 * 100, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				step++;
 				break;
 			case 35:// Fade image 6 and 7 and show 8
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 106, 20, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 23, 13);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 106, 120, 90, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 123, 93);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 106, 200, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 203, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 106, 20, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 23, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 106, 120, 90, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 123, 93);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 106, 200, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 203, 13);
 				step++;
 				break;
 			case 36:// Load images 9
-				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO9H.PCX", 260 * 140, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
+				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO9H.PCX", 260 * 140, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
 				step++;
 				break;
 			case 37:// Show text box and image 9
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
 
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 266, 146, 20, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 23, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 266, 146, 20, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 23, 53);
 				step++;
 				break;
 			case 38:
@@ -10903,10 +10958,10 @@ static void Scene5_Intro(void) {
 				break;
 			case 39:// Show text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 9, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN5I].line[10], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN5I].line[11], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN5I]->line[10], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN5I]->line[11], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 40:// Just wait
@@ -10918,8 +10973,8 @@ static void Scene5_Intro(void) {
 				break;
 			case 41:// Hide text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
 
 				step++;
 				break;
@@ -10932,10 +10987,10 @@ static void Scene5_Intro(void) {
 				break;
 			case 43:// Show text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 9, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN5I].line[12], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN5I].line[13], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN5I]->line[12], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN5I]->line[13], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 44:// Just wait
@@ -10947,8 +11002,8 @@ static void Scene5_Intro(void) {
 				break;
 			case 45:// Hide text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
 
 				step++;
 				break;
@@ -10961,10 +11016,10 @@ static void Scene5_Intro(void) {
 				break;
 			case 47:// Show text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 9, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN5I].line[14], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN5I].line[15], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN5I]->line[14], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN5I]->line[15], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 48:// Just wait
@@ -10975,15 +11030,15 @@ static void Scene5_Intro(void) {
 				step++;
 				break;
 			case 49:// Load images 10 and 11
-				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO10H.PCX", 260 * 70, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO10L.PCX", 260 * 70, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO11H.PCX", 260 * 70, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO10H.PCX", 260 * 70, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO10L.PCX", 260 * 70, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("ISCN5.DAT", "INTRO11H.PCX", 260 * 70, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				step++;
 				break;
 			case 50:// Hide text box and Show image 10
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 266, 76, 30, 5, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 33, 8);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 266, 76, 30, 5, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 33, 8);
 				step++;
 				break;
 			case 51:
@@ -10994,10 +11049,10 @@ static void Scene5_Intro(void) {
 				step++;
 				break;
 			case 52:// Show image 10 and 11
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 266, 76, 30, 5, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 33, 8);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 266, 76, 30, 100, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 33, 103);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 266, 76, 30, 5, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 33, 8);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 266, 76, 30, 100, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 33, 103);
 				step++;
 				break;
 			case 53:
@@ -11008,10 +11063,10 @@ static void Scene5_Intro(void) {
 				step++;
 				break;
 			case 54:// Fade image 10 and show 11
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 266, 76, 30, 5, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 8);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 266, 76, 30, 100, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 33, 103);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 266, 76, 30, 5, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 8);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 266, 76, 30, 100, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 33, 103);
 				step++;
 				break;
 			case 55:
@@ -11068,8 +11123,8 @@ static void Scene5_LoadAssets(void) {
 	OBJECT_LoadObject("OBJECT5.DAT", 2, ENTITY_ID_BARREL, SPRITE_GRAPHICS_ID_OBJECT3, SPRITE_GRAPHICS_ID_OBJECT3_PORTAIT, 0, 0);
 	OBJECT_UnloadObjects();
 
-	ACTOR_Init(9 << 4, 47 << 4, SPRITE_GRAPHICS_ID_ACTOR_FEET, SPRITE_GRAPHICS_ID_ACTOR_BODY, SPRITE_GRAPHICS_ID_ACTOR_HEAD, SPRITE_GRAPHICS_ID_ACTOR_LARM, SPRITE_GRAPHICS_ID_ACTOR_RARM_BARE_HANDS, ACTOR_FACING_RIGHT);
-	ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
+	ACTOR_Load(9 << 4, 47 << 4, SPRITE_GRAPHICS_ID_ACTOR_FEET, SPRITE_GRAPHICS_ID_ACTOR_BODY, SPRITE_GRAPHICS_ID_ACTOR_HEAD, SPRITE_GRAPHICS_ID_ACTOR_LARM, SPRITE_GRAPHICS_ID_ACTOR_RARM_BARE_HANDS, ACTOR_FACING_RIGHT);
+	ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
 	ACTOR_SetBulletStatus(99, 19, 199, 9, 9);
 
 	NPC_Init();
@@ -11557,140 +11612,140 @@ static void Scene5_Update_Floor5(void) {
 static void Scene5_SetHotspotsAndEvents(void) {
 	// Initialize hotspots and events
 	// Update hotspots
-	hotspot_enabling_room1[0] = false;
-	hotspot_enabling_room1[1] = true;
-	hotspot_enabling_room1[2] = true;
-	hotspot_enabling_room1[3] = false;
-	hotspot_enabling_room1[4] = false;
-	hotspot_enabling_room1[5] = false;
-	hotspot_enabling_room1[6] = false;
-	hotspot_enabling_room1[7] = false;
-	hotspot_enabling_room1[8] = false;
-	hotspot_enabling_room1[9] = false;
-	hotspot_enabling_room1[10] = false;
-	hotspot_enabling_room1[11] = false;
-	hotspot_enabling_room1[12] = false;
-	hotspot_enabling_room1[13] = false;
-	hotspot_enabling_room1[14] = false;
-	hotspot_enabling_room1[15] = false;
-	hotspot_enabling_room1[16] = false;
-	hotspot_enabling_room1[17] = false;
-	hotspot_enabling_room1[18] = false;
-	hotspot_enabling_room1[19] = false;
-	hotspot_enabling_room1[20] = false;
-	hotspot_enabling_room1[21] = false;
-	hotspot_enabling_room1[22] = false;
-	hotspot_enabling_room1[23] = false;
-	hotspot_enabling_room1[24] = false;
-	hotspot_enabling_room1[25] = false;
-	hotspot_enabling_room1[26] = false;
-	hotspot_enabling_room1[27] = false;
-	hotspot_enabling_room1[28] = false;
-	hotspot_enabling_room1[29] = false;
-	hotspot_enabling_room1[30] = false;
-	hotspot_enabling_room1[31] = false;
+	map->hotspot_enabling_room1[0] = false;
+	map->hotspot_enabling_room1[1] = true;
+	map->hotspot_enabling_room1[2] = true;
+	map->hotspot_enabling_room1[3] = false;
+	map->hotspot_enabling_room1[4] = false;
+	map->hotspot_enabling_room1[5] = false;
+	map->hotspot_enabling_room1[6] = false;
+	map->hotspot_enabling_room1[7] = false;
+	map->hotspot_enabling_room1[8] = false;
+	map->hotspot_enabling_room1[9] = false;
+	map->hotspot_enabling_room1[10] = false;
+	map->hotspot_enabling_room1[11] = false;
+	map->hotspot_enabling_room1[12] = false;
+	map->hotspot_enabling_room1[13] = false;
+	map->hotspot_enabling_room1[14] = false;
+	map->hotspot_enabling_room1[15] = false;
+	map->hotspot_enabling_room1[16] = false;
+	map->hotspot_enabling_room1[17] = false;
+	map->hotspot_enabling_room1[18] = false;
+	map->hotspot_enabling_room1[19] = false;
+	map->hotspot_enabling_room1[20] = false;
+	map->hotspot_enabling_room1[21] = false;
+	map->hotspot_enabling_room1[22] = false;
+	map->hotspot_enabling_room1[23] = false;
+	map->hotspot_enabling_room1[24] = false;
+	map->hotspot_enabling_room1[25] = false;
+	map->hotspot_enabling_room1[26] = false;
+	map->hotspot_enabling_room1[27] = false;
+	map->hotspot_enabling_room1[28] = false;
+	map->hotspot_enabling_room1[29] = false;
+	map->hotspot_enabling_room1[30] = false;
+	map->hotspot_enabling_room1[31] = false;
 
 	// Update events
-	event_enabling_room1[0] = false;
-	event_enabling_room1[1] = true;
-	event_enabling_room1[2] = true;
-	event_enabling_room1[3] = false;
-	event_enabling_room1[4] = false;
-	event_enabling_room1[5] = false;
-	event_enabling_room1[6] = false;
-	event_enabling_room1[7] = false;
-	event_enabling_room1[8] = false;
-	event_enabling_room1[9] = false;
-	event_enabling_room1[10] = false;
-	event_enabling_room1[11] = false;
-	event_enabling_room1[12] = false;
-	event_enabling_room1[13] = false;
-	event_enabling_room1[14] = false;
-	event_enabling_room1[15] = false;
-	event_enabling_room1[16] = true;
-	event_enabling_room1[17] = false;
-	event_enabling_room1[18] = false;
-	event_enabling_room1[19] = false;
-	event_enabling_room1[20] = false;
-	event_enabling_room1[21] = false;
-	event_enabling_room1[22] = false;
-	event_enabling_room1[23] = false;
-	event_enabling_room1[24] = false;
-	event_enabling_room1[25] = false;
-	event_enabling_room1[26] = false;
-	event_enabling_room1[27] = false;
-	event_enabling_room1[28] = false;
-	event_enabling_room1[29] = false;
-	event_enabling_room1[30] = false;
-	event_enabling_room1[31] = false;
+	map->event_enabling_room1[0] = false;
+	map->event_enabling_room1[1] = true;
+	map->event_enabling_room1[2] = true;
+	map->event_enabling_room1[3] = false;
+	map->event_enabling_room1[4] = false;
+	map->event_enabling_room1[5] = false;
+	map->event_enabling_room1[6] = false;
+	map->event_enabling_room1[7] = false;
+	map->event_enabling_room1[8] = false;
+	map->event_enabling_room1[9] = false;
+	map->event_enabling_room1[10] = false;
+	map->event_enabling_room1[11] = false;
+	map->event_enabling_room1[12] = false;
+	map->event_enabling_room1[13] = false;
+	map->event_enabling_room1[14] = false;
+	map->event_enabling_room1[15] = false;
+	map->event_enabling_room1[16] = true;
+	map->event_enabling_room1[17] = false;
+	map->event_enabling_room1[18] = false;
+	map->event_enabling_room1[19] = false;
+	map->event_enabling_room1[20] = false;
+	map->event_enabling_room1[21] = false;
+	map->event_enabling_room1[22] = false;
+	map->event_enabling_room1[23] = false;
+	map->event_enabling_room1[24] = false;
+	map->event_enabling_room1[25] = false;
+	map->event_enabling_room1[26] = false;
+	map->event_enabling_room1[27] = false;
+	map->event_enabling_room1[28] = false;
+	map->event_enabling_room1[29] = false;
+	map->event_enabling_room1[30] = false;
+	map->event_enabling_room1[31] = false;
 
 	// Update hotspots
-	hotspot_enabling_room2[0] = false;
-	hotspot_enabling_room2[1] = false;
-	hotspot_enabling_room2[2] = false;
-	hotspot_enabling_room2[3] = false;
-	hotspot_enabling_room2[4] = false;
-	hotspot_enabling_room2[5] = false;
-	hotspot_enabling_room2[6] = false;
-	hotspot_enabling_room2[7] = false;
-	hotspot_enabling_room2[8] = false;
-	hotspot_enabling_room2[9] = false;
-	hotspot_enabling_room2[10] = false;
-	hotspot_enabling_room2[11] = false;
-	hotspot_enabling_room2[12] = false;
-	hotspot_enabling_room2[13] = false;
-	hotspot_enabling_room2[14] = false;
-	hotspot_enabling_room2[15] = false;
-	hotspot_enabling_room2[16] = false;
-	hotspot_enabling_room2[17] = false;
-	hotspot_enabling_room2[18] = false;
-	hotspot_enabling_room2[19] = false;
-	hotspot_enabling_room2[20] = false;
-	hotspot_enabling_room2[21] = false;
-	hotspot_enabling_room2[22] = false;
-	hotspot_enabling_room2[23] = false;
-	hotspot_enabling_room2[24] = false;
-	hotspot_enabling_room2[25] = false;
-	hotspot_enabling_room2[26] = false;
-	hotspot_enabling_room2[27] = false;
-	hotspot_enabling_room2[28] = false;
-	hotspot_enabling_room2[29] = false;
-	hotspot_enabling_room2[30] = false;
-	hotspot_enabling_room2[31] = false;
+	map->hotspot_enabling_room2[0] = false;
+	map->hotspot_enabling_room2[1] = false;
+	map->hotspot_enabling_room2[2] = false;
+	map->hotspot_enabling_room2[3] = false;
+	map->hotspot_enabling_room2[4] = false;
+	map->hotspot_enabling_room2[5] = false;
+	map->hotspot_enabling_room2[6] = false;
+	map->hotspot_enabling_room2[7] = false;
+	map->hotspot_enabling_room2[8] = false;
+	map->hotspot_enabling_room2[9] = false;
+	map->hotspot_enabling_room2[10] = false;
+	map->hotspot_enabling_room2[11] = false;
+	map->hotspot_enabling_room2[12] = false;
+	map->hotspot_enabling_room2[13] = false;
+	map->hotspot_enabling_room2[14] = false;
+	map->hotspot_enabling_room2[15] = false;
+	map->hotspot_enabling_room2[16] = false;
+	map->hotspot_enabling_room2[17] = false;
+	map->hotspot_enabling_room2[18] = false;
+	map->hotspot_enabling_room2[19] = false;
+	map->hotspot_enabling_room2[20] = false;
+	map->hotspot_enabling_room2[21] = false;
+	map->hotspot_enabling_room2[22] = false;
+	map->hotspot_enabling_room2[23] = false;
+	map->hotspot_enabling_room2[24] = false;
+	map->hotspot_enabling_room2[25] = false;
+	map->hotspot_enabling_room2[26] = false;
+	map->hotspot_enabling_room2[27] = false;
+	map->hotspot_enabling_room2[28] = false;
+	map->hotspot_enabling_room2[29] = false;
+	map->hotspot_enabling_room2[30] = false;
+	map->hotspot_enabling_room2[31] = false;
 
 	// Update events
-	event_enabling_room2[0] = false;
-	event_enabling_room2[1] = false;
-	event_enabling_room2[2] = false;
-	event_enabling_room2[3] = false;
-	event_enabling_room2[4] = false;
-	event_enabling_room2[5] = false;
-	event_enabling_room2[6] = false;
-	event_enabling_room2[7] = false;
-	event_enabling_room2[8] = false;
-	event_enabling_room2[9] = false;
-	event_enabling_room2[10] = false;
-	event_enabling_room2[11] = false;
-	event_enabling_room2[12] = false;
-	event_enabling_room2[13] = false;
-	event_enabling_room2[14] = false;
-	event_enabling_room2[15] = true;
-	event_enabling_room2[16] = false;
-	event_enabling_room2[17] = false;
-	event_enabling_room2[18] = false;
-	event_enabling_room2[19] = false;
-	event_enabling_room2[20] = false;
-	event_enabling_room2[21] = false;
-	event_enabling_room2[22] = false;
-	event_enabling_room2[23] = false;
-	event_enabling_room2[24] = false;
-	event_enabling_room2[25] = false;
-	event_enabling_room2[26] = false;
-	event_enabling_room2[27] = false;
-	event_enabling_room2[28] = false;
-	event_enabling_room2[29] = false;
-	event_enabling_room2[30] = false;
-	event_enabling_room2[31] = false;
+	map->event_enabling_room2[0] = false;
+	map->event_enabling_room2[1] = false;
+	map->event_enabling_room2[2] = false;
+	map->event_enabling_room2[3] = false;
+	map->event_enabling_room2[4] = false;
+	map->event_enabling_room2[5] = false;
+	map->event_enabling_room2[6] = false;
+	map->event_enabling_room2[7] = false;
+	map->event_enabling_room2[8] = false;
+	map->event_enabling_room2[9] = false;
+	map->event_enabling_room2[10] = false;
+	map->event_enabling_room2[11] = false;
+	map->event_enabling_room2[12] = false;
+	map->event_enabling_room2[13] = false;
+	map->event_enabling_room2[14] = false;
+	map->event_enabling_room2[15] = true;
+	map->event_enabling_room2[16] = false;
+	map->event_enabling_room2[17] = false;
+	map->event_enabling_room2[18] = false;
+	map->event_enabling_room2[19] = false;
+	map->event_enabling_room2[20] = false;
+	map->event_enabling_room2[21] = false;
+	map->event_enabling_room2[22] = false;
+	map->event_enabling_room2[23] = false;
+	map->event_enabling_room2[24] = false;
+	map->event_enabling_room2[25] = false;
+	map->event_enabling_room2[26] = false;
+	map->event_enabling_room2[27] = false;
+	map->event_enabling_room2[28] = false;
+	map->event_enabling_room2[29] = false;
+	map->event_enabling_room2[30] = false;
+	map->event_enabling_room2[31] = false;
 }
 static void Scene5_Loop(void) {
 	bool end_sequence;
@@ -11701,10 +11756,10 @@ static void Scene5_Loop(void) {
 	VIDEO_ClearScreenBuffer();
 	GFX_LoadPalette("PALETTES.DAT", "SCN51.PCX", 256);
 
-	VIDEO_StringToScreenBuffer(50, 60, ui.txt_file[UI_TXT_SCN5I].line[40], FONT_BIG_WHITE);
-	VIDEO_StringToScreenBuffer(60, 85, ui.txt_file[UI_TXT_SCN5I].line[41], FONT_BIG_WHITE);
-	VIDEO_StringToScreenBuffer(90, 135, ui.txt_file[UI_TXT_SCN5I].line[42], FONT_SLIM_WHITE);
-	VIDEO_StringToScreenBuffer(160, 135, ui.txt_file[UI_TXT_SCN5I].line[43], FONT_SLIM_WHITE);
+	VIDEO_StringToScreenBuffer(50, 60, ui->txt_file[UI_TXT_SCN5I]->line[40], FONT_BIG_WHITE);
+	VIDEO_StringToScreenBuffer(60, 85, ui->txt_file[UI_TXT_SCN5I]->line[41], FONT_BIG_WHITE);
+	VIDEO_StringToScreenBuffer(90, 135, ui->txt_file[UI_TXT_SCN5I]->line[42], FONT_SLIM_WHITE);
+	VIDEO_StringToScreenBuffer(160, 135, ui->txt_file[UI_TXT_SCN5I]->line[43], FONT_SLIM_WHITE);
 
 	VIDEO_VSync();
 	VIDEO_ScreenBufferToVRAM();
@@ -11736,7 +11791,7 @@ static void Scene5_Loop(void) {
 			ACTOR_SetPosition(21 << 4, 8 << 4, ACTOR_FACING_RIGHT);// Set actor position
 			ACTOR_SetCombatMode(true);
 
-			CAM_Init(map.width_px, map.height_px, 5 << 4, 0 << 4);// Initialize camera
+			CAM_Init(map->width_px, map->height_px, 5 << 4, 0 << 4);// Initialize camera
 			MAP_DrawMapToMapVideoBuffer();
 
 			Update(true);
@@ -11744,15 +11799,15 @@ static void Scene5_Loop(void) {
 			VIDEO_FadeIn(1);
 
 			ACTOR_SetCombatMode(true);
-			ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_SNIPPER);
+			ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_SNIPPER);
 			ACTOR_Reload();
 
 			break;
 		case 2:// Room 2. ??
 			Scene5_LoadRoom2();
 
-			ACTOR_SetPosition(2 << 4, 10 << 4, ACTOR_FACING_RIGHT);// Set actor position
-			CAM_Init(map.width_px, map.height_px, 0 << 4, 0 << 4); // Initialize camera
+			ACTOR_SetPosition(2 << 4, 10 << 4, ACTOR_FACING_RIGHT); // Set actor position
+			CAM_Init(map->width_px, map->height_px, 0 << 4, 0 << 4);// Initialize camera
 			MAP_DrawMapToMapVideoBuffer();
 
 			Update(true);
@@ -11769,7 +11824,7 @@ static void Scene5_Loop(void) {
 		switch (engine.room) {
 			case 1:// Room 1. Roof
 				// Hotspots
-				if (!actor.mode_combat) {
+				if (!actor->mode_combat) {
 					// Check point on object or enemy
 					switch (cursor.point_on & 0xFF) {
 						case ENTITY_ID_HSPOT:// Hotspot
@@ -11778,7 +11833,7 @@ static void Scene5_Loop(void) {
 									break;
 								case 1:// Spare
 									if (cursor.left_click) {
-										//UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN5H, 120, 121, 122, false, 100);
+										//UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN5H, 120, 121, 122, false, 100);
 
 									} else {
 										//UI_ShowDescription(UI_TXT_SCN5H, 6);
@@ -11803,26 +11858,26 @@ static void Scene5_Loop(void) {
 				}
 
 				// Events
-				actor_tile_num = MAP_GetTileNumber(actor.pos_x + (gfx_sprite_stack[actor.sprite_num].width_px >> 1), actor.pos_y + (gfx_sprite_stack[actor.sprite_num].height_px >> 1));
-				switch ((map.layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
+				actor_tile_num = MAP_GetTileNumber(actor->pos_x + (gfx_sprite_stack[actor->sprite_num].width_px >> 1), actor->pos_y + (gfx_sprite_stack[actor->sprite_num].height_px >> 1));
+				switch ((map->layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
 					case 1:// Event 1. Spare
-						if (event_enabling_room1[1]) {
-							event_enabling_room1[1] = false;
+						if (map->event_enabling_room1[1]) {
+							map->event_enabling_room1[1] = false;
 						}
 						break;
 					case 2:// Event 2. Spare
-						if (event_enabling_room1[2]) {
-							event_enabling_room1[2] = false;
+						if (map->event_enabling_room1[2]) {
+							map->event_enabling_room1[2] = false;
 						}
 						break;
 					case 15:// Event 15. Spare
-						if (event_enabling_room1[15]) {
-							event_enabling_room1[15] = false;
+						if (map->event_enabling_room1[15]) {
+							map->event_enabling_room1[15] = false;
 						}
 						break;
 					case 16:// Event 16. ??
-						if (event_enabling_room1[16]) {
-							event_enabling_room1[16] = false;
+						if (map->event_enabling_room1[16]) {
+							map->event_enabling_room1[16] = false;
 
 							VIDEO_FadeOut(4);
 							ENEMY_UnloadEnemies();
@@ -11836,8 +11891,8 @@ static void Scene5_Loop(void) {
 							MAP_UnloadMap();
 
 							Scene5_LoadRoom2();
-							ACTOR_SetPosition(2 << 4, 10 << 4, ACTOR_FACING_RIGHT);// Set actor position
-							CAM_Init(map.width_px, map.height_px, 0 << 4, 6 << 4); // Initialize camera
+							ACTOR_SetPosition(2 << 4, 10 << 4, ACTOR_FACING_RIGHT); // Set actor position
+							CAM_Init(map->width_px, map->height_px, 0 << 4, 6 << 4);// Initialize camera
 							MAP_DrawMapToMapVideoBuffer();
 
 							Update(true);
@@ -11855,7 +11910,7 @@ static void Scene5_Loop(void) {
 				break;
 			case 2:// Room 2. ??
 				   // Hotspots
-				if (!actor.mode_combat) {
+				if (!actor->mode_combat) {
 					// Check point on object or enemy
 					switch (cursor.point_on & 0xFF) {
 						case ENTITY_ID_HSPOT:// Hotspot
@@ -11889,48 +11944,48 @@ static void Scene5_Loop(void) {
 				}
 
 				// Events
-				actor_tile_num = MAP_GetTileNumber(actor.pos_x + (gfx_sprite_stack[actor.sprite_num].width_px >> 1), actor.pos_y + (gfx_sprite_stack[actor.sprite_num].height_px >> 1));
-				switch ((map.layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
+				actor_tile_num = MAP_GetTileNumber(actor->pos_x + (gfx_sprite_stack[actor->sprite_num].width_px >> 1), actor->pos_y + (gfx_sprite_stack[actor->sprite_num].height_px >> 1));
+				switch ((map->layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
 					case 1:// Event 1.
-						if (event_enabling_room2[1]) {
-							event_enabling_room2[1] = false;
+						if (map->event_enabling_room2[1]) {
+							map->event_enabling_room2[1] = false;
 						}
 						break;
 					case 2:// Event 2.
-						if (event_enabling_room2[2]) {
-							event_enabling_room2[2] = false;
+						if (map->event_enabling_room2[2]) {
+							map->event_enabling_room2[2] = false;
 						}
 						break;
 					case 3:// Event 3.
-						if (event_enabling_room2[3]) {
-							event_enabling_room2[3] = false;
+						if (map->event_enabling_room2[3]) {
+							map->event_enabling_room2[3] = false;
 						}
 						break;
 					case 4:// Event 4.
-						if (event_enabling_room2[4]) {
-							event_enabling_room2[4] = false;
+						if (map->event_enabling_room2[4]) {
+							map->event_enabling_room2[4] = false;
 						}
 						break;
 					case 5:// Event 5.
-						if (event_enabling_room2[5]) {
+						if (map->event_enabling_room2[5]) {
 						}
 						break;
 					case 6:// Event 6.
-						if (event_enabling_room2[6]) {
-							event_enabling_room2[6] = false;
+						if (map->event_enabling_room2[6]) {
+							map->event_enabling_room2[6] = false;
 						}
 						break;
 					case 15:// Event 15. Go down
-						if (event_enabling_room2[15]) {
-							event_enabling_room2[15] = false;
+						if (map->event_enabling_room2[15]) {
+							map->event_enabling_room2[15] = false;
 							switch (scene_step) {
 								case 0:// 6th floor to 5th floor
 									VIDEO_FadeOut(4);
-									event_enabling_room2[16] = true;
+									map->event_enabling_room2[16] = true;
 									scene_step++;
 									Scene5_Update_Floor5();
-									ACTOR_SetPosition(44 << 4, 11 << 4, ACTOR_FACING_UP);  // Set actor position
-									CAM_Init(map.width_px, map.height_px, 30 << 4, 0 << 4);// Initialize camera
+									ACTOR_SetPosition(44 << 4, 11 << 4, ACTOR_FACING_UP);    // Set actor position
+									CAM_Init(map->width_px, map->height_px, 30 << 4, 0 << 4);// Initialize camera
 									MAP_DrawMapToMapVideoBuffer();
 
 									Update(true);
@@ -11939,11 +11994,11 @@ static void Scene5_Loop(void) {
 									break;
 								case 2:// 4th floor to 3th floor
 									VIDEO_FadeOut(4);
-									event_enabling_room2[16] = true;
+									map->event_enabling_room2[16] = true;
 									scene_step++;
 									Scene5_Update_Floor3();
-									ACTOR_SetPosition(44 << 4, 11 << 4, ACTOR_FACING_UP);  // Set actor position
-									CAM_Init(map.width_px, map.height_px, 30 << 4, 0 << 4);// Initialize camera
+									ACTOR_SetPosition(44 << 4, 11 << 4, ACTOR_FACING_UP);    // Set actor position
+									CAM_Init(map->width_px, map->height_px, 30 << 4, 0 << 4);// Initialize camera
 									MAP_DrawMapToMapVideoBuffer();
 
 									Update(true);
@@ -11952,11 +12007,11 @@ static void Scene5_Loop(void) {
 									break;
 								case 4:// 2th floor to 1th floor
 									VIDEO_FadeOut(4);
-									event_enabling_room2[16] = true;
+									map->event_enabling_room2[16] = true;
 									scene_step++;
 									Scene5_Update_Floor1();
-									ACTOR_SetPosition(44 << 4, 11 << 4, ACTOR_FACING_UP);  // Set actor position
-									CAM_Init(map.width_px, map.height_px, 30 << 4, 0 << 4);// Initialize camera
+									ACTOR_SetPosition(44 << 4, 11 << 4, ACTOR_FACING_UP);    // Set actor position
+									CAM_Init(map->width_px, map->height_px, 30 << 4, 0 << 4);// Initialize camera
 									MAP_DrawMapToMapVideoBuffer();
 
 									Update(true);
@@ -11969,16 +12024,16 @@ static void Scene5_Loop(void) {
 						}
 						break;
 					case 16:// Event 16. Go down
-						if (event_enabling_room2[16]) {
-							event_enabling_room2[16] = false;
+						if (map->event_enabling_room2[16]) {
+							map->event_enabling_room2[16] = false;
 							switch (scene_step) {
 								case 1:// 5th floor to 4th floor
 									VIDEO_FadeOut(4);
-									event_enabling_room2[15] = true;
+									map->event_enabling_room2[15] = true;
 									scene_step++;
 									Scene5_Update_Floor4();
-									ACTOR_SetPosition(2 << 4, 10 << 4, ACTOR_FACING_RIGHT);// Set actor position
-									CAM_Init(map.width_px, map.height_px, 0 << 4, 6 << 4); // Initialize camera
+									ACTOR_SetPosition(2 << 4, 10 << 4, ACTOR_FACING_RIGHT); // Set actor position
+									CAM_Init(map->width_px, map->height_px, 0 << 4, 6 << 4);// Initialize camera
 									MAP_DrawMapToMapVideoBuffer();
 
 									Update(true);
@@ -11987,11 +12042,11 @@ static void Scene5_Loop(void) {
 									break;
 								case 3:// 3th floor to 2th floor
 									VIDEO_FadeOut(4);
-									event_enabling_room2[15] = true;
+									map->event_enabling_room2[15] = true;
 									scene_step++;
 									Scene5_Update_Floor2();
-									ACTOR_SetPosition(2 << 4, 10 << 4, ACTOR_FACING_RIGHT);// Set actor position
-									CAM_Init(map.width_px, map.height_px, 0 << 4, 6 << 4); // Initialize camera
+									ACTOR_SetPosition(2 << 4, 10 << 4, ACTOR_FACING_RIGHT); // Set actor position
+									CAM_Init(map->width_px, map->height_px, 0 << 4, 6 << 4);// Initialize camera
 									MAP_DrawMapToMapVideoBuffer();
 
 									Update(true);
@@ -12018,7 +12073,7 @@ static void Scene5_Loop(void) {
 		Update(true);
 
 		// Finish all if actor is dead
-		if (actor.status_dead) GameOver();
+		if (actor->status_dead) GameOver();
 	}
 
 	VIDEO_FadeOut(4);
@@ -12053,9 +12108,9 @@ static void Scene5_Outro(void) {
 				step++;
 				break;
 			case 1:// Load first scene
-				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO1H.PCX", 104 * 140, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO1L.PCX", 104 * 140, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO2H.PCX", 104 * 140, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO1H.PCX", 104 * 140, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO1L.PCX", 104 * 140, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO2H.PCX", 104 * 140, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				AUDIO_LoadSong(AUDIO_SONG_3);
 				step++;
 				break;
@@ -12076,8 +12131,8 @@ static void Scene5_Outro(void) {
 				step++;
 				break;
 			case 4:// First image
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 110, 146, 30, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 33, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 110, 146, 30, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 33, 53);
 				step++;
 				break;
 			case 5:// Just wait
@@ -12089,10 +12144,10 @@ static void Scene5_Outro(void) {
 				break;
 			case 6://Speech
 				   // Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 8, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN5I].line[20], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN5I].line[21], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN5I]->line[20], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN5I]->line[21], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -12103,8 +12158,8 @@ static void Scene5_Outro(void) {
 				break;
 			case 7:// Hide speech
 				   // Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 8, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 				step++;
 				break;
 			case 8:// Just wait
@@ -12115,10 +12170,10 @@ static void Scene5_Outro(void) {
 				step++;
 				break;
 			case 9://Speech
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 8, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN5I].line[22], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN5I].line[23], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN5I]->line[22], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN5I]->line[23], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -12128,10 +12183,10 @@ static void Scene5_Outro(void) {
 				step++;
 				break;
 			case 10:// Show first and Second image image
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 110, 146, 30, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 33, 53);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 110, 146, 180, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 183, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 110, 146, 30, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 33, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 110, 146, 180, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 183, 53);
 				step++;
 				break;
 			case 11:// Just wait
@@ -12142,13 +12197,13 @@ static void Scene5_Outro(void) {
 				step++;
 				break;
 			case 12:// Clear chat Fade first and show Second image
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 8, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 110, 146, 30, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 33, 53);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 110, 146, 180, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 183, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 110, 146, 30, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 33, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 110, 146, 180, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 183, 53);
 				step++;
 				break;
 			case 13:// Just wait
@@ -12160,10 +12215,10 @@ static void Scene5_Outro(void) {
 				break;
 			case 14://Speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 239);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 8, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN5I].line[24], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN5I].line[25], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN5I]->line[24], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN5I]->line[25], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -12178,14 +12233,14 @@ static void Scene5_Outro(void) {
 				step++;
 				break;
 			case 16:// Load images 3 and 4
-				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO3H.PCX", 250 * 135, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO4H.PCX", 251 * 140, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO3H.PCX", 250 * 135, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO4H.PCX", 251 * 140, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				step++;
 				break;
 			case 17:/// Image 3 :: back home
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 211, 141, 10, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, 205, gfx.image_buffer1_height, 13, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 211, 141, 10, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, 205, gfx->image_buffer1_height, 13, 43);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				VIDEO_FadeIn(4);
@@ -12205,9 +12260,9 @@ static void Scene5_Outro(void) {
 					dst_index = CAM_VISIBLE_WIDTH * 43 + 13;
 
 					// Draw image with scroll
-					for (i = 0; i < gfx.image_buffer1_height; i++) {
-						memcpy(&video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx.image_buffer1[src_index], 205);
-						src_index += gfx.image_buffer1_width;
+					for (i = 0; i < gfx->image_buffer1_height; i++) {
+						memcpy(&video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK][dst_index], &gfx->image_buffer1[src_index], 205);
+						src_index += gfx->image_buffer1_width;
 						dst_index += CAM_VISIBLE_WIDTH;
 					}
 					if (horizontal_scroll < 45) horizontal_scroll++;
@@ -12215,11 +12270,11 @@ static void Scene5_Outro(void) {
 						scroll_end = true;
 
 					// Draw text background
-					VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 242);
-					VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 250);
+					VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 242);
+					VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 250);
 
-					VIDEO_StringToScreenBuffer(28, 13, ui.txt_file[UI_TXT_SCN5I].line[30], FONT_SLIM_BLACK);
-					VIDEO_StringToScreenBuffer(28, 25, ui.txt_file[UI_TXT_SCN5I].line[31], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN5I]->line[30], FONT_SLIM_BLACK);
+					VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN5I]->line[31], FONT_SLIM_BLACK);
 
 					SetDelayTime(50);
 					while (!AwaitDelayTime()) {
@@ -12242,11 +12297,11 @@ static void Scene5_Outro(void) {
 			case 20://Image 2
 
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 250);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 242);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 250);
 
-				VIDEO_StringToScreenBuffer(28, 13, ui.txt_file[UI_TXT_SCN5I].line[32], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 25, ui.txt_file[UI_TXT_SCN5I].line[33], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN5I]->line[32], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN5I]->line[33], FONT_SLIM_BLACK);
 
 				step++;
 				break;
@@ -12259,8 +12314,8 @@ static void Scene5_Outro(void) {
 				break;
 			case 22:// Show image 3
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 257, 146, 20, 45, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 23, 48);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 257, 146, 20, 45, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 23, 48);
 				step++;
 				break;
 			case 23:
@@ -12272,11 +12327,11 @@ static void Scene5_Outro(void) {
 				break;
 			case 24://Speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 242);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 250);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 242);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 250);
 
-				VIDEO_StringToScreenBuffer(28, 13, ui.txt_file[UI_TXT_SCN5I].line[34], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 25, ui.txt_file[UI_TXT_SCN5I].line[35], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN5I]->line[34], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN5I]->line[35], FONT_SLIM_BLACK);
 
 				step++;
 				break;
@@ -12288,15 +12343,15 @@ static void Scene5_Outro(void) {
 				step++;
 				break;
 			case 26:// Load images 5 and 6
-				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO5H.PCX", 150 * 160, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO5L.PCX", 150 * 160, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO6H.PCX", 140 * 130, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO5H.PCX", 150 * 160, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO5L.PCX", 150 * 160, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO6H.PCX", 140 * 130, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				step++;
 				break;
 			case 27:// show image 5
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 156, 166, 10, 30, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 13, 33);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 156, 166, 10, 30, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 13, 33);
 				step++;
 				break;
 			case 28:// Just wait
@@ -12307,11 +12362,11 @@ static void Scene5_Outro(void) {
 				step++;
 				break;
 			case 29:// show image 6
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 156, 166, 10, 30, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 13, 33);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 156, 166, 10, 30, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 13, 33);
 
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 136, 150, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 153, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 136, 150, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 153, 53);
 				step++;
 				break;
 			case 30:// Just wait
@@ -12323,10 +12378,10 @@ static void Scene5_Outro(void) {
 				break;
 			case 31:// fade image 5
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 156, 166, 10, 30, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 13, 33);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 136, 150, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 153, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 156, 166, 10, 30, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 13, 33);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 136, 150, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 153, 53);
 
 				step++;
 				break;
@@ -12338,15 +12393,15 @@ static void Scene5_Outro(void) {
 				step++;
 				break;
 			case 33:// Load images 5 and 6
-				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO7H.PCX", 110 * 150, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO7L.PCX", 110 * 150, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO8H.PCX", 110 * 140, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO7H.PCX", 110 * 150, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO7L.PCX", 110 * 150, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO8H.PCX", 110 * 140, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				step++;
 				break;
 			case 34:// show image 7
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 116, 156, 10, 30, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 13, 33);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 116, 156, 10, 30, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 13, 33);
 				step++;
 				break;
 			case 35:// Just wait
@@ -12357,11 +12412,11 @@ static void Scene5_Outro(void) {
 				step++;
 				break;
 			case 36:// show image 8
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 116, 156, 10, 30, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 13, 33);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 116, 156, 10, 30, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 13, 33);
 
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 116, 146, 160, 35, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 163, 38);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 116, 146, 160, 35, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 163, 38);
 				step++;
 				break;
 			case 37:// Just wait
@@ -12372,11 +12427,11 @@ static void Scene5_Outro(void) {
 				step++;
 				break;
 			case 38:// fade image 7 and show image 8
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 116, 156, 10, 30, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 13, 33);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 116, 156, 10, 30, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 13, 33);
 
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 116, 146, 160, 35, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 163, 38);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 116, 146, 160, 35, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 163, 38);
 				step++;
 				break;
 			case 39:// Just wait
@@ -12387,15 +12442,15 @@ static void Scene5_Outro(void) {
 				step++;
 				break;
 			case 40:// Load image 9
-				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO9H.PCX", 110 * 140, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO9H.PCX", 110 * 140, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
 				step++;
 				break;
 			case 41:// fade image 8 and show image 9
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 116, 156, 10, 30, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 13, 33);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 116, 156, 10, 30, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 13, 33);
 
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 116, 146, 160, 35, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 163, 38);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 116, 146, 160, 35, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 163, 38);
 				step++;
 				break;
 			case 42:// Just wait
@@ -12406,14 +12461,14 @@ static void Scene5_Outro(void) {
 				step++;
 				break;
 			case 43:// Load image 10 and 11
-				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO10H.PCX", 220 * 90, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO11H.PCX", 220 * 90, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
+				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO10H.PCX", 220 * 90, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN5.DAT", "OUTRO11H.PCX", 220 * 90, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
 				step++;
 				break;
 			case 44:// show image 10
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 226, 96, 30, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 33, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 226, 96, 30, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 33, 13);
 				step++;
 				break;
 			case 45:// Just wait
@@ -12425,10 +12480,10 @@ static void Scene5_Outro(void) {
 				break;
 			case 46:// show image 10 and 11
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 226, 96, 30, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 33, 13);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 226, 96, 50, 80, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 53, 83);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 226, 96, 30, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 33, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 226, 96, 50, 80, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 53, 83);
 				step++;
 				break;
 			case 47:// Just wait
@@ -12478,8 +12533,8 @@ static void Scene6_Intro(void) {
 				step++;
 				break;
 			case 1:// Load first intro scene
-				GFX_PCXImageToBuffer("ISCN6.DAT", "INTRO1H.PCX", 256 * 180, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("ISCN6.DAT", "INTRO2H.PCX", 91 * 141, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
+				GFX_PCXImageToBuffer("ISCN6.DAT", "INTRO1H.PCX", 256 * 180, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("ISCN6.DAT", "INTRO2H.PCX", 91 * 141, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
 
 				AUDIO_LoadSong(AUDIO_SONG_3);
 				step++;
@@ -12501,8 +12556,8 @@ static void Scene6_Intro(void) {
 				step++;
 				break;
 			case 4:// Draw frame and image 1
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 262, 186, 50, 5, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 53, 8);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 262, 186, 50, 5, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 53, 8);
 				step++;
 				break;
 			case 5:// Just wait
@@ -12514,10 +12569,10 @@ static void Scene6_Intro(void) {
 				break;
 			case 6:// Show text
 				   // Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 299, 46, 5, 1, 202);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 8, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN6I].line[1], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN6I].line[2], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 299, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 8, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN6I]->line[1], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN6I]->line[2], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 7:// Just wait
@@ -12529,8 +12584,8 @@ static void Scene6_Intro(void) {
 				break;
 			case 8:// Hide text
 				   // Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 299, 46, 5, 1, 202);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 8, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 299, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 8, 4, 208);
 				step++;
 				break;
 			case 9:// Just wait
@@ -12542,10 +12597,10 @@ static void Scene6_Intro(void) {
 				break;
 			case 10:// Show text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 299, 46, 5, 1, 202);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 8, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN6I].line[3], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN6I].line[4], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 299, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 8, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN6I]->line[3], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN6I]->line[4], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 11:// Just wait
@@ -12556,12 +12611,12 @@ static void Scene6_Intro(void) {
 				step++;
 				break;
 			case 12:// Show image 1 and 2
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 262, 186, 50, 5, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 53, 8);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 97, 147, 10, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 13, 53);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 299, 46, 5, 1, 202);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 8, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 262, 186, 50, 5, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 53, 8);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 97, 147, 10, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 13, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 299, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 8, 4, 208);
 				step++;
 				break;
 			case 13:// Just wait
@@ -12573,9 +12628,9 @@ static void Scene6_Intro(void) {
 				break;
 			case 14:// Show text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 299, 46, 5, 1, 202);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 8, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN6I].line[5], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 299, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 8, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN6I]->line[5], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 15:// Just wait
@@ -12587,8 +12642,8 @@ static void Scene6_Intro(void) {
 				break;
 			case 16:// Show text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 299, 46, 5, 1, 202);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 8, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 299, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 8, 4, 208);
 				step++;
 				break;
 			case 17:// Just wait
@@ -12600,10 +12655,10 @@ static void Scene6_Intro(void) {
 				break;
 			case 18:// Show text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 299, 46, 5, 1, 202);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 293, 40, 8, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN6I].line[6], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN6I].line[7], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 299, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 8, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN6I]->line[6], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN6I]->line[7], FONT_SLIM_BLACK);
 				step++;
 				break;
 			case 19:// Just wait
@@ -12615,10 +12670,10 @@ static void Scene6_Intro(void) {
 				break;
 			case 20:// Show image 1 and 2
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 262, 186, 50, 5, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 53, 8);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 97, 147, 10, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 13, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 262, 186, 50, 5, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 53, 8);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 97, 147, 10, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 13, 53);
 				step++;
 				break;
 			case 21:// Show chat
@@ -12638,7 +12693,7 @@ static void Scene6_Intro(void) {
 				step++;
 				break;
 			case 22:// Show chat
-				VIDEO_StringToScreenBuffer(106, 105, ui.txt_file[UI_TXT_SCN6I].line[9], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 105, ui->txt_file[UI_TXT_SCN6I]->line[9], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -12692,11 +12747,11 @@ static void Scene6_LoadAssets(void) {
 	OBJECT_UnloadObjects();
 
 	// Load boss and unload it just to preload graphics
-	BOSS_Load("BOSS4.DAT", 0, 0, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_AK, SPRITE_GRAPHICS_ID_GUN0, SPRITE_GRAPHICS_ID_BULLET1, BOSS_STATUS_STATIC, BOSS_LIFE);
+	BOSS_Load("BOSS4.DAT", 0, 0, BOSS_TYPE_STRONG, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_AK, SPRITE_GRAPHICS_ID_GUN0, SPRITE_GRAPHICS_ID_BULLET1, BOSS_STATUS_STATIC, BOSS_LIFE);
 	BOSS_Unload();
 
-	ACTOR_Init(9 << 4, 47 << 4, SPRITE_GRAPHICS_ID_ACTOR_FEET, SPRITE_GRAPHICS_ID_ACTOR_BODY, SPRITE_GRAPHICS_ID_ACTOR_HEAD, SPRITE_GRAPHICS_ID_ACTOR_LARM, SPRITE_GRAPHICS_ID_ACTOR_RARM_BARE_HANDS, ACTOR_FACING_RIGHT);
-	ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
+	ACTOR_Load(9 << 4, 47 << 4, SPRITE_GRAPHICS_ID_ACTOR_FEET, SPRITE_GRAPHICS_ID_ACTOR_BODY, SPRITE_GRAPHICS_ID_ACTOR_HEAD, SPRITE_GRAPHICS_ID_ACTOR_LARM, SPRITE_GRAPHICS_ID_ACTOR_RARM_BARE_HANDS, ACTOR_FACING_RIGHT);
+	ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
 	ACTOR_SetBulletStatus(99, 19, 199, 9, 9);
 
 	NPC_Init();
@@ -12790,140 +12845,140 @@ static void Scene6_LoadRoom2(void) {
 static void Scene6_SetHotspotsAndEvents(void) {
 	// Initialize hotspots and events
 	// Update hotspots
-	hotspot_enabling_room1[0] = false;
-	hotspot_enabling_room1[1] = false;
-	hotspot_enabling_room1[2] = false;
-	hotspot_enabling_room1[3] = false;
-	hotspot_enabling_room1[4] = false;
-	hotspot_enabling_room1[5] = false;
-	hotspot_enabling_room1[6] = false;
-	hotspot_enabling_room1[7] = false;
-	hotspot_enabling_room1[8] = false;
-	hotspot_enabling_room1[9] = false;
-	hotspot_enabling_room1[10] = false;
-	hotspot_enabling_room1[11] = false;
-	hotspot_enabling_room1[12] = false;
-	hotspot_enabling_room1[13] = false;
-	hotspot_enabling_room1[14] = false;
-	hotspot_enabling_room1[15] = false;
-	hotspot_enabling_room1[16] = false;
-	hotspot_enabling_room1[17] = false;
-	hotspot_enabling_room1[18] = false;
-	hotspot_enabling_room1[19] = false;
-	hotspot_enabling_room1[20] = false;
-	hotspot_enabling_room1[21] = false;
-	hotspot_enabling_room1[22] = false;
-	hotspot_enabling_room1[23] = false;
-	hotspot_enabling_room1[24] = false;
-	hotspot_enabling_room1[25] = false;
-	hotspot_enabling_room1[26] = false;
-	hotspot_enabling_room1[27] = false;
-	hotspot_enabling_room1[28] = false;
-	hotspot_enabling_room1[29] = false;
-	hotspot_enabling_room1[30] = false;
-	hotspot_enabling_room1[31] = false;
+	map->hotspot_enabling_room1[0] = false;
+	map->hotspot_enabling_room1[1] = false;
+	map->hotspot_enabling_room1[2] = false;
+	map->hotspot_enabling_room1[3] = false;
+	map->hotspot_enabling_room1[4] = false;
+	map->hotspot_enabling_room1[5] = false;
+	map->hotspot_enabling_room1[6] = false;
+	map->hotspot_enabling_room1[7] = false;
+	map->hotspot_enabling_room1[8] = false;
+	map->hotspot_enabling_room1[9] = false;
+	map->hotspot_enabling_room1[10] = false;
+	map->hotspot_enabling_room1[11] = false;
+	map->hotspot_enabling_room1[12] = false;
+	map->hotspot_enabling_room1[13] = false;
+	map->hotspot_enabling_room1[14] = false;
+	map->hotspot_enabling_room1[15] = false;
+	map->hotspot_enabling_room1[16] = false;
+	map->hotspot_enabling_room1[17] = false;
+	map->hotspot_enabling_room1[18] = false;
+	map->hotspot_enabling_room1[19] = false;
+	map->hotspot_enabling_room1[20] = false;
+	map->hotspot_enabling_room1[21] = false;
+	map->hotspot_enabling_room1[22] = false;
+	map->hotspot_enabling_room1[23] = false;
+	map->hotspot_enabling_room1[24] = false;
+	map->hotspot_enabling_room1[25] = false;
+	map->hotspot_enabling_room1[26] = false;
+	map->hotspot_enabling_room1[27] = false;
+	map->hotspot_enabling_room1[28] = false;
+	map->hotspot_enabling_room1[29] = false;
+	map->hotspot_enabling_room1[30] = false;
+	map->hotspot_enabling_room1[31] = false;
 
 	// Update events
-	event_enabling_room1[0] = false;
-	event_enabling_room1[1] = true;
-	event_enabling_room1[2] = true;
-	event_enabling_room1[3] = true;
-	event_enabling_room1[4] = true;
-	event_enabling_room1[5] = false;
-	event_enabling_room1[6] = false;
-	event_enabling_room1[7] = false;
-	event_enabling_room1[8] = false;
-	event_enabling_room1[9] = false;
-	event_enabling_room1[10] = false;
-	event_enabling_room1[11] = false;
-	event_enabling_room1[12] = false;
-	event_enabling_room1[13] = false;
-	event_enabling_room1[14] = false;
-	event_enabling_room1[15] = false;
-	event_enabling_room1[16] = true;
-	event_enabling_room1[17] = false;
-	event_enabling_room1[18] = false;
-	event_enabling_room1[19] = false;
-	event_enabling_room1[20] = false;
-	event_enabling_room1[21] = false;
-	event_enabling_room1[22] = false;
-	event_enabling_room1[23] = false;
-	event_enabling_room1[24] = false;
-	event_enabling_room1[25] = false;
-	event_enabling_room1[26] = false;
-	event_enabling_room1[27] = false;
-	event_enabling_room1[28] = false;
-	event_enabling_room1[29] = false;
-	event_enabling_room1[30] = false;
-	event_enabling_room1[31] = false;
+	map->event_enabling_room1[0] = false;
+	map->event_enabling_room1[1] = true;
+	map->event_enabling_room1[2] = true;
+	map->event_enabling_room1[3] = true;
+	map->event_enabling_room1[4] = true;
+	map->event_enabling_room1[5] = false;
+	map->event_enabling_room1[6] = false;
+	map->event_enabling_room1[7] = false;
+	map->event_enabling_room1[8] = false;
+	map->event_enabling_room1[9] = false;
+	map->event_enabling_room1[10] = false;
+	map->event_enabling_room1[11] = false;
+	map->event_enabling_room1[12] = false;
+	map->event_enabling_room1[13] = false;
+	map->event_enabling_room1[14] = false;
+	map->event_enabling_room1[15] = false;
+	map->event_enabling_room1[16] = true;
+	map->event_enabling_room1[17] = false;
+	map->event_enabling_room1[18] = false;
+	map->event_enabling_room1[19] = false;
+	map->event_enabling_room1[20] = false;
+	map->event_enabling_room1[21] = false;
+	map->event_enabling_room1[22] = false;
+	map->event_enabling_room1[23] = false;
+	map->event_enabling_room1[24] = false;
+	map->event_enabling_room1[25] = false;
+	map->event_enabling_room1[26] = false;
+	map->event_enabling_room1[27] = false;
+	map->event_enabling_room1[28] = false;
+	map->event_enabling_room1[29] = false;
+	map->event_enabling_room1[30] = false;
+	map->event_enabling_room1[31] = false;
 
 	// Update hotspots
-	hotspot_enabling_room2[0] = false;
-	hotspot_enabling_room2[1] = false;
-	hotspot_enabling_room2[2] = false;
-	hotspot_enabling_room2[3] = false;
-	hotspot_enabling_room2[4] = false;
-	hotspot_enabling_room2[5] = false;
-	hotspot_enabling_room2[6] = false;
-	hotspot_enabling_room2[7] = false;
-	hotspot_enabling_room2[8] = false;
-	hotspot_enabling_room2[9] = false;
-	hotspot_enabling_room2[10] = false;
-	hotspot_enabling_room2[11] = false;
-	hotspot_enabling_room2[12] = false;
-	hotspot_enabling_room2[13] = false;
-	hotspot_enabling_room2[14] = false;
-	hotspot_enabling_room2[15] = false;
-	hotspot_enabling_room2[16] = false;
-	hotspot_enabling_room2[17] = false;
-	hotspot_enabling_room2[18] = false;
-	hotspot_enabling_room2[19] = false;
-	hotspot_enabling_room2[20] = false;
-	hotspot_enabling_room2[21] = false;
-	hotspot_enabling_room2[22] = false;
-	hotspot_enabling_room2[23] = false;
-	hotspot_enabling_room2[24] = false;
-	hotspot_enabling_room2[25] = false;
-	hotspot_enabling_room2[26] = false;
-	hotspot_enabling_room2[27] = false;
-	hotspot_enabling_room2[28] = false;
-	hotspot_enabling_room2[29] = false;
-	hotspot_enabling_room2[30] = false;
-	hotspot_enabling_room2[31] = false;
+	map->hotspot_enabling_room2[0] = false;
+	map->hotspot_enabling_room2[1] = false;
+	map->hotspot_enabling_room2[2] = false;
+	map->hotspot_enabling_room2[3] = false;
+	map->hotspot_enabling_room2[4] = false;
+	map->hotspot_enabling_room2[5] = false;
+	map->hotspot_enabling_room2[6] = false;
+	map->hotspot_enabling_room2[7] = false;
+	map->hotspot_enabling_room2[8] = false;
+	map->hotspot_enabling_room2[9] = false;
+	map->hotspot_enabling_room2[10] = false;
+	map->hotspot_enabling_room2[11] = false;
+	map->hotspot_enabling_room2[12] = false;
+	map->hotspot_enabling_room2[13] = false;
+	map->hotspot_enabling_room2[14] = false;
+	map->hotspot_enabling_room2[15] = false;
+	map->hotspot_enabling_room2[16] = false;
+	map->hotspot_enabling_room2[17] = false;
+	map->hotspot_enabling_room2[18] = false;
+	map->hotspot_enabling_room2[19] = false;
+	map->hotspot_enabling_room2[20] = false;
+	map->hotspot_enabling_room2[21] = false;
+	map->hotspot_enabling_room2[22] = false;
+	map->hotspot_enabling_room2[23] = false;
+	map->hotspot_enabling_room2[24] = false;
+	map->hotspot_enabling_room2[25] = false;
+	map->hotspot_enabling_room2[26] = false;
+	map->hotspot_enabling_room2[27] = false;
+	map->hotspot_enabling_room2[28] = false;
+	map->hotspot_enabling_room2[29] = false;
+	map->hotspot_enabling_room2[30] = false;
+	map->hotspot_enabling_room2[31] = false;
 
 	// Update events
-	event_enabling_room2[0] = false;
-	event_enabling_room2[1] = true;
-	event_enabling_room2[2] = true;
-	event_enabling_room2[3] = true;
-	event_enabling_room2[4] = true;
-	event_enabling_room2[5] = true;
-	event_enabling_room2[6] = false;
-	event_enabling_room2[7] = false;
-	event_enabling_room2[8] = false;
-	event_enabling_room2[9] = false;
-	event_enabling_room2[10] = false;
-	event_enabling_room2[11] = false;
-	event_enabling_room2[12] = false;
-	event_enabling_room2[13] = false;
-	event_enabling_room2[14] = false;
-	event_enabling_room2[15] = false;
-	event_enabling_room2[16] = true;
-	event_enabling_room2[17] = false;
-	event_enabling_room2[18] = false;
-	event_enabling_room2[19] = false;
-	event_enabling_room2[20] = false;
-	event_enabling_room2[21] = false;
-	event_enabling_room2[22] = false;
-	event_enabling_room2[23] = false;
-	event_enabling_room2[24] = false;
-	event_enabling_room2[25] = false;
-	event_enabling_room2[26] = false;
-	event_enabling_room2[27] = false;
-	event_enabling_room2[28] = false;
-	event_enabling_room2[29] = false;
-	event_enabling_room2[30] = false;
-	event_enabling_room2[31] = false;
+	map->event_enabling_room2[0] = false;
+	map->event_enabling_room2[1] = true;
+	map->event_enabling_room2[2] = true;
+	map->event_enabling_room2[3] = false;
+	map->event_enabling_room2[4] = false;
+	map->event_enabling_room2[5] = false;
+	map->event_enabling_room2[6] = false;
+	map->event_enabling_room2[7] = false;
+	map->event_enabling_room2[8] = false;
+	map->event_enabling_room2[9] = false;
+	map->event_enabling_room2[10] = false;
+	map->event_enabling_room2[11] = false;
+	map->event_enabling_room2[12] = false;
+	map->event_enabling_room2[13] = false;
+	map->event_enabling_room2[14] = false;
+	map->event_enabling_room2[15] = false;
+	map->event_enabling_room2[16] = false;
+	map->event_enabling_room2[17] = false;
+	map->event_enabling_room2[18] = false;
+	map->event_enabling_room2[19] = false;
+	map->event_enabling_room2[20] = false;
+	map->event_enabling_room2[21] = false;
+	map->event_enabling_room2[22] = false;
+	map->event_enabling_room2[23] = false;
+	map->event_enabling_room2[24] = false;
+	map->event_enabling_room2[25] = false;
+	map->event_enabling_room2[26] = false;
+	map->event_enabling_room2[27] = false;
+	map->event_enabling_room2[28] = false;
+	map->event_enabling_room2[29] = false;
+	map->event_enabling_room2[30] = false;
+	map->event_enabling_room2[31] = false;
 }
 static void Scene6_Loop(void) {
 	bool end_sequence;
@@ -12935,10 +12990,10 @@ static void Scene6_Loop(void) {
 	VIDEO_ClearScreenBuffer();
 	GFX_LoadPalette("PALETTES.DAT", "SCN61.PCX", 256);
 
-	VIDEO_StringToScreenBuffer(50, 60, ui.txt_file[UI_TXT_SCN6I].line[40], FONT_BIG_WHITE);
-	VIDEO_StringToScreenBuffer(30, 85, ui.txt_file[UI_TXT_SCN6I].line[41], FONT_BIG_WHITE);
-	VIDEO_StringToScreenBuffer(90, 135, ui.txt_file[UI_TXT_SCN6I].line[42], FONT_SLIM_WHITE);
-	VIDEO_StringToScreenBuffer(160, 135, ui.txt_file[UI_TXT_SCN6I].line[43], FONT_SLIM_WHITE);
+	VIDEO_StringToScreenBuffer(50, 60, ui->txt_file[UI_TXT_SCN6I]->line[40], FONT_BIG_WHITE);
+	VIDEO_StringToScreenBuffer(30, 85, ui->txt_file[UI_TXT_SCN6I]->line[41], FONT_BIG_WHITE);
+	VIDEO_StringToScreenBuffer(90, 135, ui->txt_file[UI_TXT_SCN6I]->line[42], FONT_SLIM_WHITE);
+	VIDEO_StringToScreenBuffer(160, 135, ui->txt_file[UI_TXT_SCN6I]->line[43], FONT_SLIM_WHITE);
 
 	VIDEO_VSync();
 	VIDEO_ScreenBufferToVRAM();
@@ -12970,14 +13025,14 @@ static void Scene6_Loop(void) {
 			ACTOR_SetPosition(19 << 4, 59 << 4, ACTOR_FACING_UP);// Set actor position
 			ACTOR_SetCombatMode(true);
 
-			CAM_Init(map.width_px, map.height_px, 14 << 4, 50 << 4);// Initialize camera
+			CAM_Init(map->width_px, map->height_px, 14 << 4, 50 << 4);// Initialize camera
 			MAP_DrawMapToMapVideoBuffer();
 
 			Update(true);
 			Update(true);
 			VIDEO_FadeIn(1);
 
-			ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_PISTOL);
+			ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_PISTOL);
 			ACTOR_Reload();
 			break;
 
@@ -12985,15 +13040,15 @@ static void Scene6_Loop(void) {
 		case 2:// Room 2. Inside base
 			Scene6_LoadRoom2();
 
-			ACTOR_SetPosition(17 << 4, 27 << 4, ACTOR_FACING_UP);   // Set actor position
-			CAM_Init(map.width_px, map.height_px, 12 << 4, 20 << 4);// Initialize camera
+			ACTOR_SetPosition(17 << 4, 27 << 4, ACTOR_FACING_UP);     // Set actor position
+			CAM_Init(map->width_px, map->height_px, 12 << 4, 20 << 4);// Initialize camera
 			MAP_DrawMapToMapVideoBuffer();
 
 			Update(true);
 			Update(true);
 			VIDEO_FadeIn(1);
 
-			ACTOR_SetGun(actor.sprite_num, ACTOR_GUN_TYPE_PISTOL);
+			ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_PISTOL);
 			ACTOR_Reload();
 
 			break;
@@ -13007,7 +13062,7 @@ static void Scene6_Loop(void) {
 		switch (engine.room) {
 			case 1:// Room 1. Inside base
 				// Hotspots
-				if (!actor.mode_combat) {
+				if (!actor->mode_combat) {
 					// Check point on object or enemy
 					switch (cursor.point_on & 0xFF) {
 						case ENTITY_ID_HSPOT:// Hotspot
@@ -13016,7 +13071,7 @@ static void Scene6_Loop(void) {
 									break;
 								case 1:// Spare
 									if (cursor.left_click) {
-										//UI_ShowSpeech(&gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN5H, 120, 121, 122, false, 100);
+										//UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN5H, 120, 121, 122, false, 100);
 
 									} else {
 										//UI_ShowDescription(UI_TXT_SCN5H, 6);
@@ -13041,13 +13096,13 @@ static void Scene6_Loop(void) {
 				}
 
 				// Events
-				actor_tile_num = MAP_GetTileNumber(actor.pos_x + (gfx_sprite_stack[actor.sprite_num].width_px >> 1), actor.pos_y + (gfx_sprite_stack[actor.sprite_num].height_px >> 1));
-				switch ((map.layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
+				actor_tile_num = MAP_GetTileNumber(actor->pos_x + (gfx_sprite_stack[actor->sprite_num].width_px >> 1), actor->pos_y + (gfx_sprite_stack[actor->sprite_num].height_px >> 1));
+				switch ((map->layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
 					case 1:// Event 1. Green door
-						if (event_enabling_room1[1]) {
-							event_enabling_room1[1] = false;
+						if (map->event_enabling_room1[1]) {
+							map->event_enabling_room1[1] = false;
 
-							if (actor.key_entity_id != ENTITY_ID_ITEM_KEYGREEN) {
+							if (actor->key_entity_id != ENTITY_ID_ITEM_KEYGREEN) {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 1);
 							} else {
 
@@ -13068,10 +13123,10 @@ static void Scene6_Loop(void) {
 						}
 						break;
 					case 2:// Event 2. Blue door
-						if (event_enabling_room1[2]) {
-							event_enabling_room1[2] = false;
+						if (map->event_enabling_room1[2]) {
+							map->event_enabling_room1[2] = false;
 
-							if (actor.key_entity_id != ENTITY_ID_ITEM_KEYBLUE) {
+							if (actor->key_entity_id != ENTITY_ID_ITEM_KEYBLUE) {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 1);
 							} else {
 
@@ -13092,10 +13147,10 @@ static void Scene6_Loop(void) {
 						}
 						break;
 					case 3:// Event 3. Yellow door
-						if (event_enabling_room1[3]) {
-							event_enabling_room1[3] = false;
+						if (map->event_enabling_room1[3]) {
+							map->event_enabling_room1[3] = false;
 
-							if (actor.key_entity_id != ENTITY_ID_ITEM_KEYYELLOW) {
+							if (actor->key_entity_id != ENTITY_ID_ITEM_KEYYELLOW) {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 1);
 							} else {
 
@@ -13116,10 +13171,10 @@ static void Scene6_Loop(void) {
 						}
 						break;
 					case 4:// Event 4. Red door
-						if (event_enabling_room1[4]) {
-							event_enabling_room1[4] = false;
+						if (map->event_enabling_room1[4]) {
+							map->event_enabling_room1[4] = false;
 
-							if (actor.key_entity_id != ENTITY_ID_ITEM_KEYRED) {
+							if (actor->key_entity_id != ENTITY_ID_ITEM_KEYRED) {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 1);
 							} else {
 
@@ -13140,13 +13195,13 @@ static void Scene6_Loop(void) {
 						}
 						break;
 					case 15:// Event 15. Spare
-						if (event_enabling_room1[15]) {
-							event_enabling_room1[15] = false;
+						if (map->event_enabling_room1[15]) {
+							map->event_enabling_room1[15] = false;
 						}
 						break;
 					case 16:// Event 16. ??
-						if (event_enabling_room1[16]) {
-							event_enabling_room1[16] = false;
+						if (map->event_enabling_room1[16]) {
+							map->event_enabling_room1[16] = false;
 
 							VIDEO_FadeOut(4);
 							ENEMY_UnloadEnemies();
@@ -13159,8 +13214,8 @@ static void Scene6_Loop(void) {
 							MAP_UnloadMap();
 
 							Scene6_LoadRoom2();
-							ACTOR_SetPosition(17 << 4, 27 << 4, ACTOR_FACING_UP);   // Set actor position
-							CAM_Init(map.width_px, map.height_px, 12 << 4, 20 << 4);// Initialize camera
+							ACTOR_SetPosition(17 << 4, 27 << 4, ACTOR_FACING_UP);     // Set actor position
+							CAM_Init(map->width_px, map->height_px, 12 << 4, 20 << 4);// Initialize camera
 							MAP_DrawMapToMapVideoBuffer();
 
 							Update(true);
@@ -13173,23 +13228,23 @@ static void Scene6_Loop(void) {
 						break;
 					default:
 						// Reenable green door event if actor did not have key
-						if (!event_enabling_room1[1] && (scene_step < 2)) {
-							event_enabling_room1[1] = true;
+						if (!map->event_enabling_room1[1] && (scene_step < 2)) {
+							map->event_enabling_room1[1] = true;
 						}
 
 						// Reenable blue door event if actor did not have key
-						if (!event_enabling_room1[2] && (scene_step < 1)) {
-							event_enabling_room1[2] = true;
+						if (!map->event_enabling_room1[2] && (scene_step < 1)) {
+							map->event_enabling_room1[2] = true;
 						}
 
 						// Reenable yellow door event if actor did not have key
-						if (!event_enabling_room1[3] && (scene_step < 3)) {
-							event_enabling_room1[3] = true;
+						if (!map->event_enabling_room1[3] && (scene_step < 3)) {
+							map->event_enabling_room1[3] = true;
 						}
 
 						// Reenable red door event if actor did not have key
-						if (!event_enabling_room1[4] && (scene_step < 4)) {
-							event_enabling_room1[4] = true;
+						if (!map->event_enabling_room1[4] && (scene_step < 4)) {
+							map->event_enabling_room1[4] = true;
 						}
 
 
@@ -13199,7 +13254,7 @@ static void Scene6_Loop(void) {
 				break;
 			case 2:// Room 2. Final boss
 				   // Hotspots
-				if (!actor.mode_combat) {
+				if (!actor->mode_combat) {
 					// Check point on object or enemy
 					switch (cursor.point_on & 0xFF) {
 						case ENTITY_ID_HSPOT:// Hotspot
@@ -13233,11 +13288,13 @@ static void Scene6_Loop(void) {
 				}
 
 				// Events
-				actor_tile_num = MAP_GetTileNumber(actor.pos_x + (gfx_sprite_stack[actor.sprite_num].width_px >> 1), actor.pos_y + (gfx_sprite_stack[actor.sprite_num].height_px >> 1));
-				switch ((map.layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
+				actor_tile_num = MAP_GetTileNumber(actor->pos_x + (gfx_sprite_stack[actor->sprite_num].width_px >> 1), actor->pos_y + (gfx_sprite_stack[actor->sprite_num].height_px >> 1));
+				switch ((map->layer[MAP_EVENT_HSPOT_LAYER][actor_tile_num] >> 8) & 0xFF) {
 					case 1:// Event 1. Near final boss
-						if (event_enabling_room2[1]) {
-							event_enabling_room2[1] = false;
+						if (map->event_enabling_room2[1]) {
+							map->event_enabling_room2[1] = false;
+
+							scene_step = 2;
 
 							BOSS_SetBehavior(BOSS_STATUS_CHASE);
 
@@ -13245,34 +13302,30 @@ static void Scene6_Loop(void) {
 						}
 						break;
 					case 2:// Event 2. Entry
-						if (event_enabling_room2[2]) {
-							event_enabling_room2[2] = false;
+						if (map->event_enabling_room2[2]) {
+							map->event_enabling_room2[2] = false;
 
-							BOSS_Load("BOSS4.DAT", 14 << 4, 3 << 4, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_AK, SPRITE_GRAPHICS_ID_GUN2, SPRITE_GRAPHICS_ID_BULLET1, BOSS_STATUS_STATIC, BOSS_LIFE);
+							scene_step = 1;
+
+							BOSS_Load("BOSS4.DAT", 14 << 4, 3 << 4, BOSS_TYPE_STRONG, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_ENEMY2_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY2_FEET, SPRITE_GRAPHICS_ID_ENEMY2_BODY, SPRITE_GRAPHICS_ID_ENEMY2_HEAD, SPRITE_GRAPHICS_ID_ENEMY2_LARM, SPRITE_GRAPHICS_ID_ENEMY2_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_AK, SPRITE_GRAPHICS_ID_GUN2, SPRITE_GRAPHICS_ID_BULLET1, BOSS_STATUS_STATIC, BOSS_LIFE);
 						}
 						break;
-					case 3:// Event 3.
-						if (event_enabling_room2[3]) {
-							event_enabling_room2[3] = false;
-						}
+					default:
 						break;
-					case 4:// Event 4.
-						if (event_enabling_room2[4]) {
-							event_enabling_room2[4] = false;
-						}
+				}
+
+				// Scene events
+				switch (scene_step) {
+					case 1:// before fight
 						break;
-					case 5:// Event 5.
-						if (event_enabling_room2[5]) {
-						}
-						break;
-					case 6:// Event 6.
-						if (event_enabling_room2[6]) {
-							event_enabling_room2[6] = false;
-						}
-						break;
-					case 16:// Event 16.
-						if (event_enabling_room2[16]) {
-							event_enabling_room2[16] = false;
+					case 2:// fight
+
+						if (!boss->is_loaded) {
+							ENEMY_UnloadEnemies();
+							VIDEO_FadeOut(4);
+							engine.ingame = false;
+							engine.scene = 7;
+							engine.room = 1;
 						}
 						break;
 					default:
@@ -13283,7 +13336,7 @@ static void Scene6_Loop(void) {
 		Update(true);
 
 		// Finish all if actor is dead
-		if (actor.status_dead) GameOver();
+		if (actor->status_dead) GameOver();
 	}
 
 	VIDEO_FadeOut(4);
@@ -13318,9 +13371,9 @@ static void Scene6_Outro(void) {
 				step++;
 				break;
 			case 1:// Load first scene
-				GFX_PCXImageToBuffer("OSCN6.DAT", "OUTRO1H.PCX", 120 * 120, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("OSCN6.DAT", "OUTRO1L.PCX", 120 * 120, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("OSCN6.DAT", "OUTRO2H.PCX", 140 * 120, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("OSCN6.DAT", "OUTRO1H.PCX", 120 * 120, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN6.DAT", "OUTRO1L.PCX", 120 * 120, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("OSCN6.DAT", "OUTRO2H.PCX", 140 * 120, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				AUDIO_LoadSong(AUDIO_SONG_3);
 				step++;
 				break;
@@ -13341,8 +13394,8 @@ static void Scene6_Outro(void) {
 				step++;
 				break;
 			case 4:// First image
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 126, 126, 10, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 13, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 126, 126, 10, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 13, 53);
 				step++;
 				break;
 			case 5:// Just wait
@@ -13354,10 +13407,10 @@ static void Scene6_Outro(void) {
 				break;
 			case 6://Speech
 				   // Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 202);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 8, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN6I].line[15], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN6I].line[16], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN6I]->line[15], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN6I]->line[16], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -13368,8 +13421,8 @@ static void Scene6_Outro(void) {
 				break;
 			case 7:// Hide speech
 				   // Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 202);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 8, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 				step++;
 				break;
 			case 8:// Just wait
@@ -13380,10 +13433,10 @@ static void Scene6_Outro(void) {
 				step++;
 				break;
 			case 9://Speech
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 202);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 8, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN6I].line[17], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN6I].line[18], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN6I]->line[17], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN6I]->line[18], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -13393,10 +13446,10 @@ static void Scene6_Outro(void) {
 				step++;
 				break;
 			case 10:// Show first and Second image image
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 126, 126, 10, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 13, 53);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 126, 160, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 163, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 126, 126, 10, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 13, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 126, 160, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 163, 53);
 				step++;
 				break;
 			case 11:// Just wait
@@ -13407,13 +13460,13 @@ static void Scene6_Outro(void) {
 				step++;
 				break;
 			case 12:// Clear chat Fade first and show Second image
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 202);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 8, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 126, 126, 10, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 13, 53);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 126, 160, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 163, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 126, 126, 10, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 13, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 126, 160, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 163, 53);
 				step++;
 				break;
 			case 13:// Just wait
@@ -13425,10 +13478,10 @@ static void Scene6_Outro(void) {
 				break;
 			case 14://Speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 202);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 8, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN6I].line[19], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN6I].line[20], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN6I]->line[19], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN6I]->line[20], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -13438,13 +13491,13 @@ static void Scene6_Outro(void) {
 				step++;
 				break;
 			case 15:// Clear chat Fade first and show Second image
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 202);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 8, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 126, 126, 10, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 13, 53);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 126, 160, 50, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 163, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 126, 126, 10, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 13, 53);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 126, 160, 50, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 163, 53);
 				step++;
 				break;
 			case 16:// Just wait
@@ -13456,10 +13509,10 @@ static void Scene6_Outro(void) {
 				break;
 			case 17://Speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 296, 46, 5, 1, 202);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 290, 40, 8, 4, 208);
-				VIDEO_StringToScreenBuffer(12, 12, ui.txt_file[UI_TXT_SCN6I].line[21], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(12, 22, ui.txt_file[UI_TXT_SCN6I].line[22], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
+				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN6I]->line[21], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN6I]->line[22], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -13474,13 +13527,13 @@ static void Scene6_Outro(void) {
 				step++;
 				break;
 			case 19:// Load image 3
-				GFX_PCXImageToBuffer("OSCN6.DAT", "OUTRO3H.PCX", 220 * 140, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
+				GFX_PCXImageToBuffer("OSCN6.DAT", "OUTRO3H.PCX", 220 * 140, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
 				step++;
 				break;
 			case 20:/// Image 3 :: OUT
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 226, 146, 10, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 13, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 226, 146, 10, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 13, 43);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				VIDEO_FadeIn(4);
@@ -13489,10 +13542,10 @@ static void Scene6_Outro(void) {
 			case 21://Image 2
 
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 202);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 208);
-				VIDEO_StringToScreenBuffer(28, 13, ui.txt_file[UI_TXT_SCN6I].line[23], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 25, ui.txt_file[UI_TXT_SCN6I].line[24], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 208);
+				VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN6I]->line[23], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN6I]->line[24], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -13502,8 +13555,8 @@ static void Scene6_Outro(void) {
 				step++;
 				break;
 			case 22:// Clear speech
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 202);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 208);
 				step++;
 				break;
 			case 23:
@@ -13515,10 +13568,10 @@ static void Scene6_Outro(void) {
 				break;
 			case 24://Speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 202);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 208);
-				VIDEO_StringToScreenBuffer(28, 13, ui.txt_file[UI_TXT_SCN6I].line[25], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 25, ui.txt_file[UI_TXT_SCN6I].line[26], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 208);
+				VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN6I]->line[25], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN6I]->line[26], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -13536,10 +13589,10 @@ static void Scene6_Outro(void) {
 				break;
 			case 26://Speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 252, 30, 23, 7, 202);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 248, 26, 25, 9, 208);
-				VIDEO_StringToScreenBuffer(28, 13, ui.txt_file[UI_TXT_SCN6I].line[27], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(28, 25, ui.txt_file[UI_TXT_SCN6I].line[28], FONT_SLIM_BLACK);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 208);
+				VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN6I]->line[27], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN6I]->line[28], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(2000);
@@ -13592,7 +13645,7 @@ static void Scene7_EndCredits(void) {
 				step++;
 				break;
 			case 1:// Load first scene
-				GFX_PCXImageToBuffer("END.DAT", "END1H.PCX", 256 * 160, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
+				GFX_PCXImageToBuffer("END.DAT", "END1H.PCX", 256 * 160, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
 				AUDIO_LoadSong(AUDIO_SONG_3);
 				step++;
 				break;
@@ -13613,8 +13666,8 @@ static void Scene7_EndCredits(void) {
 				step++;
 				break;
 			case 4:// First image
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 262, 166, 40, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 43, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 262, 166, 40, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 43, 23);
 				step++;
 				break;
 			case 5:// Just wait
@@ -13641,9 +13694,9 @@ static void Scene7_EndCredits(void) {
 				step++;
 				break;
 			case 7:// Show chat
-				VIDEO_StringToScreenBuffer(126, 105, ui.txt_file[UI_TXT_END].line[1], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(126, 120, ui.txt_file[UI_TXT_END].line[2], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(126, 135, ui.txt_file[UI_TXT_END].line[3], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(126, 105, ui->txt_file[UI_TXT_END]->line[1], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(126, 120, ui->txt_file[UI_TXT_END]->line[2], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(126, 135, ui->txt_file[UI_TXT_END]->line[3], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(4000);
@@ -13654,15 +13707,15 @@ static void Scene7_EndCredits(void) {
 				step++;
 				break;
 			case 8:// Load second scene
-				GFX_PCXImageToBuffer("END.DAT", "END2H.PCX", 100 * 140, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("END.DAT", "END2L.PCX", 100 * 140, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("END.DAT", "END3H.PCX", 140 * 95, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("END.DAT", "END2H.PCX", 100 * 140, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("END.DAT", "END2L.PCX", 100 * 140, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("END.DAT", "END3H.PCX", 140 * 95, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				step++;
 				break;
 			case 9:// First image
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 146, 10, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 13, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 146, 10, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 13, 23);
 				step++;
 				break;
 			case 10:// Show chat
@@ -13674,9 +13727,9 @@ static void Scene7_EndCredits(void) {
 				step++;
 				break;
 			case 11:// Show chat
-				VIDEO_StringToScreenBuffer(106, 15, ui.txt_file[UI_TXT_END].line[5], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 30, ui.txt_file[UI_TXT_END].line[6], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 45, ui.txt_file[UI_TXT_END].line[7], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 15, ui->txt_file[UI_TXT_END]->line[5], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 30, ui->txt_file[UI_TXT_END]->line[6], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 45, ui->txt_file[UI_TXT_END]->line[7], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -13688,10 +13741,10 @@ static void Scene7_EndCredits(void) {
 				break;
 			case 12:// second and third image
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 146, 10, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 13, 23);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 101, 150, 80, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 153, 83);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 146, 10, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 13, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 101, 150, 80, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 153, 83);
 				step++;
 				break;
 			case 13:// Just wait
@@ -13703,10 +13756,10 @@ static void Scene7_EndCredits(void) {
 				break;
 			case 14:// second and third image
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 146, 10, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 13, 23);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 101, 150, 80, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 153, 83);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 146, 10, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 13, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 101, 150, 80, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 153, 83);
 				step++;
 				break;
 			case 15:// Just wait
@@ -13718,10 +13771,10 @@ static void Scene7_EndCredits(void) {
 				break;
 			case 16:// second and third image
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 146, 10, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 13, 23);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 101, 150, 80, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 153, 85);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 146, 10, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 13, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 101, 150, 80, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 153, 85);
 				step++;
 				break;
 			case 17:// Just wait
@@ -13733,10 +13786,10 @@ static void Scene7_EndCredits(void) {
 				break;
 			case 18:// second and third image
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 146, 10, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 13, 23);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 101, 150, 80, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 153, 81);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 146, 10, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 13, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 101, 150, 80, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 153, 81);
 				step++;
 				break;
 			case 19:// Just wait
@@ -13748,10 +13801,10 @@ static void Scene7_EndCredits(void) {
 				break;
 			case 20:// second and third image
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 146, 10, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 13, 23);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 101, 150, 80, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 153, 85);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 146, 10, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 13, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 101, 150, 80, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 153, 85);
 				step++;
 				break;
 			case 21:// Just wait
@@ -13763,10 +13816,10 @@ static void Scene7_EndCredits(void) {
 				break;
 			case 22:// second and third image
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 146, 10, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 13, 23);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 101, 150, 80, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 153, 81);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 146, 10, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 13, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 101, 150, 80, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 153, 81);
 				step++;
 				break;
 			case 23:// Just wait
@@ -13778,22 +13831,22 @@ static void Scene7_EndCredits(void) {
 				break;
 			case 24:// second and third image
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 146, 10, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 13, 23);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 101, 150, 80, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 153, 83);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 146, 10, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 13, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 101, 150, 80, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 153, 83);
 				step++;
 				break;
 			case 25:// Load fourth scene
-				GFX_PCXImageToBuffer("END.DAT", "END4H.PCX", 140 * 140, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("END.DAT", "END4L.PCX", 140 * 140, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("END.DAT", "END5H.PCX", 120 * 80, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("END.DAT", "END4H.PCX", 140 * 140, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("END.DAT", "END4L.PCX", 140 * 140, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("END.DAT", "END5H.PCX", 120 * 80, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				step++;
 				break;
 			case 26:// First image
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 10, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 13, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 10, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 13, 23);
 				step++;
 				break;
 			case 27:// Show chat
@@ -13804,9 +13857,9 @@ static void Scene7_EndCredits(void) {
 				step++;
 				break;
 			case 28:// Show chat
-				VIDEO_StringToScreenBuffer(106, 25, ui.txt_file[UI_TXT_END].line[9], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 40, ui.txt_file[UI_TXT_END].line[10], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(106, 55, ui.txt_file[UI_TXT_END].line[11], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 25, ui->txt_file[UI_TXT_END]->line[9], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 40, ui->txt_file[UI_TXT_END]->line[10], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 55, ui->txt_file[UI_TXT_END]->line[11], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -13818,8 +13871,8 @@ static void Scene7_EndCredits(void) {
 				break;
 			case 29:// Show chat
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 10, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 13, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 10, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 13, 23);
 
 				GFX_SetDefaultAnimation(chat_spr_num, false, false, 10);
 				GFX_SetSpritePosition(chat_spr_num, 130, 100);
@@ -13828,9 +13881,9 @@ static void Scene7_EndCredits(void) {
 				step++;
 				break;
 			case 30:// Show chat
-				VIDEO_StringToScreenBuffer(136, 105, ui.txt_file[UI_TXT_END].line[13], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(136, 120, ui.txt_file[UI_TXT_END].line[14], FONT_SLIM_BLACK);
-				VIDEO_StringToScreenBuffer(136, 135, ui.txt_file[UI_TXT_END].line[15], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(136, 105, ui->txt_file[UI_TXT_END]->line[13], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(136, 120, ui->txt_file[UI_TXT_END]->line[14], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(136, 135, ui->txt_file[UI_TXT_END]->line[15], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -13842,10 +13895,10 @@ static void Scene7_EndCredits(void) {
 				break;
 			case 31://  image
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 10, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 13, 23);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 126, 86, 180, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 183, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 10, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 13, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 126, 86, 180, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 183, 43);
 				step++;
 				break;
 			case 32:// Just wait
@@ -13857,10 +13910,10 @@ static void Scene7_EndCredits(void) {
 				break;
 			case 33://  image
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 10, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 13, 23);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 126, 86, 180, 40, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 183, 43);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 10, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 13, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 126, 86, 180, 40, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 183, 43);
 				step++;
 				break;
 			case 34:// Just wait
@@ -13871,17 +13924,17 @@ static void Scene7_EndCredits(void) {
 				step++;
 				break;
 			case 35:// Load fourth scene
-				GFX_PCXImageToBuffer("END.DAT", "END6H.PCX", 140 * 140, gfx.image_buffer1, &gfx.image_buffer1_width, &gfx.image_buffer1_height);
-				GFX_PCXImageToBuffer("END.DAT", "END7H.PCX", 100 * 100, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
-				GFX_PCXImageToBuffer("END.DAT", "END8H.PCX", 100 * 100, gfx.image_buffer3, &gfx.image_buffer3_width, &gfx.image_buffer3_height);
+				GFX_PCXImageToBuffer("END.DAT", "END6H.PCX", 140 * 140, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
+				GFX_PCXImageToBuffer("END.DAT", "END7H.PCX", 100 * 100, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
+				GFX_PCXImageToBuffer("END.DAT", "END8H.PCX", 100 * 100, gfx->image_buffer3, &gfx->image_buffer3_width, &gfx->image_buffer3_height);
 				step++;
 				break;
 			case 36://  image
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 140, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 143, 23);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 106, 60, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 63, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 140, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 143, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 106, 60, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 63, 13);
 				step++;
 				break;
 			case 37:// Just wait
@@ -13892,10 +13945,10 @@ static void Scene7_EndCredits(void) {
 				step++;
 				break;
 			case 38://  image
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 140, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 143, 23);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 106, 60, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 63, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 140, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 143, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 106, 60, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 63, 13);
 				step++;
 				break;
 			case 39:// Just wait
@@ -13906,10 +13959,10 @@ static void Scene7_EndCredits(void) {
 				step++;
 				break;
 			case 40://  image
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 140, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 143, 23);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 106, 60, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 63, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 140, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 143, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 106, 60, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 63, 13);
 				step++;
 				break;
 			case 41:// Just wait
@@ -13920,21 +13973,21 @@ static void Scene7_EndCredits(void) {
 				step++;
 				break;
 			case 42://  image
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 140, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 143, 23);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 106, 60, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer3, gfx.image_buffer3_width, gfx.image_buffer3_height, gfx.image_buffer3_width, gfx.image_buffer3_height, 63, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 140, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 143, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 106, 60, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 63, 13);
 				step++;
 				break;
 			case 43:// Load fourth scene
-				GFX_PCXImageToBuffer("END.DAT", "END9H.PCX", 100 * 100, gfx.image_buffer2, &gfx.image_buffer2_width, &gfx.image_buffer2_height);
+				GFX_PCXImageToBuffer("END.DAT", "END9H.PCX", 100 * 100, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
 				step++;
 				break;
 			case 44://  image
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 146, 146, 140, 20, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer1, gfx.image_buffer1_width, gfx.image_buffer1_height, gfx.image_buffer1_width, gfx.image_buffer1_height, 143, 23);
-				VIDEO_DrawSquareToScreenBuffer(video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video.screen_width, video.screen_height, 106, 106, 60, 10, 222);
-				VIDEO_BufferToScreenBuffer(gfx.image_buffer2, gfx.image_buffer2_width, gfx.image_buffer2_height, gfx.image_buffer2_width, gfx.image_buffer2_height, 63, 13);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 146, 146, 140, 20, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 143, 23);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 106, 106, 60, 10, 222);
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 63, 13);
 				step++;
 				break;
 			case 45:// Just wait
@@ -13950,7 +14003,7 @@ static void Scene7_EndCredits(void) {
 				break;
 			case 47:
 				VIDEO_ClearScreenBuffer();
-				VIDEO_StringToScreenBuffer(100, 90, ui.txt_file[UI_TXT_END].line[20], FONT_BIG_WHITE);
+				VIDEO_StringToScreenBuffer(100, 90, ui->txt_file[UI_TXT_END]->line[20], FONT_BIG_WHITE);
 
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
@@ -14051,7 +14104,7 @@ static void Test(void) {
 	ACTOR_LoadActorAssets("ACTOR.DAT");
 
 	GFX_LoadSpriteGraphicsRLE("MISC.DAT", "EMPTY.PCX", SPRITE_GRAPHICS_ID_EMPTY, 1, 1, 1, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
-
+	GFX_LoadSpriteGraphicsRLE("MISC.DAT", "FUCK.PCX", SPRITE_GRAPHICS_ID_FUCK, 158, 81, 1, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_TEMPORARY_SPRITE);
 	GFX_LoadSpriteGraphicsRLE("MISC.DAT", "CHAT.PCX", SPRITE_GRAPHICS_ID_CHAT_SMALL, 55, 30, 1, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 	GFX_LoadSpriteGraphicsRLE("MISC.DAT", "CHAT_BIG.PCX", SPRITE_GRAPHICS_ID_CHAT_BIG, 140, 50, 1, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 
@@ -14080,7 +14133,7 @@ void set_video_mode(int mode) {
 /** MAIN FUNCTION*******
  */
 int main(int argc, char **argv) {
-	//gdb_start();
+	gdb_start();
 
 	engine.good_mode = false;
 	engine.debug_mode = false;
@@ -14131,13 +14184,13 @@ int main(int argc, char **argv) {
 
 	Test();
 
-	Logo();
+	//Logo();
 
-	Intro();
+	//Intro();
 
 	engine.exit_game = false;
 
-	engine.scene = 0;
+	engine.scene = 2;
 	engine.room = 1;
 
 	MOUSE_InitCursorSprite(SPRITE_GRAPHICS_ID_CURSOR);// Initialize mouse cursor
@@ -14151,32 +14204,32 @@ int main(int argc, char **argv) {
 			case 1:// scene 1 :: Mission 1 :: The travel. Pass: TRAVEL
 				Scene1_Intro();
 				Scene1_Loop();
-				if (!actor.status_dead && !engine.exit_menu) Scene1_Outro();
+				if (!actor->status_dead && !engine.exit_menu) Scene1_Outro();
 				break;
 			case 2:// scene 2 :: Mission 2 :: Down to the hell. Pass: GODOWN
 				Scene2_Intro();
 				Scene2_Loop();
-				if (!actor.status_dead && !engine.exit_menu) Scene2_Outro();
+				if (!actor->status_dead && !engine.exit_menu) Scene2_Outro();
 				break;
 			case 3:// scene 3 :: Mission 3 :: Behind enemy lines. Pass: INSIDE
 				Scene3_Intro();
 				Scene3_Loop();
-				if (!actor.status_dead && !engine.exit_menu) Scene3_Outro();
+				if (!actor->status_dead && !engine.exit_menu) Scene3_Outro();
 				break;
 			case 4:// scene 4 :: Mission 4 :: Praise for mercy
 				Scene4_Intro();
 				Scene4_Loop();
-				if (!actor.status_dead && !engine.exit_menu) Scene4_Outro();
+				if (!actor->status_dead && !engine.exit_menu) Scene4_Outro();
 				break;
 			case 5:// scene 5 :: Mission 5 :: Hit and run
 				Scene5_Intro();
 				Scene5_Loop();
-				if (!actor.status_dead && !engine.exit_menu) Scene5_Outro();
+				if (!actor->status_dead && !engine.exit_menu) Scene5_Outro();
 				break;
 			case 6:// scene 6 :: Mission 6 :: Bullet hell
 				Scene6_Intro();
 				Scene6_Loop();
-				if (!actor.status_dead && !engine.exit_menu) Scene6_Outro();
+				if (!actor->status_dead && !engine.exit_menu) Scene6_Outro();
 				break;
 			case 7:// scene 7 :: End scene
 				Scene7_EndCredits();

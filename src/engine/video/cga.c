@@ -23,7 +23,7 @@ void CGA_ScreenMainBufferToVRAM(void) {
 
 	//disable();//disable interrupts
 
-	memcpy(CGA, video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], CGA_RESOLUTION_WIDTH * CGA_RESOLUTION_HEIGHT);
+	memcpy(CGA, video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], CGA_RESOLUTION_WIDTH * CGA_RESOLUTION_HEIGHT);
 
 	//enable();
 }

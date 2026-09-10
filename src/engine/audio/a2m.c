@@ -253,8 +253,8 @@
 
 */
 
-A2M_SONGINFO songinfo;
-A2M_CHDATA ch_data;
+A2M_SONGINFO *songinfo;
+A2M_CHDATA *ch_data;
 
 /* internal data structure */
 struct A2M_APDSTATE {
@@ -264,6 +264,13 @@ struct A2M_APDSTATE {
 	word tag;
 	word bitcount;
 };
+
+void A2M_Init(void) {
+	songinfo = MM_PushChunk(sizeof(A2M_SONGINFO), CT_ENGINE);
+
+	ch_data = MM_PushChunk(sizeof(A2M_CHDATA), CT_ENGINE);
+}
+
 
 static word A2M_GetBit(struct A2M_APDSTATE *ud) {
 	word bit;
@@ -445,23 +452,23 @@ word A2M_Depack(const byte *source, byte *destination, int srcsize, int dstsize)
 /* Clean songinfo before importing a2t tune */
 static void A2M_InitSongData(void) {
 
-	songinfo.patt_len = 64;
-	songinfo.nm_tracks = 18;
-	songinfo.tempo = 50;
-	songinfo.speed = 6;
-	songinfo.macro_speedup = 1;
+	songinfo->patt_len = 64;
+	songinfo->nm_tracks = 18;
+	songinfo->tempo = 50;
+	songinfo->speed = 6;
+	songinfo->macro_speedup = 1;
 
 	// common flags
-	songinfo.speed_update = false;
-	songinfo.lockvol = false;
-	songinfo.panlock = false;
-	songinfo.lockVP = false;
-	songinfo.tremolo_depth = 0;
-	songinfo.vibrato_depth = 0;
-	songinfo.volume_scaling = false;
-	songinfo.percussion_mode = false;
-	songinfo.overall_volume = 63;
-	songinfo.global_volume = 63;
+	songinfo->speed_update = false;
+	songinfo->lockvol = false;
+	songinfo->panlock = false;
+	songinfo->lockVP = false;
+	songinfo->tremolo_depth = 0;
+	songinfo->vibrato_depth = 0;
+	songinfo->volume_scaling = false;
+	songinfo->percussion_mode = false;
+	songinfo->overall_volume = 63;
+	songinfo->global_volume = 63;
 }
 
 static bool A2M_IsDataEmpty(void *data, unsigned int size) {
@@ -524,55 +531,55 @@ static void A2M_ImportFMregTable(dword n, byte *src) {
 		if (src[0] /* length */) {
 
 			// Copy field by field
-			songinfo.instrinfo.instruments[i].fmreg.length = src[0];        // length
-			songinfo.instrinfo.instruments[i].fmreg.loop_begin = src[1];    // loop_begin
-			songinfo.instrinfo.instruments[i].fmreg.loop_length = src[2];   // loop_length
-			songinfo.instrinfo.instruments[i].fmreg.keyoff_pos = src[3];    // keyoff_pos
-			songinfo.instrinfo.instruments[i].fmreg.arpeggio_table = src[4];// arpeggio_table
-			songinfo.instrinfo.instruments[i].fmreg.vibrato_table = src[5]; // vibrato_table
+			songinfo->instrinfo.instruments[i].fmreg.length = src[0];        // length
+			songinfo->instrinfo.instruments[i].fmreg.loop_begin = src[1];    // loop_begin
+			songinfo->instrinfo.instruments[i].fmreg.loop_length = src[2];   // loop_length
+			songinfo->instrinfo.instruments[i].fmreg.keyoff_pos = src[3];    // keyoff_pos
+			songinfo->instrinfo.instruments[i].fmreg.arpeggio_table = src[4];// arpeggio_table
+			songinfo->instrinfo.instruments[i].fmreg.vibrato_table = src[5]; // vibrato_table
 
 			rts_offset = 6;
 			for (j = 0; j < 255; j++, rts_offset += tREGISTER_TABLE_DEF_SIZE) {
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.multipM = src[rts_offset + 0] & 0xf;
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.ksrM = (src[rts_offset + 0] >> 4) & 1;
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.sustM = (src[rts_offset + 0] >> 5) & 1;
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.vibrM = (src[rts_offset + 0] >> 6) & 1;
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.tremM = (src[rts_offset + 0] >> 7) & 1;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.multipM = src[rts_offset + 0] & 0xf;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.ksrM = (src[rts_offset + 0] >> 4) & 1;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.sustM = (src[rts_offset + 0] >> 5) & 1;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.vibrM = (src[rts_offset + 0] >> 6) & 1;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.tremM = (src[rts_offset + 0] >> 7) & 1;
 
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.multipC = src[rts_offset + 1] & 0xf;
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.ksrC = (src[rts_offset + 1] >> 4) & 1;
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.sustC = (src[rts_offset + 1] >> 5) & 1;
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.vibrC = (src[rts_offset + 1] >> 6) & 1;
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.tremC = (src[rts_offset + 1] >> 7) & 1;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.multipC = src[rts_offset + 1] & 0xf;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.ksrC = (src[rts_offset + 1] >> 4) & 1;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.sustC = (src[rts_offset + 1] >> 5) & 1;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.vibrC = (src[rts_offset + 1] >> 6) & 1;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.tremC = (src[rts_offset + 1] >> 7) & 1;
 
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.volM = src[rts_offset + 2] & 0x3f;
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.kslM = (src[rts_offset + 2] >> 6) & 3;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.volM = src[rts_offset + 2] & 0x3f;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.kslM = (src[rts_offset + 2] >> 6) & 3;
 
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.volC = src[rts_offset + 3] & 0x3f;
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.kslC = (src[rts_offset + 3] >> 6) & 3;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.volC = src[rts_offset + 3] & 0x3f;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.kslC = (src[rts_offset + 3] >> 6) & 3;
 
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.decM = src[rts_offset + 4] & 0xf;
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.attckM = (src[rts_offset + 4] >> 4) & 0xf;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.decM = src[rts_offset + 4] & 0xf;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.attckM = (src[rts_offset + 4] >> 4) & 0xf;
 
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.decC = src[rts_offset + 5] & 0xf;
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.attckC = (src[rts_offset + 5] >> 4) & 0xf;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.decC = src[rts_offset + 5] & 0xf;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.attckC = (src[rts_offset + 5] >> 4) & 0xf;
 
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.relM = src[rts_offset + 6] & 0xf;
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.sustnM = (src[rts_offset + 6] >> 4) & 0xf;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.relM = src[rts_offset + 6] & 0xf;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.sustnM = (src[rts_offset + 6] >> 4) & 0xf;
 
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.relC = src[rts_offset + 7] & 0xf;
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.sustnC = (src[rts_offset + 7] >> 4) & 0xf;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.relC = src[rts_offset + 7] & 0xf;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.sustnC = (src[rts_offset + 7] >> 4) & 0xf;
 
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.wformM = src[rts_offset + 8] & 7;
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.wformC = src[rts_offset + 9] & 7;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.wformM = src[rts_offset + 8] & 7;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.wformC = src[rts_offset + 9] & 7;
 
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.connect = src[rts_offset + 10] & 1;
-				songinfo.instrinfo.instruments[i].fmreg.data[j].fm.feedb = (src[rts_offset + 10] >> 1) & 7;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.connect = src[rts_offset + 10] & 1;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].fm.feedb = (src[rts_offset + 10] >> 1) & 7;
 
-				songinfo.instrinfo.instruments[i].fmreg.data[j].freq_slide = (int16_t) (src[rts_offset + 11] | (src[rts_offset + 12] << 8));
-				songinfo.instrinfo.instruments[i].fmreg.data[j].panning = src[rts_offset + 13]; // panning
-				songinfo.instrinfo.instruments[i].fmreg.data[j].duration = src[rts_offset + 14];// duration
-				songinfo.instrinfo.instruments[i].fmreg.data[j].macro_flags = src[rts_offset + 10] & 0xf0;
+				songinfo->instrinfo.instruments[i].fmreg.data[j].freq_slide = (int16_t) (src[rts_offset + 11] | (src[rts_offset + 12] << 8));
+				songinfo->instrinfo.instruments[i].fmreg.data[j].panning = src[rts_offset + 13]; // panning
+				songinfo->instrinfo.instruments[i].fmreg.data[j].duration = src[rts_offset + 14];// duration
+				songinfo->instrinfo.instruments[i].fmreg.data[j].macro_flags = src[rts_offset + 10] & 0xf0;
 			}
 		}
 	}
@@ -601,10 +608,10 @@ void A2M_LoadFile(const char *dat_name, const char *asset_name) {
 
 	A2M_InitSongData();
 
-	songinfo.ffver = A2M_HEADER_FFVER(header);
-	songinfo.num_patterns = A2M_HEADER_NPATT(header);
+	songinfo->ffver = A2M_HEADER_FFVER(header);
+	songinfo->num_patterns = A2M_HEADER_NPATT(header);
 
-	if (songinfo.ffver != 11)
+	if (songinfo->ffver != 11)
 		Error("Error in function A2M_LoadFile!", "Only version 11 is supported", asset_name, ERROR_SOUND);
 
 	// 17 fixed data blocks. Length size of each 4 bytes
@@ -627,81 +634,81 @@ void A2M_LoadFile(const char *dat_name, const char *asset_name) {
 	A2M_Depack(blockptr, unpacked, datablock_length[0], 0x115ea2);
 
 	// Fill songinfo structure
-	memcpy(songinfo.songname, A2M_SONGDATA_SONGNAME_P(unpacked) + 1, 42);
-	memcpy(songinfo.composer, A2M_SONGDATA_COMPOSER_P(unpacked) + 1, 42);
+	memcpy(songinfo->songname, A2M_SONGDATA_SONGNAME_P(unpacked) + 1, 42);
+	memcpy(songinfo->composer, A2M_SONGDATA_COMPOSER_P(unpacked) + 1, 42);
 
 	// Calculate the real number of used instruments
-	songinfo.instrinfo.count = 255;
-	while (songinfo.instrinfo.count && A2M_IsDataEmpty(A2M_SONGDATA_INSTR_DATA_P(unpacked, songinfo.instrinfo.count - 1), tINSTR_DATA_SIZE))
-		songinfo.instrinfo.count--;
+	songinfo->instrinfo.count = 255;
+	while (songinfo->instrinfo.count && A2M_IsDataEmpty(A2M_SONGDATA_INSTR_DATA_P(unpacked, songinfo->instrinfo.count - 1), tINSTR_DATA_SIZE))
+		songinfo->instrinfo.count--;
 
-	songinfo.instrinfo.size = songinfo.instrinfo.count * sizeof(A2M_INSTR_DATA_EXT);
-	for (int i = 1; i <= songinfo.instrinfo.count; i++) {
+	songinfo->instrinfo.size = songinfo->instrinfo.count * sizeof(A2M_INSTR_DATA_EXT);
+	for (int i = 1; i <= songinfo->instrinfo.count; i++) {
 		byte *srci = A2M_SONGDATA_INSTR_DATA_P(unpacked, i - 1);
 
-		A2M_GetFM_Data(&songinfo.instrinfo.instruments[i].instr_data.fm, srci);
+		A2M_GetFM_Data(&songinfo->instrinfo.instruments[i].instr_data.fm, srci);
 
-		songinfo.instrinfo.instruments[i].instr_data.panning = srci[11] & 3;
-		songinfo.instrinfo.instruments[i].instr_data.fine_tune = srci[12];
+		songinfo->instrinfo.instruments[i].instr_data.panning = srci[11] & 3;
+		songinfo->instrinfo.instruments[i].instr_data.fine_tune = srci[12];
 
-		songinfo.instrinfo.instruments[i].instr_data.perc_voice = srci[13];
+		songinfo->instrinfo.instruments[i].instr_data.perc_voice = srci[13];
 
-		if (songinfo.instrinfo.instruments[i].instr_data.panning >= 3) {
-			songinfo.instrinfo.instruments[i].instr_data.panning = 0;
+		if (songinfo->instrinfo.instruments[i].instr_data.panning >= 3) {
+			songinfo->instrinfo.instruments[i].instr_data.panning = 0;
 		}
 	}
 
 	for (int i = 1; i < 255; i++)
-		memcpy(songinfo.instr_names[i], A2M_SONGDATA_INSTR_NAMES_P(unpacked, i) + 1, 42);
+		memcpy(songinfo->instr_names[i], A2M_SONGDATA_INSTR_NAMES_P(unpacked, i) + 1, 42);
 
 
 	// Allocate fmreg macro tables
-	A2M_ImportFMregTable(songinfo.instrinfo.count, A2M_SONGDATA_FMREG_TABLE_P(unpacked, 0));
+	A2M_ImportFMregTable(songinfo->instrinfo.count, A2M_SONGDATA_FMREG_TABLE_P(unpacked, 0));
 
-	for (int i = 1; i <= songinfo.instrinfo.count; i++) {
+	for (int i = 1; i <= songinfo->instrinfo.count; i++) {
 		// Instrument arpegio/vibrato references
-		songinfo.instrinfo.instruments[i].arpeggio = songinfo.instrinfo.instruments[i].fmreg.arpeggio_table;
-		songinfo.instrinfo.instruments[i].vibrato = songinfo.instrinfo.instruments[i].fmreg.vibrato_table;
+		songinfo->instrinfo.instruments[i].arpeggio = songinfo->instrinfo.instruments[i].fmreg.arpeggio_table;
+		songinfo->instrinfo.instruments[i].vibrato = songinfo->instrinfo.instruments[i].fmreg.vibrato_table;
 	}
 
 	// Allocate arpeggio/vibrato macro tables
 	// TODO: Calculate actual num of arp/vib tables
 	//arpvib_tables_allocate(255, A2M_SONGDATA_V9_14_ARPVIB_TABLE_P(unpacked, 0));
 
-	memcpy(songinfo.pattern_order, A2M_SONGDATA_PATTERN_ORDER_P(unpacked, 0), 128);
+	memcpy(songinfo->pattern_order, A2M_SONGDATA_PATTERN_ORDER_P(unpacked, 0), 128);
 
-	songinfo.tempo = A2M_SONGDATA_TEMPO(unpacked);
-	songinfo.speed = A2M_SONGDATA_SPEED(unpacked);
-	songinfo.common_flag = A2M_SONGDATA_COMMON_FLAG(unpacked);
-	songinfo.patt_len = A2M_SONGDATA_PATT_LEN(unpacked);
-	songinfo.nm_tracks = A2M_SONGDATA_NM_TRACKS(unpacked);
-	songinfo.macro_speedup = A2M_SONGDATA_MACRO_SPEEDUP(unpacked);
+	songinfo->tempo = A2M_SONGDATA_TEMPO(unpacked);
+	songinfo->speed = A2M_SONGDATA_SPEED(unpacked);
+	songinfo->common_flag = A2M_SONGDATA_COMMON_FLAG(unpacked);
+	songinfo->patt_len = A2M_SONGDATA_PATT_LEN(unpacked);
+	songinfo->nm_tracks = A2M_SONGDATA_NM_TRACKS(unpacked);
+	songinfo->macro_speedup = A2M_SONGDATA_MACRO_SPEEDUP(unpacked);
 
-	songinfo.speed_update = (songinfo.common_flag >> 0) & 1;
-	songinfo.lockvol = (songinfo.common_flag >> 1) & 1;
-	songinfo.lockVP = (songinfo.common_flag >> 2) & 1;
-	songinfo.tremolo_depth = (songinfo.common_flag >> 3) & 1;
-	songinfo.vibrato_depth = (songinfo.common_flag >> 4) & 1;
-	songinfo.panlock = (songinfo.common_flag >> 5) & 1;
-	songinfo.percussion_mode = (songinfo.common_flag >> 6) & 1;
-	songinfo.volume_scaling = (songinfo.common_flag >> 7) & 1;
+	songinfo->speed_update = (songinfo->common_flag >> 0) & 1;
+	songinfo->lockvol = (songinfo->common_flag >> 1) & 1;
+	songinfo->lockVP = (songinfo->common_flag >> 2) & 1;
+	songinfo->tremolo_depth = (songinfo->common_flag >> 3) & 1;
+	songinfo->vibrato_depth = (songinfo->common_flag >> 4) & 1;
+	songinfo->panlock = (songinfo->common_flag >> 5) & 1;
+	songinfo->percussion_mode = (songinfo->common_flag >> 6) & 1;
+	songinfo->volume_scaling = (songinfo->common_flag >> 7) & 1;
 
 	// Free all allocated memory and allocate fixed memory for music events
 	MM_PopChunks(CT_TEMPORARY);
 
-	if (songinfo.nm_tracks > 9)
+	if (songinfo->nm_tracks > 9)
 		Error("Error in function A2M_LoadFile!", "Excessive number of tracks (channels)", "Maximum number of channels == 9", ERROR_SOUND);
 
-	if (songinfo.num_patterns > 0x70) {
+	if (songinfo->num_patterns > 0x70) {
 		Error("Error in function A2M_LoadFile!", "Excessive number of patterns", "Maximum number of patterns == 16", ERROR_SOUND);
 	}
 
-	for (int p = 0; p < songinfo.num_patterns; p++) {
-		songinfo.pattern[p].channels = songinfo.nm_tracks;
+	for (int p = 0; p < songinfo->num_patterns; p++) {
+		songinfo->pattern[p].channels = songinfo->nm_tracks;
 
-		for (int c = 0; c < songinfo.nm_tracks; c++) {
-			songinfo.pattern[p].channel[c].rows = songinfo.patt_len;
-			songinfo.pattern[p].channel[c].events = MM_PushChunk(songinfo.patt_len * sizeof(A2M_TRACK_EVENT), CT_MUSIC);
+		for (int c = 0; c < songinfo->nm_tracks; c++) {
+			songinfo->pattern[p].channel[c].rows = songinfo->patt_len;
+			songinfo->pattern[p].channel[c].events = MM_PushChunk(songinfo->patt_len * sizeof(A2M_TRACK_EVENT), CT_MUSIC);
 		}
 	}
 
@@ -724,16 +731,16 @@ void A2M_LoadFile(const char *dat_name, const char *asset_name) {
 		A2M_Depack(blockptr, unpacked, datablock_length[1], 8 * 20 * 256 * 6);
 
 		for (int p = 0; p < 8; p++) {
-			for (int c = 0; c < songinfo.nm_tracks; c++) {// channel
+			for (int c = 0; c < songinfo->nm_tracks; c++) {// channel
 				src_index = (p * 20 * 256 * 6) + (c * 256 * 6);
 				dst_index = 0;
-				for (int r = 0; r < songinfo.pattern[p].channel[c].rows; r++) {// row
-					songinfo.pattern[p].channel[c].events[dst_index].note = unpacked[src_index];
-					songinfo.pattern[p].channel[c].events[dst_index].instr_def = unpacked[src_index + 1];
-					songinfo.pattern[p].channel[c].events[dst_index].eff[0].def = unpacked[src_index + 2];
-					songinfo.pattern[p].channel[c].events[dst_index].eff[0].val = unpacked[src_index + 3];
-					songinfo.pattern[p].channel[c].events[dst_index].eff[1].def = unpacked[src_index + 4];
-					songinfo.pattern[p].channel[c].events[dst_index].eff[1].val = unpacked[src_index + 5];
+				for (int r = 0; r < songinfo->pattern[p].channel[c].rows; r++) {// row
+					songinfo->pattern[p].channel[c].events[dst_index].note = unpacked[src_index];
+					songinfo->pattern[p].channel[c].events[dst_index].instr_def = unpacked[src_index + 1];
+					songinfo->pattern[p].channel[c].events[dst_index].eff[0].def = unpacked[src_index + 2];
+					songinfo->pattern[p].channel[c].events[dst_index].eff[0].val = unpacked[src_index + 3];
+					songinfo->pattern[p].channel[c].events[dst_index].eff[1].def = unpacked[src_index + 4];
+					songinfo->pattern[p].channel[c].events[dst_index].eff[1].val = unpacked[src_index + 5];
 					src_index += 6;
 					dst_index++;
 				}
@@ -745,21 +752,21 @@ void A2M_LoadFile(const char *dat_name, const char *asset_name) {
 
 	/*FILE *f;
 	f = fopen("song.out", "wb");
-	fwrite(songinfo.pattern[0].channel[5].events, sizeof(A2M_TRACK_EVENT) * 64, 1, f);
+	fwrite(songinfo->pattern[0].channel[5].events, sizeof(A2M_TRACK_EVENT) * 64, 1, f);
 	fclose(f);*/
 
-	/*printf("A2M song name: %s\n", songinfo.songname);
-	printf("A2M song name: %s\n", songinfo.composer);
-	printf("A2M version: %d\n", songinfo.ffver);
-	printf("Number of patterns: %d\n", songinfo.num_patterns);
-	printf("Rows per pattern: %d\n", songinfo.patt_len);
-	printf("Voices per pattern (channels): %d\n", songinfo.nm_tracks);
-	printf("Intrument counter: %d\n", songinfo.instrinfo.count);
-	printf("Tempo: %d\n", songinfo.tempo);
-	printf("Speed: %d\n", songinfo.speed);
-	printf("Volume scaling: %d\n", songinfo.volume_scaling);
-	printf("Percussion mode: %d\n", songinfo.percussion_mode);
-	printf("Track volume lock: %d\n", songinfo.lockvol);*/
+	/*printf("A2M song name: %s\n", songinfo->songname);
+	printf("A2M song name: %s\n", songinfo->composer);
+	printf("A2M version: %d\n", songinfo->ffver);
+	printf("Number of patterns: %d\n", songinfo->num_patterns);
+	printf("Rows per pattern: %d\n", songinfo->patt_len);
+	printf("Voices per pattern (channels): %d\n", songinfo->nm_tracks);
+	printf("Intrument counter: %d\n", songinfo->instrinfo.count);
+	printf("Tempo: %d\n", songinfo->tempo);
+	printf("Speed: %d\n", songinfo->speed);
+	printf("Volume scaling: %d\n", songinfo->volume_scaling);
+	printf("Percussion mode: %d\n", songinfo->percussion_mode);
+	printf("Track volume lock: %d\n", songinfo->lockvol);*/
 
 	//sleep(50);
 }
@@ -1058,11 +1065,11 @@ static inline word A2M_RegsOffsets(int chan, int op) {
  */
 static void A2M_ChangeFreq(int chan, word freq) {
 
-	ch_data.freq_table[chan] = freq & 0x03ff;// 00111111 11111111
+	ch_data->freq_table[chan] = freq & 0x03ff;// 00111111 11111111
 
-	//printf("CH %u >> frequency %x \n", chan, ch_data.freq_table[chan]);
-	A2M_WriteFM(0xA0 + chan, ch_data.freq_table[chan] & 0xFF);
-	A2M_WriteFM(0xB0 + chan, A2M_ReadFM(0xB0 + chan) | ((ch_data.freq_table[chan] >> 8) & 0x03));
+	//printf("CH %u >> frequency %x \n", chan, ch_data->freq_table[chan]);
+	A2M_WriteFM(0xA0 + chan, ch_data->freq_table[chan] & 0xFF);
+	A2M_WriteFM(0xB0 + chan, A2M_ReadFM(0xB0 + chan) | ((ch_data->freq_table[chan] >> 8) & 0x03));
 }
 
 /** A2M :: Change frequency and update macro table
@@ -1072,11 +1079,11 @@ static void A2M_ChangeFrequency(int chan, word freq) {
 	A2M_ChangeFreq(chan, freq);
 
 	// Update macro table
-	ch_data.macro_table[chan].vib_paused = true;
-	ch_data.macro_table[chan].vib_count = 1;
-	ch_data.macro_table[chan].vib_pos = 0;
-	ch_data.macro_table[chan].vib_freq = freq;
-	ch_data.macro_table[chan].vib_paused = false;
+	ch_data->macro_table[chan].vib_paused = true;
+	ch_data->macro_table[chan].vib_count = 1;
+	ch_data->macro_table[chan].vib_pos = 0;
+	ch_data->macro_table[chan].vib_freq = freq;
+	ch_data->macro_table[chan].vib_paused = false;
 }
 
 /** A2M :: Key off
@@ -1087,9 +1094,9 @@ static void A2M_ChangeFrequency(int chan, word freq) {
  *   -  bit 1..0 >> Freq (2 high bits) 
  */
 static void A2M_KeyOFF(int chan) {
-	ch_data.freq_table[chan] &= ~0x2000;
-	A2M_ChangeFrequency(chan, ch_data.freq_table[chan]);
-	ch_data.event_table[chan].note |= 0x80;//keyoff_flag
+	ch_data->freq_table[chan] &= ~0x2000;
+	A2M_ChangeFrequency(chan, ch_data->freq_table[chan]);
+	ch_data->event_table[chan].note |= 0x80;//keyoff_flag
 
 	//printf("CH %u >> key off\n", chan);
 
@@ -1126,16 +1133,16 @@ static int A2M_nFreq(byte note) {
 static void A2M_InitMacroTable(int chan, byte note, byte ins, word freq) {
 
 	//byte arp_table = instrument ? instrument->arpeggio : 0;
-	byte arp_table = songinfo.instrinfo.instruments[ins].arpeggio & 0x01;
-	ch_data.macro_table[chan].fmreg_pos = 0;
-	ch_data.macro_table[chan].fmreg_duration = 0;
-	ch_data.macro_table[chan].fmreg_ins = ins;// todo: check against instruments->fmreg.length
-	ch_data.macro_table[chan].arpg_count = 1;
-	ch_data.macro_table[chan].arpg_pos = 0;
-	ch_data.macro_table[chan].arpg_table = arp_table;
-	ch_data.macro_table[chan].arpg_note = note;
+	byte arp_table = songinfo->instrinfo.instruments[ins].arpeggio & 0x01;
+	ch_data->macro_table[chan].fmreg_pos = 0;
+	ch_data->macro_table[chan].fmreg_duration = 0;
+	ch_data->macro_table[chan].fmreg_ins = ins;// todo: check against instruments->fmreg.length
+	ch_data->macro_table[chan].arpg_count = 1;
+	ch_data->macro_table[chan].arpg_pos = 0;
+	ch_data->macro_table[chan].arpg_table = arp_table;
+	ch_data->macro_table[chan].arpg_note = note;
 
-	byte vib_table = songinfo.instrinfo.instruments[ins].vibrato & 0x01;
+	byte vib_table = songinfo->instrinfo.instruments[ins].vibrato & 0x01;
 
 
 	//	A2M_VIBRATO_TABLE *vib = get_vibrato_table(vib_table);
@@ -1143,14 +1150,14 @@ static void A2M_InitMacroTable(int chan, byte note, byte ins, word freq) {
 	//	uint8_t vib_delay = vib ? vib->delay : 0;
 	byte vib_delay = 0;
 
-	ch_data.macro_table[chan].vib_count = 1;
-	ch_data.macro_table[chan].vib_paused = false;
-	ch_data.macro_table[chan].vib_pos = 0;
-	ch_data.macro_table[chan].vib_table = vib_table;
-	ch_data.macro_table[chan].vib_freq = freq;
-	ch_data.macro_table[chan].vib_delay = vib_delay;
+	ch_data->macro_table[chan].vib_count = 1;
+	ch_data->macro_table[chan].vib_paused = false;
+	ch_data->macro_table[chan].vib_pos = 0;
+	ch_data->macro_table[chan].vib_table = vib_table;
+	ch_data->macro_table[chan].vib_freq = freq;
+	ch_data->macro_table[chan].vib_delay = vib_delay;
 
-	ch_data.zero_fq_table[chan] = 0;
+	ch_data->zero_fq_table[chan] = 0;
 }
 
 static void A2M_OutputNote(byte note, uint8_t ins, int chan, bool restart_macro, bool restart_adsr) {
@@ -1158,25 +1165,25 @@ static void A2M_OutputNote(byte note, uint8_t ins, int chan, bool restart_macro,
 
 	//printf("Output note on channel %u \n", chan);
 
-	if ((note == 0) && (ch_data.ftune_table[chan] == 0)) return;
+	if ((note == 0) && (ch_data->ftune_table[chan] == 0)) return;
 
 	if ((note & 0x80) || !A2M_NoteInRange(note)) {//keyoff_flag
-		freq = ch_data.freq_table[chan];
+		freq = ch_data->freq_table[chan];
 	} else {
-		freq = A2M_nFreq(note - 1) + songinfo.instrinfo.instruments[ins].instr_data.fine_tune;
+		freq = A2M_nFreq(note - 1) + songinfo->instrinfo.instruments[ins].instr_data.fine_tune;
 
 		if (restart_adsr) {
 			A2M_KeyON(chan);
 			//printf("CH %u >> note %u frequency %x \n", chan, note % 12, freq);
 		}
 
-		ch_data.freq_table[chan] |= 0x2000;
+		ch_data->freq_table[chan] |= 0x2000;
 	}
 
-	if (ch_data.ftune_table[chan] == -127)
-		ch_data.ftune_table[chan] = 0;
+	if (ch_data->ftune_table[chan] == -127)
+		ch_data->ftune_table[chan] = 0;
 
-	freq = freq + ch_data.ftune_table[chan];
+	freq = freq + ch_data->ftune_table[chan];
 	A2M_ChangeFrequency(chan, freq);
 }
 
@@ -1190,7 +1197,7 @@ static void A2M_NewProcessNote(A2M_TRACK_EVENT event, int chan) {
 	// This might delay even note-off
 	// Or put this after key_off?
 	if (notedelay_flag) {
-		ch_data.event_table[chan].note = event.note;
+		ch_data->event_table[chan].note = event.note;
 		return;
 	}
 
@@ -1198,13 +1205,13 @@ static void A2M_NewProcessNote(A2M_TRACK_EVENT event, int chan) {
 
 	if (event.note & 0x80) {// keyoff_flag
 		A2M_KeyOFF(chan);
-		SB_NoteOff(chan, ch_data.event_table[chan].note % 12, ch_data.event_table[chan].note / 12);
+		SB_NoteOff(chan, ch_data->event_table[chan].note % 12, ch_data->event_table[chan].note / 12);
 		return;
 	}
 
 	if (!tporta_flag) {
-		//A2M_OutputNote(event.note, ch_data.voice_table[chan], chan, true, no_swap_and_restart(event));
-		//A2M_OutputNote(event.note, ch_data.voice_table[chan], chan, true, true);
+		//A2M_OutputNote(event.note, ch_data->voice_table[chan], chan, true, no_swap_and_restart(event));
+		//A2M_OutputNote(event.note, ch_data->voice_table[chan], chan, true, true);
 		A2M_KeyON(chan);
 		SB_NoteOn(chan, event.note % 12, event.note / 12);
 		return;
@@ -1212,11 +1219,11 @@ static void A2M_NewProcessNote(A2M_TRACK_EVENT event, int chan) {
 
 	// if previous note was off'ed or restart_adsr enabled for channel
 	// and we are doing portamento to a new note
-	if (ch_data.event_table[chan].note & 0x80 || ch_data.portaFK_table[chan]) {//keyoff_flag
-		//A2M_OutputNote(ch_data.event_table[chan].note & ~0x80, ch_data.voice_table[chan], chan, false, true);//keyoff_flag
+	if (ch_data->event_table[chan].note & 0x80 || ch_data->portaFK_table[chan]) {//keyoff_flag
+		//A2M_OutputNote(ch_data->event_table[chan].note & ~0x80, ch_data->voice_table[chan], chan, false, true);//keyoff_flag
 		SB_NoteOn(chan, event.note % 12, event.note / 12);
 	} else {
-		ch_data.event_table[chan].note = event.note;
+		ch_data->event_table[chan].note = event.note;
 	}
 }
 
@@ -1236,41 +1243,41 @@ static void A2M_SetInsData(byte ins, int chan) {
 	//}
 
 	// Check if instrument changes from last instrument used
-	if ((ins != ch_data.event_table[chan].instr_def) || ch_data.reset_chan[chan]) {
+	if ((ins != ch_data->event_table[chan].instr_def) || ch_data->reset_chan[chan]) {
 
 		//printf("- CH %u >> Set instrument %u ", chan, ins);
-		ch_data.panning_table[chan] = !ch_data.pan_lock[chan] ? songinfo.instrinfo.instruments[ins].instr_data.panning : songinfo.lock_flags[chan] & 3;
+		ch_data->panning_table[chan] = !ch_data->pan_lock[chan] ? songinfo->instrinfo.instruments[ins].instr_data.panning : songinfo->lock_flags[chan] & 3;
 
-		if (ch_data.panning_table[chan] >= sizeof(_panning))
-			ch_data.panning_table[chan] = 0;// various code paths can lead to this value going out of the 0-2 range
+		if (ch_data->panning_table[chan] >= sizeof(_panning))
+			ch_data->panning_table[chan] = 0;// various code paths can lead to this value going out of the 0-2 range
 
 		// Set instrument data
-		A2M_SetInstrument(chan, songinfo.instrinfo.instruments[ins].instr_data);
+		A2M_SetInstrument(chan, songinfo->instrinfo.instruments[ins].instr_data);
 
 		// Update table
-		ch_data.fm_table[chan] = songinfo.instrinfo.instruments[ins].instr_data.fm;// Copy struct
+		ch_data->fm_table[chan] = songinfo->instrinfo.instruments[ins].instr_data.fm;// Copy struct
 
 		// Stop instr macro if resetting voice
-		if (!ch_data.reset_chan[chan])
-			ch_data.keyoff_loop[chan] = false;
+		if (!ch_data->reset_chan[chan])
+			ch_data->keyoff_loop[chan] = false;
 
-		if (ch_data.reset_chan[chan]) {
-			ch_data.voice_table[chan] = ins;
+		if (ch_data->reset_chan[chan]) {
+			ch_data->voice_table[chan] = ins;
 			//dbg reset_ins_volume(chan);
-			ch_data.reset_chan[chan] = false;
+			ch_data->reset_chan[chan] = false;
 		}
 
-		byte note = ch_data.event_table[chan].note & ~0x80;//keyoff_flag;
+		byte note = ch_data->event_table[chan].note & ~0x80;//keyoff_flag;
 		//note = A2M_NoteInRange(note) ? note : 0;
 
-		A2M_InitMacroTable(chan, note, ins, ch_data.freq_table[chan]);
+		A2M_InitMacroTable(chan, note, ins, ch_data->freq_table[chan]);
 	}
 
-	ch_data.voice_table[chan] = ins;
-	byte old_ins = ch_data.event_table[chan].instr_def;
-	ch_data.event_table[chan].instr_def = ins;
+	ch_data->voice_table[chan] = ins;
+	byte old_ins = ch_data->event_table[chan].instr_def;
+	ch_data->event_table[chan].instr_def = ins;
 
-	//if (!ch_data.volume_lock[chan] || (ins != old_ins))
+	//if (!ch_data->volume_lock[chan] || (ins != old_ins))
 	//	reset_ins_volume(chan);
 }
 
@@ -1299,7 +1306,7 @@ static void A2M_RawFillFromFMdata(byte *dst, A2M_FM_INST_DATA *fm) {
 
 static bool A2M_IsChanAddrDataEmpty(int chan) {
 	byte data[11];
-	A2M_RawFillFromFMdata(data, &ch_data.fm_table[chan]);
+	A2M_RawFillFromFMdata(data, &ch_data->fm_table[chan]);
 
 	return (
 			!data[4] &&
@@ -1320,7 +1327,7 @@ static void A2M_SetInsVolume(byte modulator, byte carrier, byte chan) {
 	// ** OPL3 emulation workaround **
 	// force muted instrument volume with missing channel ADSR data
 	// when there is additionally no FM-reg macro defined for this instrument
-	byte fmreg_length = songinfo.instrinfo.instruments[ch_data.voice_table[chan]].fmreg.length;
+	byte fmreg_length = songinfo->instrinfo.instruments[ch_data->voice_table[chan]].fmreg.length;
 
 	if (A2M_IsChanAddrDataEmpty(chan) && !fmreg_length) {
 		modulator = 63;
@@ -1331,39 +1338,39 @@ static void A2M_SetInsVolume(byte modulator, byte carrier, byte chan) {
 	// modulator_vol/carrier_vol have scaled but without overall_volume
 	if (modulator != 0xFF) {// Byte NULL
 		byte regm;
-		bool is_perc_chan = songinfo.instrinfo.instruments[ch_data.voice_table[chan]].instr_data.fm.connect;
+		bool is_perc_chan = songinfo->instrinfo.instruments[ch_data->voice_table[chan]].instr_data.fm.connect;
 
-		ch_data.fm_table[chan].volM = modulator;
+		ch_data->fm_table[chan].volM = modulator;
 
 		if (is_perc_chan) {// in [17..20]
-			if (songinfo.volume_scaling)
-				modulator = A2M_ScaleVolume(songinfo.instrinfo.instruments[ch_data.voice_table[chan]].instr_data.fm.volM, modulator);
+			if (songinfo->volume_scaling)
+				modulator = A2M_ScaleVolume(songinfo->instrinfo.instruments[ch_data->voice_table[chan]].instr_data.fm.volM, modulator);
 
-			modulator = A2M_ScaleVolume(modulator, /*scale_volume(*/ 63 - songinfo.global_volume /*, 63 - fade_out_volume)*/);
-			regm = A2M_ScaleVolume(modulator, 63 - songinfo.overall_volume) + (ch_data.fm_table[chan].kslM << 6);
+			modulator = A2M_ScaleVolume(modulator, /*scale_volume(*/ 63 - songinfo->global_volume /*, 63 - fade_out_volume)*/);
+			regm = A2M_ScaleVolume(modulator, 63 - songinfo->overall_volume) + (ch_data->fm_table[chan].kslM << 6);
 		} else {
-			regm = modulator + (ch_data.fm_table[chan].kslM << 6);
+			regm = modulator + (ch_data->fm_table[chan].kslM << 6);
 		}
 
 		A2M_WriteFM(0x40 + A2M_RegsOffsets(chan, 0), regm);
 
-		ch_data.modulator_vol[chan] = 63 - modulator;
+		ch_data->modulator_vol[chan] = 63 - modulator;
 	}
 
 	if (carrier != 0xFF) {
 		byte regc;
 
-		ch_data.fm_table[chan].volC = carrier;
+		ch_data->fm_table[chan].volC = carrier;
 
-		if (songinfo.volume_scaling)
-			carrier = A2M_ScaleVolume(songinfo.instrinfo.instruments[ch_data.voice_table[chan]].instr_data.fm.volC, carrier);
+		if (songinfo->volume_scaling)
+			carrier = A2M_ScaleVolume(songinfo->instrinfo.instruments[ch_data->voice_table[chan]].instr_data.fm.volC, carrier);
 
-		carrier = A2M_ScaleVolume(carrier, /*scale_volume(*/ 63 - songinfo.global_volume /*, 63 - fade_out_volume)*/);
-		regc = A2M_ScaleVolume(carrier, 63 - songinfo.overall_volume) + (ch_data.fm_table[chan].kslC << 6);
+		carrier = A2M_ScaleVolume(carrier, /*scale_volume(*/ 63 - songinfo->global_volume /*, 63 - fade_out_volume)*/);
+		regc = A2M_ScaleVolume(carrier, 63 - songinfo->overall_volume) + (ch_data->fm_table[chan].kslC << 6);
 
 		//opl3out(0x40 + c, regc);
 		A2M_WriteFM(0x40 + A2M_RegsOffsets(chan, 1), regc);
-		ch_data.carrier_vol[chan] = 63 - carrier;
+		ch_data->carrier_vol[chan] = 63 - carrier;
 	}
 }
 
@@ -1374,7 +1381,7 @@ static inline word A2M_Max(word value, word maximum) {
 static void A2M_UpdateCarrierAdsrw(int chan) {
 	word c = A2M_RegsOffsets(chan, 1);
 	byte data[11];
-	A2M_RawFillFromFMdata(data, ch_data.fm_table);
+	A2M_RawFillFromFMdata(data, ch_data->fm_table);
 
 	//opl3out(0x60 + c, data[5]);
 	A2M_WriteFM(0x60 + c - 1, data[5]);
@@ -1383,10 +1390,10 @@ static void A2M_UpdateCarrierAdsrw(int chan) {
 }
 
 static void A2M_SetGlobalVolume(void) {
-	for (int chan = 0; chan < songinfo.nm_tracks; chan++) {
-		if (ch_data.carrier_vol[chan] || ch_data.modulator_vol[chan]) {
-			byte instr_fm_connect = songinfo.instrinfo.instruments[ch_data.voice_table[chan]].instr_data.fm.connect;
-			A2M_SetInsVolume(instr_fm_connect ? ch_data.fm_table[chan].volM : 0xFF, ch_data.fm_table[chan].volC, chan);
+	for (int chan = 0; chan < songinfo->nm_tracks; chan++) {
+		if (ch_data->carrier_vol[chan] || ch_data->modulator_vol[chan]) {
+			byte instr_fm_connect = songinfo->instrinfo.instruments[ch_data->voice_table[chan]].instr_data.fm.connect;
+			A2M_SetInsVolume(instr_fm_connect ? ch_data->fm_table[chan].volM : 0xFF, ch_data->fm_table[chan].volC, chan);
 		}
 	}
 }
@@ -1431,168 +1438,168 @@ static void A2M_ProcessEffects(Song *song, A2M_TRACK_EVENT event, int slot, int 
 	byte def = event.eff[slot].def;
 	byte val = event.eff[slot].val;
 
-	ch_data.effect_table[slot][chan].def = def;
-	ch_data.effect_table[slot][chan].val = val;
+	ch_data->effect_table[slot][chan].def = def;
+	ch_data->effect_table[slot][chan].val = val;
 
 	switch (def) {
 		case A2M_EF_ARPEGGIO:// 0xy :: x = semitone offset for tick 1, y = semitone offset for tick 2
 			if (val != 0) {
-				ch_data.effect_table[slot][chan].def = A2M_EF_ARPEGGIO;
-				ch_data.effect_table[slot][chan].val = val;
+				ch_data->effect_table[slot][chan].def = A2M_EF_ARPEGGIO;
+				ch_data->effect_table[slot][chan].val = val;
 			}
 			break;
 		case A2M_EF_FREQ_SLIDE_UP:// 1xx - Freq. Slide up (pitch bend up speed)
-			ch_data.effect_table[slot][chan].def = A2M_EF_FREQ_SLIDE_UP;
-			ch_data.effect_table[slot][chan].val = val;
-			ch_data.fslide_table[slot][chan] = val;
+			ch_data->effect_table[slot][chan].def = A2M_EF_FREQ_SLIDE_UP;
+			ch_data->effect_table[slot][chan].val = val;
+			ch_data->fslide_table[slot][chan] = val;
 			break;
 		case A2M_EF_FREQ_SLIDE_DOWN://2xx - Freq. Slide down (pitch bend down speed)
-			ch_data.effect_table[slot][chan].def = A2M_EF_FREQ_SLIDE_DOWN;
-			ch_data.effect_table[slot][chan].val = val;
-			ch_data.fslide_table[slot][chan] = val;
+			ch_data->effect_table[slot][chan].def = A2M_EF_FREQ_SLIDE_DOWN;
+			ch_data->effect_table[slot][chan].val = val;
+			ch_data->fslide_table[slot][chan] = val;
 			break;
 		case A2M_EF_TONE_PORTAMENTO://3xx - Tone Portamento
-			ch_data.effect_table[slot][chan].def = A2M_EF_TONE_PORTAMENTO;
-			ch_data.effect_table[slot][chan].val = val;
-			ch_data.porta_table[slot][chan].freq = A2M_nFreq(event.note - 1) + songinfo.instrinfo.instruments[ch_data.event_table[chan].instr_def].instr_data.fine_tune;
-			ch_data.porta_table[slot][chan].speed = val;
+			ch_data->effect_table[slot][chan].def = A2M_EF_TONE_PORTAMENTO;
+			ch_data->effect_table[slot][chan].val = val;
+			ch_data->porta_table[slot][chan].freq = A2M_nFreq(event.note - 1) + songinfo->instrinfo.instruments[ch_data->event_table[chan].instr_def].instr_data.fine_tune;
+			ch_data->porta_table[slot][chan].speed = val;
 			break;
 		case A2M_EF_VIBRATO://4xy - Vibrato (speed/depth)
-			ch_data.effect_table[slot][chan].def = A2M_EF_VIBRATO;
-			ch_data.effect_table[slot][chan].val = val;
-			ch_data.vibr_table[slot][chan].fine = false;
-			ch_data.vibr_table[slot][chan].speed = val / 16;
-			ch_data.vibr_table[slot][chan].depth = val % 16;
+			ch_data->effect_table[slot][chan].def = A2M_EF_VIBRATO;
+			ch_data->effect_table[slot][chan].val = val;
+			ch_data->vibr_table[slot][chan].fine = false;
+			ch_data->vibr_table[slot][chan].speed = val / 16;
+			ch_data->vibr_table[slot][chan].depth = val % 16;
 			break;
 		case A2M_EF_TPORT_VOLSLIDE://5xy - 3xx + Vol Slide (up/down)
-			ch_data.effect_table[slot][chan].def = A2M_EF_TPORT_VOLSLIDE;
-			ch_data.effect_table[slot][chan].val = val;
+			ch_data->effect_table[slot][chan].def = A2M_EF_TPORT_VOLSLIDE;
+			ch_data->effect_table[slot][chan].val = val;
 			break;
 		case A2M_EF_VIB_VOLSLIDE://6xy - 4xy + Vol Slide (up/down)
-			ch_data.effect_table[slot][chan].def = A2M_EF_VIB_VOLSLIDE;
-			ch_data.effect_table[slot][chan].val = val;
-			ch_data.vibr_table[slot][chan].fine = false;
+			ch_data->effect_table[slot][chan].def = A2M_EF_VIB_VOLSLIDE;
+			ch_data->effect_table[slot][chan].val = val;
+			ch_data->vibr_table[slot][chan].fine = false;
 			break;
 		case A2M_EF_FREQ_SLIDE_UP_FINE://7xx & 8xx - Fine Freq.Slide up / down, respectively
-			ch_data.effect_table[slot][chan].def = A2M_EF_FREQ_SLIDE_UP_FINE;
-			ch_data.effect_table[slot][chan].val = val;
-			ch_data.fslide_table[slot][chan] = val;
+			ch_data->effect_table[slot][chan].def = A2M_EF_FREQ_SLIDE_UP_FINE;
+			ch_data->effect_table[slot][chan].val = val;
+			ch_data->fslide_table[slot][chan] = val;
 			break;
 		case A2M_EF_FREQ_SLIDE_DOWN_FINE://7xx & 8xx - Fine Freq.Slide up / down, respectively
-			ch_data.effect_table[slot][chan].def = A2M_EF_FREQ_SLIDE_DOWN_FINE;
-			ch_data.effect_table[slot][chan].val = val;
-			ch_data.fslide_table[slot][chan] = val;
+			ch_data->effect_table[slot][chan].def = A2M_EF_FREQ_SLIDE_DOWN_FINE;
+			ch_data->effect_table[slot][chan].val = val;
+			ch_data->fslide_table[slot][chan] = val;
 			break;
 		case A2M_EF_SET_MOD_VOL://9xx - Set modulator volume (Goes up to 3F, dec. 63)
-			ch_data.effect_table[slot][chan].def = A2M_EF_SET_MOD_VOL;
-			ch_data.effect_table[slot][chan].val = val;
+			ch_data->effect_table[slot][chan].def = A2M_EF_SET_MOD_VOL;
+			ch_data->effect_table[slot][chan].val = val;
 			break;
 		case A2M_EF_VOL_SLIDE://Axy - Vol.Slide(up / down)
-			ch_data.effect_table[slot][chan].def = A2M_EF_VOL_SLIDE;
-			ch_data.effect_table[slot][chan].val = val;
+			ch_data->effect_table[slot][chan].def = A2M_EF_VOL_SLIDE;
+			ch_data->effect_table[slot][chan].val = val;
 			break;
 		case A2M_EF_POS_JUMP://Bxx - Position Jump (xx = pattern number)
 			song->pattern_break = true;
 			for (int c = 1; c <= chan; c++) {
-				if ((ch_data.loop_table[c][song->current_line] != 0) &&
-					(ch_data.loop_table[c][song->current_line] != 0xFF))
+				if ((ch_data->loop_table[c][song->current_line] != 0) &&
+					(ch_data->loop_table[c][song->current_line] != 0xFF))
 					song->pattern_break = false;
 			}
 			if (song->pattern_break) {
-				ch_data.effect_table[slot][chan].def = A2M_EF_POS_JUMP;
-				ch_data.effect_table[slot][chan].val = val;
+				ch_data->effect_table[slot][chan].def = A2M_EF_POS_JUMP;
+				ch_data->effect_table[slot][chan].val = val;
 				song->next_line = 0xf0 + chan;//pattern_break_flag
 			}
 			break;
 		case A2M_EF_SET_INS_VOLUME://Cxx - Set instrument Volume (Goes up to 3F, dec. 63)
-			ch_data.effect_table[slot][chan].def = A2M_EF_SET_INS_VOLUME;
-			ch_data.effect_table[slot][chan].val = val;
+			ch_data->effect_table[slot][chan].def = A2M_EF_SET_INS_VOLUME;
+			ch_data->effect_table[slot][chan].val = val;
 			if (event.note == 0) {// Just silent current note, reset instrument so next note must set again the instrument and volume
-				ch_data.event_table[chan].instr_def = 0xff;
+				ch_data->event_table[chan].instr_def = 0xff;
 			}
 			break;
 		case A2M_EF_PATTERN_BREAK://Dxx - Pattern Break
-			ch_data.effect_table[slot][chan].def = A2M_EF_PATTERN_BREAK;
-			ch_data.effect_table[slot][chan].val = val;
+			ch_data->effect_table[slot][chan].def = A2M_EF_PATTERN_BREAK;
+			ch_data->effect_table[slot][chan].val = val;
 
 			//song.pattern_break = true;
-			//song.next_line = A2M_Max(val, songinfo.patt_len - 1);
+			//song.next_line = A2M_Max(val, songinfo->patt_len - 1);
 
 			/*for (int c = 0; c < chan; c++) {
-				if ((ch_data.loop_table[c][song.current_line] != 0) &&
-					(ch_data.loop_table[c][song.current_line] != 0xFF))
+				if ((ch_data->loop_table[c][song.current_line] != 0) &&
+					(ch_data->loop_table[c][song.current_line] != 0xFF))
 					song.pattern_break = false;
 			}*/
 
 			/*if (song.pattern_break) {
-				ch_data.effect_table[slot][chan].def = A2M_EF_POS_JUMP;
-				ch_data.effect_table[slot][chan].val = val;
-				song.next_line = A2M_Max(val, songinfo.patt_len - 1);
+				ch_data->effect_table[slot][chan].def = A2M_EF_POS_JUMP;
+				ch_data->effect_table[slot][chan].val = val;
+				song.next_line = A2M_Max(val, songinfo->patt_len - 1);
 			}*/
 			break;
 		case A2M_EF_SET_TEMPO://Exx - Set Tempo
-			ch_data.effect_table[slot][chan].def = A2M_EF_SET_TEMPO;
-			ch_data.effect_table[slot][chan].val = val;
+			ch_data->effect_table[slot][chan].def = A2M_EF_SET_TEMPO;
+			ch_data->effect_table[slot][chan].val = val;
 			break;
 		case A2M_EF_SET_SPEED://Fxx - Set Speed
-			ch_data.effect_table[slot][chan].def = A2M_EF_SET_SPEED;
-			ch_data.effect_table[slot][chan].val = val;
+			ch_data->effect_table[slot][chan].def = A2M_EF_SET_SPEED;
+			ch_data->effect_table[slot][chan].val = val;
 			break;
 		case A2M_EF_TPORT_FINE_VOL_SLIDE://Gxy - 3xx + Fine Vol. Slide (up/down)
-			ch_data.effect_table[slot][chan].def = A2M_EF_TPORT_FINE_VOL_SLIDE;
-			ch_data.effect_table[slot][chan].val = val;
+			ch_data->effect_table[slot][chan].def = A2M_EF_TPORT_FINE_VOL_SLIDE;
+			ch_data->effect_table[slot][chan].val = val;
 			break;
 		case A2M_EF_VIBR_FINE_VOL_SLIDE://Hxy - 4xy + Fine Vol. Slide (up/down)
-			ch_data.effect_table[slot][chan].def = A2M_EF_VIBR_FINE_VOL_SLIDE;
-			ch_data.effect_table[slot][chan].val = val;
+			ch_data->effect_table[slot][chan].def = A2M_EF_VIBR_FINE_VOL_SLIDE;
+			ch_data->effect_table[slot][chan].val = val;
 			break;
 		case A2M_EF_SET_CARRIER_VOL://Ixx - Set carrier vol.
-			ch_data.effect_table[slot][chan].def = A2M_EF_SET_CARRIER_VOL;
-			ch_data.effect_table[slot][chan].val = val;
+			ch_data->effect_table[slot][chan].def = A2M_EF_SET_CARRIER_VOL;
+			ch_data->effect_table[slot][chan].val = val;
 			break;
 		case A2M_EF_SET_WAVEFORM://Jxx - Set waveform
-			ch_data.effect_table[slot][chan].def = A2M_EF_SET_WAVEFORM;
-			ch_data.effect_table[slot][chan].val = val;
-			if (val / 16 <= 7) ch_data.fm_table[chan].wformC = val / 16;
-			if (val % 16 <= 7) ch_data.fm_table[chan].wformM = val % 16;
+			ch_data->effect_table[slot][chan].def = A2M_EF_SET_WAVEFORM;
+			ch_data->effect_table[slot][chan].val = val;
+			if (val / 16 <= 7) ch_data->fm_table[chan].wformC = val / 16;
+			if (val % 16 <= 7) ch_data->fm_table[chan].wformM = val % 16;
 			break;
 		case A2M_EF_VOL_SLIDE_FINE://Kxy - Fine vol. slide (up/down)
-			ch_data.effect_table[slot][chan].def = A2M_EF_VOL_SLIDE_FINE;
-			ch_data.effect_table[slot][chan].val = val;
+			ch_data->effect_table[slot][chan].def = A2M_EF_VOL_SLIDE_FINE;
+			ch_data->effect_table[slot][chan].val = val;
 			break;
 		case A2M_EF_RETRIG_NOTE://Lxx - Retrig. Note (speed)
-			ch_data.effect_table[slot][chan].def = A2M_EF_RETRIG_NOTE;
-			ch_data.effect_table[slot][chan].val = val;
-			ch_data.retrig_table[slot][chan] = 1;
+			ch_data->effect_table[slot][chan].def = A2M_EF_RETRIG_NOTE;
+			ch_data->effect_table[slot][chan].val = val;
+			ch_data->retrig_table[slot][chan] = 1;
 			break;
 		case A2M_EF_TREMOLO://Mxy - Tremolo (speed/depth)
-			ch_data.effect_table[slot][chan].def = A2M_EF_TREMOLO;
-			ch_data.effect_table[slot][chan].val = val;
-			ch_data.trem_table[slot][chan].speed = val / 16;
-			ch_data.trem_table[slot][chan].depth = val % 16;
-			ch_data.trem_table[slot][chan].fine = false;
+			ch_data->effect_table[slot][chan].def = A2M_EF_TREMOLO;
+			ch_data->effect_table[slot][chan].val = val;
+			ch_data->trem_table[slot][chan].speed = val / 16;
+			ch_data->trem_table[slot][chan].depth = val % 16;
+			ch_data->trem_table[slot][chan].fine = false;
 			break;
 		case A2M_EF_TREMOR://Nxy - Tremor (vol stays for x frames, fade to 0 for y frames)
-			ch_data.effect_table[slot][chan].def = A2M_EF_TREMOR;
-			ch_data.effect_table[slot][chan].val = val;
-			if (ch_data.last_effect[slot][chan].def != A2M_EF_TREMOR) {
-				ch_data.tremor_table[slot][chan].pos = 0;
-				ch_data.tremor_table[slot][chan].volM = ch_data.fm_table[chan].volM;
-				ch_data.tremor_table[slot][chan].volC = ch_data.fm_table[chan].volC;
+			ch_data->effect_table[slot][chan].def = A2M_EF_TREMOR;
+			ch_data->effect_table[slot][chan].val = val;
+			if (ch_data->last_effect[slot][chan].def != A2M_EF_TREMOR) {
+				ch_data->tremor_table[slot][chan].pos = 0;
+				ch_data->tremor_table[slot][chan].volM = ch_data->fm_table[chan].volM;
+				ch_data->tremor_table[slot][chan].volC = ch_data->fm_table[chan].volC;
 			}
 			break;
 		case A2M_EF_ARPG_VSLIDE:// Oxy - Arp + Vol. Slide (up/down)
-			ch_data.effect_table[slot][chan].def = A2M_EF_ARPG_VSLIDE;
-			ch_data.effect_table[slot][chan].val = val;
+			ch_data->effect_table[slot][chan].def = A2M_EF_ARPG_VSLIDE;
+			ch_data->effect_table[slot][chan].val = val;
 			break;
 		case A2M_EF_ARPG_VSLIDE_FINE:// Arp + Fine Vol. Slide (up/down)
-			ch_data.effect_table[slot][chan].def = A2M_EF_ARPG_VSLIDE_FINE;
-			ch_data.effect_table[slot][chan].val = val;
+			ch_data->effect_table[slot][chan].def = A2M_EF_ARPG_VSLIDE_FINE;
+			ch_data->effect_table[slot][chan].val = val;
 			break;
 		case A2M_EF_MULTI_RETRIG_NOTE://Qxy - Multi Retrig. Note (Consult AT2's help for more information on this)
-			ch_data.effect_table[slot][chan].def = A2M_EF_MULTI_RETRIG_NOTE;
-			ch_data.effect_table[slot][chan].val = val;
-			ch_data.retrig_table[slot][chan] = 1;
+			ch_data->effect_table[slot][chan].def = A2M_EF_MULTI_RETRIG_NOTE;
+			ch_data->effect_table[slot][chan].val = val;
+			ch_data->retrig_table[slot][chan] = 1;
 			break;
 	}
 }
@@ -1601,40 +1608,40 @@ static void A2M_PlayLine(Song *song) {
 	int current_patern;
 	A2M_TRACK_EVENT event;
 
-	current_patern = songinfo.pattern_order[song->current_pattern];
+	current_patern = songinfo->pattern_order[song->current_pattern];
 
 	//printf("Playing order %u, pattern %u, line %u\n", song.current_order, song.current_pattern, song.current_line);
 
 	// Check all channels
-	for (int chan = 0; chan < songinfo.nm_tracks; chan++) {
+	for (int chan = 0; chan < songinfo->nm_tracks; chan++) {
 		// save effect_table into last_effect
 		for (int slot = 0; slot < 2; slot++) {
 
 			// Save current effect as last executed effect
-			if (ch_data.effect_table[slot][chan].def | ch_data.effect_table[slot][chan].val) {
-				ch_data.last_effect[slot][chan].def = ch_data.effect_table[slot][chan].def;
-				ch_data.last_effect[slot][chan].val = ch_data.effect_table[slot][chan].val;
+			if (ch_data->effect_table[slot][chan].def | ch_data->effect_table[slot][chan].val) {
+				ch_data->last_effect[slot][chan].def = ch_data->effect_table[slot][chan].def;
+				ch_data->last_effect[slot][chan].val = ch_data->effect_table[slot][chan].val;
 			}
 
 			// Load queued effect if there is any
-			if (ch_data.glfsld_table[slot][chan].def | ch_data.glfsld_table[slot][chan].val) {
-				ch_data.effect_table[slot][chan].def = ch_data.glfsld_table[slot][chan].def;
-				ch_data.effect_table[slot][chan].val = ch_data.glfsld_table[slot][chan].val;
+			if (ch_data->glfsld_table[slot][chan].def | ch_data->glfsld_table[slot][chan].val) {
+				ch_data->effect_table[slot][chan].def = ch_data->glfsld_table[slot][chan].def;
+				ch_data->effect_table[slot][chan].val = ch_data->glfsld_table[slot][chan].val;
 			} else {
-				ch_data.effect_table[slot][chan].def = 0;
-				ch_data.effect_table[slot][chan].val = 0;
+				ch_data->effect_table[slot][chan].def = 0;
+				ch_data->effect_table[slot][chan].val = 0;
 			}
 		}
 		// Reset ftune table
-		ch_data.ftune_table[chan] = 0;
+		ch_data->ftune_table[chan] = 0;
 
 		// Get current line event
-		event = songinfo.pattern[current_patern].channel[chan].events[song->current_line];
+		event = songinfo->pattern[current_patern].channel[chan].events[song->current_line];
 
 
 		/*for (int slot = 0; slot < 2; slot++) {
-			ch_data.event_table[chan].eff[slot].def = event.eff[slot].def;
-			ch_data.event_table[chan].eff[slot].val = event.eff[slot].val;
+			ch_data->event_table[chan].eff[slot].def = event.eff[slot].def;
+			ch_data->event_table[chan].eff[slot].val = event.eff[slot].val;
 		}*/
 
 		A2M_SetInsData(event.instr_def, chan);
@@ -1649,11 +1656,11 @@ static void A2M_PlayLine(Song *song) {
 		// TODO: is that needed here?
 		/*for (int slot = 0; slot < 2; slot++) {
 			if (event.eff[slot].def | event.eff[slot].val) {
-				ch_data.event_table[chan].eff[slot].def = event.eff[slot].def;
-				ch_data.event_table[chan].eff[slot].val = event.eff[slot].val;
-			} else if (ch_data.glfsld_table[slot][chan].def == 0 && ch_data.glfsld_table[slot][chan].val == 0) {
-				ch_data.effect_table[slot][chan].def = 0;
-				ch_data.effect_table[slot][chan].val = 0;
+				ch_data->event_table[chan].eff[slot].def = event.eff[slot].def;
+				ch_data->event_table[chan].eff[slot].val = event.eff[slot].val;
+			} else if (ch_data->glfsld_table[slot][chan].def == 0 && ch_data->glfsld_table[slot][chan].val == 0) {
+				ch_data->effect_table[slot][chan].def = 0;
+				ch_data->effect_table[slot][chan].val = 0;
 			}
 		}*/
 
@@ -1673,22 +1680,22 @@ static void A2M_Arpeggio(int slot, int chan) {
 
 	uint16_t freq;
 
-	switch (ch_data.arpgg_table[slot][chan].state) {
+	switch (ch_data->arpgg_table[slot][chan].state) {
 		case 0:
-			freq = A2M_nFreq(ch_data.arpgg_table[slot][chan].note - 1);
+			freq = A2M_nFreq(ch_data->arpgg_table[slot][chan].note - 1);
 			break;
 		case 1:
-			freq = A2M_nFreq(ch_data.arpgg_table[slot][chan].note - 1 + ch_data.arpgg_table[slot][chan].add1);
+			freq = A2M_nFreq(ch_data->arpgg_table[slot][chan].note - 1 + ch_data->arpgg_table[slot][chan].add1);
 			break;
 		case 2:
-			freq = A2M_nFreq(ch_data.arpgg_table[slot][chan].note - 1 + ch_data.arpgg_table[slot][chan].add2);
+			freq = A2M_nFreq(ch_data->arpgg_table[slot][chan].note - 1 + ch_data->arpgg_table[slot][chan].add2);
 			break;
 		default:
 			freq = 0;
 	}
 
-	ch_data.arpgg_table[slot][chan].state = arpgg_state[ch_data.arpgg_table[slot][chan].state];
-	A2M_ChangeFrequency(chan, freq + songinfo.instrinfo.instruments[ch_data.event_table[chan].instr_def].instr_data.fine_tune);
+	ch_data->arpgg_table[slot][chan].state = arpgg_state[ch_data->arpgg_table[slot][chan].state];
+	A2M_ChangeFrequency(chan, freq + songinfo->instrinfo.instruments[ch_data->event_table[chan].instr_def].instr_data.fine_tune);
 }
 
 static void A2M_SlideVolumeDown(int chan, byte slide) {
@@ -1740,9 +1747,9 @@ static word A2M_CalcFreqShiftDown(word freq, word shift) {
 static void A2M_PortamentoUp(int chan, word slide, word limit) {
 	uint16_t freq;
 
-	if ((ch_data.freq_table[chan] & 0x1fff) == 0) return;
+	if ((ch_data->freq_table[chan] & 0x1fff) == 0) return;
 
-	freq = A2M_CalcFreqShiftUp(ch_data.freq_table[chan] & 0x1fff, slide);
+	freq = A2M_CalcFreqShiftUp(ch_data->freq_table[chan] & 0x1fff, slide);
 
 	A2M_ChangeFrequency(chan, freq <= limit ? freq : limit);
 }
@@ -1750,21 +1757,21 @@ static void A2M_PortamentoUp(int chan, word slide, word limit) {
 static void A2M_PortamentoDown(int chan, word slide, word limit) {
 	word freq;
 
-	if ((ch_data.freq_table[chan] & 0x1fff) == 0) return;
+	if ((ch_data->freq_table[chan] & 0x1fff) == 0) return;
 
-	freq = A2M_CalcFreqShiftDown(ch_data.freq_table[chan] & 0x1fff, slide);
+	freq = A2M_CalcFreqShiftDown(ch_data->freq_table[chan] & 0x1fff, slide);
 
 	A2M_ChangeFrequency(chan, freq >= limit ? freq : limit);
 }
 
 static void A2M_TonePortamento(int slot, int chan) {
-	word freq = ch_data.freq_table[chan] & 0x1fff;
-	word portafreq = ch_data.porta_table[slot][chan].freq & 0x1fff;
+	word freq = ch_data->freq_table[chan] & 0x1fff;
+	word portafreq = ch_data->porta_table[slot][chan].freq & 0x1fff;
 
 	if (freq > portafreq) {
-		A2M_PortamentoDown(chan, ch_data.porta_table[slot][chan].speed, portafreq);
+		A2M_PortamentoDown(chan, ch_data->porta_table[slot][chan].speed, portafreq);
 	} else if (freq < portafreq) {
-		A2M_PortamentoUp(chan, ch_data.porta_table[slot][chan].speed, portafreq);
+		A2M_PortamentoUp(chan, ch_data->porta_table[slot][chan].speed, portafreq);
 	}
 }
 
@@ -1782,30 +1789,30 @@ static void A2M_Vibrato(int slot, int chan) {
 	uint16_t freq, slide;
 	uint8_t direction;
 
-	freq = ch_data.freq_table[chan];
+	freq = ch_data->freq_table[chan];
 
-	ch_data.vibr_table[slot][chan].pos += ch_data.vibr_table[slot][chan].speed;
-	slide = A2M_CalcVibratoShift(ch_data.vibr_table[slot][chan].depth, ch_data.vibr_table[slot][chan].pos);
-	direction = ch_data.vibr_table[slot][chan].pos & 0x20;
+	ch_data->vibr_table[slot][chan].pos += ch_data->vibr_table[slot][chan].speed;
+	slide = A2M_CalcVibratoShift(ch_data->vibr_table[slot][chan].depth, ch_data->vibr_table[slot][chan].pos);
+	direction = ch_data->vibr_table[slot][chan].pos & 0x20;
 
 	if (direction == 0)
 		A2M_PortamentoDown(chan, slide, A2M_nFreq(0));
 	else
 		A2M_PortamentoUp(chan, slide, A2M_nFreq(12 * 8 + 1));
 
-	ch_data.freq_table[chan] = freq;
+	ch_data->freq_table[chan] = freq;
 }
 
 static void A2M_Tremolo(int slot, int chan) {
 	word slide;
 	byte direction;
 
-	byte volM = ch_data.fm_table[chan].volM;
-	byte volC = ch_data.fm_table[chan].volC;
+	byte volM = ch_data->fm_table[chan].volM;
+	byte volC = ch_data->fm_table[chan].volC;
 
-	ch_data.trem_table[slot][chan].pos += ch_data.trem_table[slot][chan].speed;
-	slide = A2M_CalcVibratoShift(ch_data.trem_table[slot][chan].depth, ch_data.trem_table[slot][chan].pos);
-	direction = ch_data.trem_table[slot][chan].pos & 0x20;
+	ch_data->trem_table[slot][chan].pos += ch_data->trem_table[slot][chan].speed;
+	slide = A2M_CalcVibratoShift(ch_data->trem_table[slot][chan].depth, ch_data->trem_table[slot][chan].pos);
+	direction = ch_data->trem_table[slot][chan].pos & 0x20;
 
 	if (direction == 0)
 		A2M_SlideVolumeDown(chan, slide);
@@ -1813,15 +1820,15 @@ static void A2M_Tremolo(int slot, int chan) {
 		A2M_SlideVolumeUp(chan, slide);
 
 	// is this needed?
-	ch_data.fm_table[chan].volM = volM;
-	ch_data.fm_table[chan].volC = volC;
+	ch_data->fm_table[chan].volM = volM;
+	ch_data->fm_table[chan].volC = volC;
 }
 
 /** A2M_UpdateEffectsSlot :: 
  */
 void A2M_UpdateEffectsSlot(Song *song, int slot, int chan) {
-	byte def = ch_data.effect_table[slot][chan].def;
-	byte val = ch_data.effect_table[slot][chan].val;
+	byte def = ch_data->effect_table[slot][chan].def;
+	byte val = ch_data->effect_table[slot][chan].val;
 
 	switch (def) {
 		case A2M_EF_ARPEGGIO:
@@ -1838,7 +1845,7 @@ void A2M_UpdateEffectsSlot(Song *song, int slot, int chan) {
 			A2M_TonePortamento(slot, chan);
 			break;
 		case A2M_EF_VIBRATO:
-			if (!ch_data.vibr_table[slot][chan].fine)
+			if (!ch_data->vibr_table[slot][chan].fine)
 				A2M_Vibrato(slot, chan);
 			break;
 		case A2M_EF_TPORT_VOLSLIDE:
@@ -1847,16 +1854,16 @@ void A2M_UpdateEffectsSlot(Song *song, int slot, int chan) {
 			break;
 		case A2M_EF_VIB_VOLSLIDE:
 			A2M_VolumeSlide(chan, val / 16, val % 16);
-			if (!ch_data.vibr_table[slot][chan].fine)
+			if (!ch_data->vibr_table[slot][chan].fine)
 				A2M_Vibrato(slot, chan);
 			break;
 		case A2M_EF_FREQ_SLIDE_UP_FINE:
-			A2M_PortamentoUp(chan, ch_data.fslide_table[slot][chan], A2M_nFreq(12 * 8 + 1));
+			A2M_PortamentoUp(chan, ch_data->fslide_table[slot][chan], A2M_nFreq(12 * 8 + 1));
 			A2M_VolumeSlide(chan, val / 16, val % 16);
 			break;
 
 		case A2M_EF_FREQ_SLIDE_DOWN_FINE:
-			A2M_PortamentoDown(chan, ch_data.fslide_table[slot][chan], A2M_nFreq(0));
+			A2M_PortamentoDown(chan, ch_data->fslide_table[slot][chan], A2M_nFreq(0));
 			A2M_VolumeSlide(chan, val / 16, val % 16);
 			break;
 		case A2M_EF_SET_MOD_VOL://9xx - Set modulator volume (Goes up to 3F, dec. 63)
@@ -1868,12 +1875,12 @@ void A2M_UpdateEffectsSlot(Song *song, int slot, int chan) {
 		case A2M_EF_POS_JUMP://Bxx - Position Jump (xx = pattern number)
 			break;
 		case A2M_EF_SET_INS_VOLUME:
-			//if (songinfo.percussion_mode && ((chan >= 16) && (chan <= 19))) {//  in [17..20]
-			if (songinfo.percussion_mode) {//  in [17..20]
+			//if (songinfo->percussion_mode && ((chan >= 16) && (chan <= 19))) {//  in [17..20]
+			if (songinfo->percussion_mode) {//  in [17..20]
 				//printf("CH %u >> set ins volume percussion, note %u \n", chan, event.note);
 				A2M_SetInsVolume(63 - val, 0xFF, chan);
 				//A2M_SetInsVolume(val, 0xFF, chan);
-			} else if (songinfo.instrinfo.instruments[ch_data.voice_table[chan]].instr_data.fm.connect == 0) {
+			} else if (songinfo->instrinfo.instruments[ch_data->voice_table[chan]].instr_data.fm.connect == 0) {
 				//printf("CH %u >> set ins volume connect 0, note %u \n", chan, event.note);
 				A2M_SetInsVolume(0xFF, 63 - val, chan);
 				//A2M_SetInsVolume(0xFF, val, chan);
@@ -1885,7 +1892,7 @@ void A2M_UpdateEffectsSlot(Song *song, int slot, int chan) {
 			break;
 		case A2M_EF_PATTERN_BREAK:
 			song->pattern_break = true;
-			song->next_line = A2M_Max(val, songinfo.patt_len - 1);
+			song->next_line = A2M_Max(val, songinfo->patt_len - 1);
 			song->next_line = song->next_line | A2M_PATTERN_BREAK_FLAG;
 			break;
 		case A2M_EF_SET_TEMPO:
@@ -1898,7 +1905,7 @@ void A2M_UpdateEffectsSlot(Song *song, int slot, int chan) {
 			A2M_TonePortamento(slot, chan);
 			break;
 		case A2M_EF_VIBR_FINE_VOL_SLIDE:
-			if (!ch_data.vibr_table[slot][chan].fine)
+			if (!ch_data->vibr_table[slot][chan].fine)
 				A2M_Vibrato(slot, chan);
 			break;
 		case A2M_EF_SET_CARRIER_VOL:
@@ -1906,11 +1913,11 @@ void A2M_UpdateEffectsSlot(Song *song, int slot, int chan) {
 			break;
 		case A2M_EF_SET_WAVEFORM:
 			if (val / 16 <= 7) {// in [0..7]
-				//ch_data.fm_table[chan].wformC = val / 16;
+				//ch_data->fm_table[chan].wformC = val / 16;
 				A2M_UpdateCarrierAdsrw(chan);
 			}
 			if (val % 16 <= 7) {// in [0..7]
-				//ch_data.fm_table[chan].wformM = val % 16;
+				//ch_data->fm_table[chan].wformM = val % 16;
 				A2M_UpdateCarrierAdsrw(chan);
 			}
 			break;
@@ -1918,31 +1925,31 @@ void A2M_UpdateEffectsSlot(Song *song, int slot, int chan) {
 			A2M_SetInsVolume(0xFF, 63 - val, chan);
 			break;
 		case A2M_EF_RETRIG_NOTE:
-			if (ch_data.retrig_table[slot][chan] >= val) {
-				ch_data.retrig_table[slot][chan] = 0;
-				A2M_OutputNote(ch_data.event_table[chan].note, ch_data.event_table[chan].instr_def, chan, true, true);
+			if (ch_data->retrig_table[slot][chan] >= val) {
+				ch_data->retrig_table[slot][chan] = 0;
+				A2M_OutputNote(ch_data->event_table[chan].note, ch_data->event_table[chan].instr_def, chan, true, true);
 			} else {
-				ch_data.retrig_table[slot][chan]++;
+				ch_data->retrig_table[slot][chan]++;
 			}
 			break;
 		case A2M_EF_TREMOLO:
-			if (!ch_data.trem_table[slot][chan].fine)
+			if (!ch_data->trem_table[slot][chan].fine)
 				A2M_Tremolo(slot, chan);
 			break;
 		case A2M_EF_TREMOR:
-			if (ch_data.tremor_table[slot][chan].pos >= 0) {
-				if ((ch_data.tremor_table[slot][chan].pos + 1) <= val / 16) {
-					ch_data.tremor_table[slot][chan].pos++;
+			if (ch_data->tremor_table[slot][chan].pos >= 0) {
+				if ((ch_data->tremor_table[slot][chan].pos + 1) <= val / 16) {
+					ch_data->tremor_table[slot][chan].pos++;
 				} else {
 					A2M_SlideVolumeDown(chan, 63);
-					ch_data.tremor_table[slot][chan].pos = -1;
+					ch_data->tremor_table[slot][chan].pos = -1;
 				}
 			} else {
-				if ((ch_data.tremor_table[slot][chan].pos - 1) >= -(val % 16)) {
-					ch_data.tremor_table[slot][chan].pos--;
+				if ((ch_data->tremor_table[slot][chan].pos - 1) >= -(val % 16)) {
+					ch_data->tremor_table[slot][chan].pos--;
 				} else {
 					//set_ins_volume(ch->tremor_table[slot][chan].volM, ch->tremor_table[slot][chan].volC, chan);
-					ch_data.tremor_table[slot][chan].pos = 1;
+					ch_data->tremor_table[slot][chan].pos = 1;
 				}
 			}
 			break;
@@ -1954,7 +1961,7 @@ void A2M_UpdateEffectsSlot(Song *song, int slot, int chan) {
 			A2M_Arpeggio(slot, chan);
 			break;
 		case A2M_EF_MULTI_RETRIG_NOTE:
-			if (ch_data.retrig_table[slot][chan] >= val / 16) {
+			if (ch_data->retrig_table[slot][chan] >= val / 16) {
 				switch (val % 16) {
 					case 0:
 						break;
@@ -2010,10 +2017,10 @@ void A2M_UpdateEffectsSlot(Song *song, int slot, int chan) {
 						break;
 				}
 
-				ch_data.retrig_table[slot][chan] = 0;
-				A2M_OutputNote(ch_data.event_table[chan].note, ch_data.event_table[chan].instr_def, chan, true, true);
+				ch_data->retrig_table[slot][chan] = 0;
+				A2M_OutputNote(ch_data->event_table[chan].note, ch_data->event_table[chan].instr_def, chan, true, true);
 			} else {
-				ch_data.retrig_table[slot][chan]++;
+				ch_data->retrig_table[slot][chan]++;
 			}
 			break;
 	}
@@ -2022,7 +2029,7 @@ void A2M_UpdateEffectsSlot(Song *song, int slot, int chan) {
 /** A2M_UpdateEffects ::
  */
 static void A2M_UpdateEffects(Song *song) {
-	for (int chan = 0; chan < songinfo.nm_tracks; chan++) {
+	for (int chan = 0; chan < songinfo->nm_tracks; chan++) {
 		A2M_UpdateEffectsSlot(song, 0, chan);
 		A2M_UpdateEffectsSlot(song, 1, chan);
 	}
@@ -2034,7 +2041,7 @@ static void A2M_UpdateEffects(Song *song) {
  */
 static void A2M_SetCurrentOrder(Song *song, byte new_order) {
 	song->current_order = new_order < 0x80 ? new_order : 0;
-	/*if (songinfo.pattern_order[song.current_order] < 0x80)
+	/*if (songinfo->pattern_order[song.current_order] < 0x80)
 		return;*/
 }
 
@@ -2049,11 +2056,11 @@ void A2M_UpdateSongPosition(Song *song) {
 	byte next_line, old_order, new_order;
 
 	// Just next line
-	if ((song->current_line < songinfo.patt_len) && !song->pattern_break) {
+	if ((song->current_line < songinfo->patt_len) && !song->pattern_break) {
 		song->current_line++;
 
 		// End of pattern
-		if (song->current_line > songinfo.patt_len - 1) {
+		if (song->current_line > songinfo->patt_len - 1) {
 			song->pattern_break = true;
 			song->next_line = 0 | A2M_PATTERN_BREAK_FLAG;
 		}
@@ -2067,8 +2074,8 @@ void A2M_UpdateSongPosition(Song *song) {
 
 		if (do_position_jump) {
 			// A bit overkill to clean arrays here, better do it in the end of pattern loop
-			memset(ch_data.loopbck_table, 0xff, sizeof(ch_data.loopbck_table));
-			memset(ch_data.loop_table, 0xff, sizeof(ch_data.loop_table));
+			memset(ch_data->loopbck_table, 0xff, sizeof(ch_data->loopbck_table));
+			memset(ch_data->loop_table, 0xff, sizeof(ch_data->loop_table));
 
 			// Bxx - order position jump
 			old_order = song->current_order;
@@ -2083,8 +2090,8 @@ void A2M_UpdateSongPosition(Song *song) {
 			next_line = song->next_line - A2M_PATTERN_LOOP_FLAG;
 			song->next_line = next_line;
 
-			/*if (ch_data.loop_table[chan][song->current_line] != 0)
-				ch_data.loop_table[chan][song->current_line]--;*/
+			/*if (ch_data->loop_table[chan][song->current_line] != 0)
+				ch_data->loop_table[chan][song->current_line]--;*/
 		}
 
 		if (do_next_pattern) {
@@ -2093,12 +2100,12 @@ void A2M_UpdateSongPosition(Song *song) {
 			song->next_line = 0;
 		}
 
-		if ((songinfo.pattern_order[song->current_order] > 0x7f)) {
+		if ((songinfo->pattern_order[song->current_order] > 0x7f)) {
 			song->current_order = 0;
 			song->next_line = 0;
 		}
 
-		song->current_pattern = songinfo.pattern_order[song->current_order];
+		song->current_pattern = songinfo->pattern_order[song->current_order];
 		song->current_line = song->next_line;
 
 		song->pattern_break = false;
@@ -2106,35 +2113,35 @@ void A2M_UpdateSongPosition(Song *song) {
 
 	// Speed update
 	if (song->speed_update && song->current_line == 0) {
-		song->speed = songinfo.speed;
+		song->speed = songinfo->speed;
 	}
 
 	// Clear table
-	for (int chan = 0; chan < songinfo.nm_tracks; chan++) {
-		ch_data.glfsld_table[0][chan].def = 0;
-		ch_data.glfsld_table[0][chan].val = 0;
-		ch_data.glfsld_table[1][chan].def = 0;
-		ch_data.glfsld_table[1][chan].val = 0;
+	for (int chan = 0; chan < songinfo->nm_tracks; chan++) {
+		ch_data->glfsld_table[0][chan].def = 0;
+		ch_data->glfsld_table[0][chan].val = 0;
+		ch_data->glfsld_table[1][chan].def = 0;
+		ch_data->glfsld_table[1][chan].val = 0;
 	}
 }
 
 static void global_volume_slide(byte up_speed, byte down_speed) {
 	if (up_speed != 0xFF)
-		songinfo.global_volume = A2M_Max(songinfo.global_volume + up_speed, 63);
+		songinfo->global_volume = A2M_Max(songinfo->global_volume + up_speed, 63);
 
 	if (down_speed != 0xFF) {
-		if (songinfo.global_volume >= down_speed)
-			songinfo.global_volume -= down_speed;
+		if (songinfo->global_volume >= down_speed)
+			songinfo->global_volume -= down_speed;
 		else
-			songinfo.global_volume = 0;
+			songinfo->global_volume = 0;
 	}
 
 	A2M_SetGlobalVolume();
 }
 
 static void A2M_UpdateExtraFineEffectsSlot(int slot, int chan) {
-	uint8_t def = ch_data.effect_table[slot][chan].def;
-	uint8_t val = ch_data.effect_table[slot][chan].val;
+	uint8_t def = ch_data->effect_table[slot][chan].def;
+	uint8_t val = ch_data->effect_table[slot][chan].val;
 
 	switch (def) {
 		case ef_Extended2:
@@ -2170,16 +2177,16 @@ static void A2M_UpdateExtraFineEffectsSlot(int slot, int chan) {
 			A2M_Arpeggio(slot, chan);
 			break;
 		case ef_ExtraFineVibrato:
-			if (!ch_data.vibr_table[slot][chan].fine) A2M_Vibrato(slot, chan);
+			if (!ch_data->vibr_table[slot][chan].fine) A2M_Vibrato(slot, chan);
 			break;
 		case ef_ExtraFineTremolo:
-			if (!ch_data.trem_table[slot][chan].fine) A2M_Tremolo(slot, chan);
+			if (!ch_data->trem_table[slot][chan].fine) A2M_Tremolo(slot, chan);
 			break;
 	}
 }
 
 static void A2M_UpdateExtraFineEffects() {
-	for (int chan = 0; chan < songinfo.nm_tracks; chan++) {
+	for (int chan = 0; chan < songinfo->nm_tracks; chan++) {
 		A2M_UpdateExtraFineEffectsSlot(0, chan);
 		A2M_UpdateExtraFineEffectsSlot(1, chan);
 	}
@@ -2293,9 +2300,9 @@ void A2M_TimerHandler(Song *song) {
 		song->macro_ticklooper++;
 
 		// Reset ticks
-		if (song->ticklooper >= (TIMER_AUDIO_TIME / songinfo.tempo))//IRQ_freq/tempo
+		if (song->ticklooper >= (TIMER_AUDIO_TIME / songinfo->tempo))//IRQ_freq/tempo
 			song->ticklooper = 0;
-		if (song->macro_ticklooper >= (TIMER_AUDIO_TIME / (songinfo.tempo * song->macro_speedup)))//IRQ_freq / (tempo * _macro_speedup()))
+		if (song->macro_ticklooper >= (TIMER_AUDIO_TIME / (songinfo->tempo * song->macro_speedup)))//IRQ_freq / (tempo * _macro_speedup()))
 			song->macro_ticklooper = 0;
 	} else {
 		song->stop = true;

@@ -43,7 +43,7 @@
 #define MAP_ANIMATION_SPEED 15
 
 /// MAP.C ///
-extern Map map;
+extern Map *map;
 void MAP_Init(void);
 void MAP_LoadTileset(const char *filename, const char *subfile, Tileset *tset, int size);
 void MAP_LoadMap(const char *dat_file_map, int width, int height, const char *dat_file_tileset, const char *asset_file_back, const char *asset_file_fore, const char *asset_file_mask, int back_tileset_size, int fore_tileset_size, int mask_tileset_size);

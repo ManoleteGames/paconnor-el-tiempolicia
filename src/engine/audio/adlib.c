@@ -1,9 +1,10 @@
 #include "../engine.h"
 #include "adlib.h"
 
-static Adlib adlib;
+Adlib *adlib;
 
 void ADLIB_Init(void) {
+	adlib = MM_PushChunk(sizeof(Adlib), CT_ENGINE);
 }
 
 void ADLIB_Shutdown(void) {
@@ -28,9 +29,9 @@ void ADLIB_Handler(SoundEffect *sound, Song *song) {
 		song->macro_ticklooper++;
 
 		// Reset ticks
-		if (song->ticklooper >= (TIMER_AUDIO_TIME / songinfo.tempo))//IRQ_freq/tempo
+		if (song->ticklooper >= (TIMER_AUDIO_TIME / songinfo->tempo))//IRQ_freq/tempo
 			song->ticklooper = 0;
-		if (song->macro_ticklooper >= (TIMER_AUDIO_TIME / (songinfo.tempo * song->macro_speedup)))//IRQ_freq / (tempo * _macro_speedup()))
+		if (song->macro_ticklooper >= (TIMER_AUDIO_TIME / (songinfo->tempo * song->macro_speedup)))//IRQ_freq / (tempo * _macro_speedup()))
 			song->macro_ticklooper = 0;
 	} else {
 		song->stop = true;
@@ -69,8 +70,8 @@ bool ADLIB_CheckFMInstalled(void) {
 	ADLIB_WriteFM(4, 0x60);
 	ADLIB_WriteFM(4, 0x80);
 	if ((value_a & 0xE0) == 0 && (value_b & 0xE0) == 0xC0) {
-		adlib.opl = 2;
-		if ((inportb(ADLIB_FM_PORT) & 0x06) == 0) { adlib.opl = 3; }
+		adlib->opl = 2;
+		if ((inportb(ADLIB_FM_PORT) & 0x06) == 0) { adlib->opl = 3; }
 		return true;
 	} else {
 		return false;
@@ -87,8 +88,8 @@ void ADLIB_LoadSong(Song *song, int number) {
 			song->loaded = true;
 			song->current_line = 0;
 			song->current_order = 0;
-			song->speed = songinfo.speed;
-			song->tempo = songinfo.tempo;
+			song->speed = songinfo->speed;
+			song->tempo = songinfo->tempo;
 			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, song->tempo);
 			break;
 		case 2:
@@ -96,8 +97,8 @@ void ADLIB_LoadSong(Song *song, int number) {
 			song->loaded = true;
 			song->current_line = 0;
 			song->current_order = 0;
-			song->speed = songinfo.speed;
-			song->tempo = songinfo.tempo;
+			song->speed = songinfo->speed;
+			song->tempo = songinfo->tempo;
 			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, song->tempo);
 			break;
 		case 3:
@@ -105,8 +106,8 @@ void ADLIB_LoadSong(Song *song, int number) {
 			song->loaded = true;
 			song->current_line = 0;
 			song->current_order = 0;
-			song->speed = songinfo.speed;
-			song->tempo = songinfo.tempo;
+			song->speed = songinfo->speed;
+			song->tempo = songinfo->tempo;
 			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, song->tempo);
 			break;
 		case 4:

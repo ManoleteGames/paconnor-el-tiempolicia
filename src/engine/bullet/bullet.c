@@ -1,30 +1,34 @@
 #include "../engine.h"
 #include "bullet.h"
 
-Bullet bullet[BULLET_MAX_BULLETS];
+Bullet *bullet;
 int bullet_counter;
+
+void BULLET_Init(void) {
+	bullet = MM_PushChunk(sizeof(Bullet) * BULLET_MAX_BULLETS, CT_ENGINE);
+}
 
 /** BULLET :: Initialize bullet
  */
-void BULLET_InitBullet(int graphics_id, int entity_id, int width, int height, int source_x, int source_y, int target_x, int target_y, int accuracy, int max_distance, int speed, int damage) {
-	int i, j;
+void BULLET_LoadBullet(int graphics_id, int entity_id, int width, int height, int source_x, int source_y, int target_x, int target_y, int accuracy, int max_distance, int speed, int damage) {
+	int i;
 	int number;
 	int dx, dy;
 	int distance;
 	int sprite_slot;
 
 	// Search free bullet slot
-	number = 0;
-	for (j = 0; j < BULLET_MAX_BULLETS; j++) {
-		if (!bullet[j].loaded) {
-			number = j;
+	number = 999;
+	for (i = 0; i < BULLET_MAX_BULLETS; i++) {
+		if (!bullet[i].loaded) {
+			number = i;
 			break;
 		}
 	}
 
 	// Check if max bullets is reached
-	if (number == BULLET_MAX_BULLETS - 1) {
-		Error("BULLET_InitBullet function error", "Max number of bullets", "", ERROR_SYSTEM);
+	if (number == 999) {
+		Error("BULLET_LoadBullet function error", "Max number of bullets", "", ERROR_SYSTEM);
 	}
 
 	bullet[number].pos_x = source_x;
@@ -86,8 +90,8 @@ void BULLET_InitBullet(int graphics_id, int entity_id, int width, int height, in
 	//	bullet[number].steps = max_distance;
 
 	sprite_slot = GFX_FindEmptySpriteSlot();
-	if (sprite_slot == -1) {
-		sprintf(engine.system_error_message1, "BULLET_InitBullet function error");
+	if (gfx_sprite_stack[sprite_slot].loaded || (sprite_slot == -1)) {
+		sprintf(engine.system_error_message1, "BULLET_LoadBullet function error");
 		sprintf(engine.system_error_message2, "No empty sprite slot available");
 		sprintf(engine.system_error_message3, " ");
 		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_GRAPHICS);
@@ -227,22 +231,22 @@ int BULLET_CheckBulletColission(int number) {
 
 	/////// ACTOR COLISSIONS /////////////
 	collision_detected = true;
-	if (!actor.action_dead && gfx_sprite_stack[bullet[number].sprite_num].entity_id != ENTITY_ID_ACTOR_BULLET) {
-		if (point1_x > actor.pos_x + actor.hit_area.points[1][0]) collision_detected = false;// Out of left side
-		if (point2_x < actor.pos_x + actor.hit_area.points[0][0]) collision_detected = false;//  Out of right side
-		if (point3_y < actor.pos_y + actor.hit_area.points[0][1]) collision_detected = false;//  Out of top side
-		if (point1_y > actor.pos_y + actor.hit_area.points[2][1]) collision_detected = false;//  Out of bottom side
-		if (collision_detected) return gfx_sprite_stack[actor.sprite_num].id;
+	if (!actor->action_dead && gfx_sprite_stack[bullet[number].sprite_num].entity_id != ENTITY_ID_ACTOR_BULLET) {
+		if (point1_x > actor->pos_x + actor->hit_area.points[1][0]) collision_detected = false;// Out of left side
+		if (point2_x < actor->pos_x + actor->hit_area.points[0][0]) collision_detected = false;//  Out of right side
+		if (point3_y < actor->pos_y + actor->hit_area.points[0][1]) collision_detected = false;//  Out of top side
+		if (point1_y > actor->pos_y + actor->hit_area.points[2][1]) collision_detected = false;//  Out of bottom side
+		if (collision_detected) return gfx_sprite_stack[actor->sprite_num].id;
 	}
 
 	/////// BOSS COLISSIONS /////////////
 	collision_detected = true;
-	if (!boss.action_dead && gfx_sprite_stack[bullet[number].sprite_num].entity_id != ENTITY_ID_ENEMY_BULLET) {
-		if (point1_x > boss.pos_x + boss.hit_area.points[1][0]) collision_detected = false;// Out of left side
-		if (point2_x < boss.pos_x + boss.hit_area.points[0][0]) collision_detected = false;//  Out of right side
-		if (point3_y < boss.pos_y + boss.hit_area.points[0][1]) collision_detected = false;//  Out of top side
-		if (point1_y > boss.pos_y + boss.hit_area.points[2][1]) collision_detected = false;//  Out of bottom side
-		if (collision_detected) return gfx_sprite_stack[boss.sprite_num].id;
+	if (!boss->action_dead && gfx_sprite_stack[bullet[number].sprite_num].entity_id != ENTITY_ID_ENEMY_BULLET) {
+		if (point1_x > boss->pos_x + boss->hit_area.points[1][0]) collision_detected = false;// Out of left side
+		if (point2_x < boss->pos_x + boss->hit_area.points[0][0]) collision_detected = false;//  Out of right side
+		if (point3_y < boss->pos_y + boss->hit_area.points[0][1]) collision_detected = false;//  Out of top side
+		if (point1_y > boss->pos_y + boss->hit_area.points[2][1]) collision_detected = false;//  Out of bottom side
+		if (collision_detected) return gfx_sprite_stack[boss->sprite_num].id;
 	}
 
 	/////// BACKGROUND COLISSIONS ///////////
@@ -307,13 +311,14 @@ void BULLET_Update(void) {
 					bullet[i].pos_y = (bullet[i].y_FP >> FP);
 
 					// Update sprite screen pos
-					gfx_sprite_stack[bullet[i].sprite_num].screen_pos_x = bullet[i].pos_x - camera.pos_x;
-					gfx_sprite_stack[bullet[i].sprite_num].screen_pos_y = bullet[i].pos_y - camera.pos_y;
+					gfx_sprite_stack[bullet[i].sprite_num].screen_pos_x = bullet[i].pos_x - camera->pos_x;
+					gfx_sprite_stack[bullet[i].sprite_num].screen_pos_y = bullet[i].pos_y - camera->pos_y;
 
 					if (gfx_sprite_stack[bullet[i].sprite_num].screen_pos_x < 0) BULLET_UnloadBullet(i);
 					if (gfx_sprite_stack[bullet[i].sprite_num].screen_pos_x > CAM_VISIBLE_WIDTH) BULLET_UnloadBullet(i);
 					if (gfx_sprite_stack[bullet[i].sprite_num].screen_pos_y < 0) BULLET_UnloadBullet(i);
 					if (gfx_sprite_stack[bullet[i].sprite_num].screen_pos_y > CAM_VISIBLE_HEIGHT) BULLET_UnloadBullet(i);
+					if (!bullet[i].loaded) return;
 
 					// Check if hits something breakable
 					bullet[i].hit_on = BULLET_CheckHitBreakableTile(i);
@@ -324,89 +329,89 @@ void BULLET_Update(void) {
 							switch (tile_type) {
 								case 1:// breaking tile. Set colission data to half colission and breakable to null
 									tile_number = MAP_GetTileNumber(bullet[i].pos_x, bullet[i].pos_y);
-									map.layer[MAP_ANIM_LAYER][tile_number] = 0;
+									map->layer[MAP_ANIM_LAYER][tile_number] = 0;
 									// Get map tile position on screen
-									tile_screen_x = ((bullet[i].pos_x >> 4) << 4) - camera.pos_x;
-									tile_screen_y = ((bullet[i].pos_y >> 4) << 4) - camera.pos_y;
+									tile_screen_x = ((bullet[i].pos_x >> 4) << 4) - camera->pos_x;
+									tile_screen_y = ((bullet[i].pos_y >> 4) << 4) - camera->pos_y;
 									// Get map tile position on video buffer
-									tile_x = camera.pos_abs_x + tile_screen_x;
-									if (tile_x >= video.map_buffer_width) {
-										tile_x = tile_x - video.map_buffer_width;
+									tile_x = camera->pos_abs_x + tile_screen_x;
+									if (tile_x >= video->map_buffer_width) {
+										tile_x = tile_x - video->map_buffer_width;
 									}
-									tile_y = camera.pos_abs_y + tile_screen_y;
-									if (tile_y >= video.map_buffer_height) {
-										tile_y = tile_y - video.map_buffer_height;
+									tile_y = camera->pos_abs_y + tile_screen_y;
+									if (tile_y >= video->map_buffer_height) {
+										tile_y = tile_y - video->map_buffer_height;
 									}
 									// redraw tile
-									tile_data = map.layer[MAP_BACKGROUND_LAYER][tile_number];
+									tile_data = map->layer[MAP_BACKGROUND_LAYER][tile_number];
 									tileset_index = tile_data << 8;
-									MAP_DrawToVideoBuffer(tile_x, tile_y, MAP_TILE_WIDTH, MAP_TILE_HEIGHT, &map.layer_tiles[MAP_BACKGROUND_LAYER].buffer[tileset_index], video.map_buffer[MAP_BACKGROUND_LAYER]);
+									MAP_DrawToVideoBuffer(tile_x, tile_y, MAP_TILE_WIDTH, MAP_TILE_HEIGHT, &map->layer_tiles[MAP_BACKGROUND_LAYER].buffer[tileset_index], video->map_buffer[MAP_BACKGROUND_LAYER]);
 									GFX_SetDefaultAnimation(bullet[i].sprite_num, false, false, 3);
 									break;
 								case 4:// breaking tile with electric effect. Set colission data to half colission and breakable to null
 									tile_number = MAP_GetTileNumber(bullet[i].pos_x, bullet[i].pos_y);
-									map.layer[MAP_ANIM_LAYER][tile_number] = 0;
+									map->layer[MAP_ANIM_LAYER][tile_number] = 0;
 									// Get map tile position on screen
-									tile_screen_x = ((bullet[i].pos_x >> 4) << 4) - camera.pos_x;
-									tile_screen_y = ((bullet[i].pos_y >> 4) << 4) - camera.pos_y;
+									tile_screen_x = ((bullet[i].pos_x >> 4) << 4) - camera->pos_x;
+									tile_screen_y = ((bullet[i].pos_y >> 4) << 4) - camera->pos_y;
 									// Get map tile position on video buffer
-									tile_x = camera.pos_abs_x + tile_screen_x;
-									if (tile_x >= video.map_buffer_width) {
-										tile_x = tile_x - video.map_buffer_width;
+									tile_x = camera->pos_abs_x + tile_screen_x;
+									if (tile_x >= video->map_buffer_width) {
+										tile_x = tile_x - video->map_buffer_width;
 									}
-									tile_y = camera.pos_abs_y + tile_screen_y;
-									if (tile_y >= video.map_buffer_height) {
-										tile_y = tile_y - video.map_buffer_height;
+									tile_y = camera->pos_abs_y + tile_screen_y;
+									if (tile_y >= video->map_buffer_height) {
+										tile_y = tile_y - video->map_buffer_height;
 									}
 									// redraw tile
-									tile_data = map.layer[MAP_BACKGROUND_LAYER][tile_number];
+									tile_data = map->layer[MAP_BACKGROUND_LAYER][tile_number];
 									tileset_index = tile_data << 8;
-									MAP_DrawToVideoBuffer(tile_x, tile_y, MAP_TILE_WIDTH, MAP_TILE_HEIGHT, &map.layer_tiles[MAP_BACKGROUND_LAYER].buffer[tileset_index], video.map_buffer[MAP_BACKGROUND_LAYER]);
+									MAP_DrawToVideoBuffer(tile_x, tile_y, MAP_TILE_WIDTH, MAP_TILE_HEIGHT, &map->layer_tiles[MAP_BACKGROUND_LAYER].buffer[tileset_index], video->map_buffer[MAP_BACKGROUND_LAYER]);
 									EFFECT_LoadEffect(ENTITY_ID_EMPTY, SPRITE_GRAPHICS_ID_ELECTRIC1, ((bullet[i].pos_x >> 4) << 4) + 2, ((bullet[i].pos_y >> 4) << 4) + 2, true, 0, false, false, 5);
 									GFX_SetDefaultAnimation(bullet[i].sprite_num, false, false, 3);
 									break;
 								case 5:// break tile with fire. Set colission data to half colission and breakable to null
 									tile_number = MAP_GetTileNumber(bullet[i].pos_x, bullet[i].pos_y);
-									map.layer[MAP_ANIM_LAYER][tile_number] = 0;
+									map->layer[MAP_ANIM_LAYER][tile_number] = 0;
 									// Get map tile position on screen
-									tile_screen_x = ((bullet[i].pos_x >> 4) << 4) - camera.pos_x;
-									tile_screen_y = ((bullet[i].pos_y >> 4) << 4) - camera.pos_y;
+									tile_screen_x = ((bullet[i].pos_x >> 4) << 4) - camera->pos_x;
+									tile_screen_y = ((bullet[i].pos_y >> 4) << 4) - camera->pos_y;
 									// Get map tile position on video buffer
-									tile_x = camera.pos_abs_x + tile_screen_x;
-									if (tile_x >= video.map_buffer_width) {
-										tile_x = tile_x - video.map_buffer_width;
+									tile_x = camera->pos_abs_x + tile_screen_x;
+									if (tile_x >= video->map_buffer_width) {
+										tile_x = tile_x - video->map_buffer_width;
 									}
-									tile_y = camera.pos_abs_y + tile_screen_y;
-									if (tile_y >= video.map_buffer_height) {
-										tile_y = tile_y - video.map_buffer_height;
+									tile_y = camera->pos_abs_y + tile_screen_y;
+									if (tile_y >= video->map_buffer_height) {
+										tile_y = tile_y - video->map_buffer_height;
 									}
 									// redraw tile
-									tile_data = map.layer[MAP_BACKGROUND_LAYER][tile_number];
+									tile_data = map->layer[MAP_BACKGROUND_LAYER][tile_number];
 									tileset_index = tile_data << 8;
-									MAP_DrawToVideoBuffer(tile_x, tile_y, MAP_TILE_WIDTH, MAP_TILE_HEIGHT, &map.layer_tiles[MAP_BACKGROUND_LAYER].buffer[tileset_index], video.map_buffer[MAP_BACKGROUND_LAYER]);
+									MAP_DrawToVideoBuffer(tile_x, tile_y, MAP_TILE_WIDTH, MAP_TILE_HEIGHT, &map->layer_tiles[MAP_BACKGROUND_LAYER].buffer[tileset_index], video->map_buffer[MAP_BACKGROUND_LAYER]);
 									EFFECT_LoadEffect(ENTITY_ID_EMPTY, SPRITE_GRAPHICS_ID_FIRE1, ((bullet[i].pos_x >> 4) << 4) + 2, ((bullet[i].pos_y >> 4) << 4) + 2, true, 0, false, false, 5);
 									GFX_SetDefaultAnimation(bullet[i].sprite_num, false, false, 3);
 
 									break;
 								case 6:// break tile with water. Set colission data to half colission and breakable to null
 									tile_number = MAP_GetTileNumber(bullet[i].pos_x, bullet[i].pos_y);
-									map.layer[MAP_ANIM_LAYER][tile_number] = 0;
+									map->layer[MAP_ANIM_LAYER][tile_number] = 0;
 									// Get map tile position on screen
-									tile_screen_x = ((bullet[i].pos_x >> 4) << 4) - camera.pos_x;
-									tile_screen_y = ((bullet[i].pos_y >> 4) << 4) - camera.pos_y;
+									tile_screen_x = ((bullet[i].pos_x >> 4) << 4) - camera->pos_x;
+									tile_screen_y = ((bullet[i].pos_y >> 4) << 4) - camera->pos_y;
 									// Get map tile position on video buffer
-									tile_x = camera.pos_abs_x + tile_screen_x;
-									if (tile_x >= video.map_buffer_width) {
-										tile_x = tile_x - video.map_buffer_width;
+									tile_x = camera->pos_abs_x + tile_screen_x;
+									if (tile_x >= video->map_buffer_width) {
+										tile_x = tile_x - video->map_buffer_width;
 									}
-									tile_y = camera.pos_abs_y + tile_screen_y;
-									if (tile_y >= video.map_buffer_height) {
-										tile_y = tile_y - video.map_buffer_height;
+									tile_y = camera->pos_abs_y + tile_screen_y;
+									if (tile_y >= video->map_buffer_height) {
+										tile_y = tile_y - video->map_buffer_height;
 									}
 									// redraw tile
-									tile_data = map.layer[MAP_BACKGROUND_LAYER][tile_number];
+									tile_data = map->layer[MAP_BACKGROUND_LAYER][tile_number];
 									tileset_index = tile_data << 8;
-									MAP_DrawToVideoBuffer(tile_x, tile_y, MAP_TILE_WIDTH, MAP_TILE_HEIGHT, &map.layer_tiles[MAP_BACKGROUND_LAYER].buffer[tileset_index], video.map_buffer[MAP_BACKGROUND_LAYER]);
+									MAP_DrawToVideoBuffer(tile_x, tile_y, MAP_TILE_WIDTH, MAP_TILE_HEIGHT, &map->layer_tiles[MAP_BACKGROUND_LAYER].buffer[tileset_index], video->map_buffer[MAP_BACKGROUND_LAYER]);
 									EFFECT_LoadEffect(ENTITY_ID_EMPTY, SPRITE_GRAPHICS_ID_WATER1, ((bullet[i].pos_x >> 4) << 4) + 2, ((bullet[i].pos_y >> 4) << 4) + 2, true, 0, false, false, 5);
 									GFX_SetDefaultAnimation(bullet[i].sprite_num, false, false, 3);
 
@@ -486,18 +491,18 @@ void BULLET_Update(void) {
 						case ENTITY_ID_ACTOR:
 							if (gfx_sprite_stack[bullet[i].sprite_num].entity_id == ENTITY_ID_ENEMY_BULLET) {
 								bullet[i].on_target = true;
-								actor.is_hit = true;
-								actor.hit_by = ENTITY_ID_ENEMY_BULLET;
-								actor.damage += bullet[i].damage;
+								actor->is_hit = true;
+								actor->hit_by = ENTITY_ID_ENEMY_BULLET;
+								actor->damage += bullet[i].damage;
 								GFX_SetDefaultAnimation(bullet[i].sprite_num, false, false, 3);
 							}
 							break;
 						case ENTITY_ID_BOSS:
 							if (gfx_sprite_stack[bullet[i].sprite_num].entity_id == ENTITY_ID_ACTOR_BULLET) {
 								bullet[i].on_target = true;
-								boss.is_hit = true;
-								boss.hit_by = ENTITY_ID_ACTOR_BULLET;
-								boss.damage += bullet[i].damage;
+								boss->is_hit = true;
+								boss->hit_by = ENTITY_ID_ACTOR_BULLET;
+								boss->damage += bullet[i].damage;
 								GFX_SetDefaultAnimation(bullet[i].sprite_num, false, false, 3);
 							}
 							break;
@@ -518,16 +523,14 @@ void BULLET_Update(void) {
 				bullet[i].damage = 0;
 
 				// Update sprite screen pos
-				gfx_sprite_stack[bullet[i].sprite_num].screen_pos_x = bullet[i].pos_x - camera.pos_x;
-				gfx_sprite_stack[bullet[i].sprite_num].screen_pos_y = bullet[i].pos_y - camera.pos_y;
+				gfx_sprite_stack[bullet[i].sprite_num].screen_pos_x = bullet[i].pos_x - camera->pos_x;
+				gfx_sprite_stack[bullet[i].sprite_num].screen_pos_y = bullet[i].pos_y - camera->pos_y;
 
 				if (GFX_IsSpriteAnimationEnded(bullet[i].sprite_num, 0)) {
 					bullet[i].on_target = false;
 					bullet[i].shown = false;
 					bullet[i].current_step = 0;
-					GFX_UnloadSprite(bullet[i].sprite_num);
-					bullet[i].loaded = false;
-					bullet[i].sprite_num = -1;
+					BULLET_UnloadBullet(i);
 				}
 			}
 		}

@@ -206,10 +206,11 @@
 
 #define ACTOR_ANIM_DEAD 133
 
-extern Actor actor;
+extern Actor *actor;
+void ACTOR_Init(void);
 void ACTOR_LoadActorAssets(const char *dat_name);
 void ACTOR_SetGun(int actor_spr_num, int type);
-void ACTOR_Init(int x, int y, int feet_gfx_id, int body_gfx_id, int head_gfx_id, int larm_gfx_id, int rarm_gfx_id, int facing);
+void ACTOR_Load(int x, int y, int feet_gfx_id, int body_gfx_id, int head_gfx_id, int larm_gfx_id, int rarm_gfx_id, int facing);
 void ACTOR_Update(void);
 void ACTOR_DrawColissionPixels(void);
 void ACTOR_DrawHitPixels(void);

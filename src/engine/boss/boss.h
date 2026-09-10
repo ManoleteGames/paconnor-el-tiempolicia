@@ -9,7 +9,7 @@
 #define BOSS_ANIMATION_SPEED 5
 
 #define BOSS_PUNCH_RANGE 16
-#define BOSS_SHOOT_RANGE 128
+#define BOSS_SHOOT_RANGE 92
 #define BOSS_REACTION_TIME 10
 
 #define BOSS_IDLE_TICKS 5
@@ -50,10 +50,15 @@
 #define BOSS_ANIM_FALL 6
 #define BOSS_ANIM_DEAD 7
 
-extern Boss boss;
+#define BOSS_TYPE_FAST_SPEED 1
+#define BOSS_TYPE_MEDIUM_SPEED 2
+#define BOSS_TYPE_SLOW 3
+#define BOSS_TYPE_STRONG 4
+
+extern Boss *boss;
 void BOSS_Init(void);
 void BOSS_LoadAnimations(const char *dat_name, int total_anims);
-void BOSS_Load(const char *dat_name, int x, int y, int face_gfx_id, int portait_gfx_id, int feet_gfx_id, int body_gfx_id, int head_gfx_id, int larm_gfx_id, int rarm_gfx_id, int facing, int gun_type, int gun_graphics_id, int bullet_graphics_id, int behavior, int life);
+void BOSS_Load(const char *dat_name, int x, int y, int type, int face_gfx_id, int portait_gfx_id, int feet_gfx_id, int body_gfx_id, int head_gfx_id, int larm_gfx_id, int rarm_gfx_id, int facing, int gun_type, int gun_graphics_id, int bullet_graphics_id, int behavior, int life);
 void BOSS_SetPosition(byte number, int x, int y);
 void BOSS_Unload(void);
 void BOSS_Update(void);

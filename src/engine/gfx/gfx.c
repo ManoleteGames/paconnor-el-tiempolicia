@@ -3,18 +3,19 @@
 #include "../video/vga.h"
 #include "string.h"
 
-Graphics gfx;
+Graphics *gfx;
 
-StatusPanel gfx_actor_status_panel;
-StatusPanel gfx_enemy_status_panel;
-ChatPanel gfx_chat_panel;
+StatusPanel *gfx_actor_status_panel;
+StatusPanel *gfx_enemy_status_panel;
+ChatPanel *gfx_chat_panel;
 
 static int gfx_sprites_priority_index;
 static byte gfx_sprites_priority_stack[SPRITE_MAX_STACK];
 
-Graphic gfx_sprite_graphics_stack[SPRITE_MAX_GRAPHICS];
-Sprite gfx_sprite_stack[SPRITE_MAX_STACK];
-Sprite gfx_sprite_cursor;
+Graphic *gfx_sprite_graphics_stack;
+
+Sprite *gfx_sprite_stack;
+Sprite *gfx_sprite_cursor;
 
 int gfx_sprite_counter;
 
@@ -22,28 +23,43 @@ int gfx_sprite_counter;
  */
 void GFX_Init(void) {
 	int i, j;
+
+	gfx = MM_PushChunk(sizeof(Graphics), CT_ENGINE);
+	gfx_sprite_graphics_stack = MM_PushChunk(sizeof(Graphic) * SPRITE_MAX_GRAPHICS, CT_ENGINE);
+	gfx_sprite_stack = MM_PushChunk(sizeof(Sprite) * SPRITE_MAX_STACK, CT_ENGINE);
+	for (i = 0; i < SPRITE_MAX_STACK; i++) {
+		gfx_sprite_stack[i].gfx = MM_PushChunk(sizeof(SpriteGfx) * 6, CT_ENGINE);
+	}
+
+	gfx_sprite_cursor = MM_PushChunk(sizeof(Sprite), CT_ENGINE);
+	gfx_sprite_cursor->gfx = MM_PushChunk(sizeof(SpriteGfx) * 5, CT_ENGINE);
+
 	// Reserve memory for palette
-	gfx.palette_shown = MM_PushChunk(256 * 3, CT_ENGINE);
-	gfx.palette_loaded = MM_PushChunk(256 * 3, CT_ENGINE);
+	gfx->palette_shown = MM_PushChunk(256 * 3, CT_ENGINE);
+	gfx->palette_loaded = MM_PushChunk(256 * 3, CT_ENGINE);
 	// Reserve memory for image buffer 1
-	gfx.image_buffer1 = MM_PushChunk(360 * 240, CT_ENGINE);
-	gfx.image_buffer1_width = 0;
-	gfx.image_buffer1_height = 0;
+	gfx->image_buffer1 = MM_PushChunk(360 * 240, CT_ENGINE);
+	gfx->image_buffer1_width = 0;
+	gfx->image_buffer1_height = 0;
 	// Reserve memory for image buffer 2
-	gfx.image_buffer2 = MM_PushChunk(360 * 240, CT_ENGINE);
-	gfx.image_buffer2_width = 0;
-	gfx.image_buffer2_height = 0;
+	gfx->image_buffer2 = MM_PushChunk(360 * 240, CT_ENGINE);
+	gfx->image_buffer2_width = 0;
+	gfx->image_buffer2_height = 0;
 	// Reserve memory for image buffer 3
-	gfx.image_buffer3 = MM_PushChunk(360 * 240, CT_ENGINE);
-	gfx.image_buffer3_width = 0;
-	gfx.image_buffer3_height = 0;
+	gfx->image_buffer3 = MM_PushChunk(360 * 240, CT_ENGINE);
+	gfx->image_buffer3_width = 0;
+	gfx->image_buffer3_height = 0;
+
+	gfx_actor_status_panel = MM_PushChunk(sizeof(StatusPanel), CT_ENGINE);
+	gfx_enemy_status_panel = MM_PushChunk(sizeof(StatusPanel), CT_ENGINE);
+	gfx_chat_panel = MM_PushChunk(sizeof(ChatPanel), CT_ENGINE);
 
 	// Reserve memory for font
-	gfx.font[0].data = MM_PushChunk(FONT_SLIM_GFX_WIDTH * FONT_SLIM_GFX_HEIGHT, CT_ENGINE);
-	gfx.font[1].data = MM_PushChunk(FONT_SLIM_GFX_WIDTH * FONT_SLIM_GFX_HEIGHT, CT_ENGINE);
-	gfx.font[2].data = MM_PushChunk(FONT_BIG_GFX_WIDTH * FONT_BIG_GFX_HEIGHT, CT_ENGINE);
-	gfx.font[3].data = MM_PushChunk(FONT_BIG_GFX_WIDTH * FONT_BIG_GFX_HEIGHT, CT_ENGINE);
-	gfx.font[4].data = MM_PushChunk(FONT_SLIM_GFX_WIDTH * FONT_SLIM_GFX_HEIGHT, CT_ENGINE);
+	gfx->font[0].data = MM_PushChunk(FONT_SLIM_GFX_WIDTH * FONT_SLIM_GFX_HEIGHT, CT_ENGINE);
+	gfx->font[1].data = MM_PushChunk(FONT_SLIM_GFX_WIDTH * FONT_SLIM_GFX_HEIGHT, CT_ENGINE);
+	gfx->font[2].data = MM_PushChunk(FONT_BIG_GFX_WIDTH * FONT_BIG_GFX_HEIGHT, CT_ENGINE);
+	gfx->font[3].data = MM_PushChunk(FONT_BIG_GFX_WIDTH * FONT_BIG_GFX_HEIGHT, CT_ENGINE);
+	gfx->font[4].data = MM_PushChunk(FONT_SLIM_GFX_WIDTH * FONT_SLIM_GFX_HEIGHT, CT_ENGINE);
 
 	// Load default fonts
 	GFX_LoadFont("FONTS.DAT", "SLIMB.PCX", 128 * 32, 8, 8, FONT_SLIM_BLACK);
@@ -60,10 +76,27 @@ void GFX_Init(void) {
 	// Reset sprite stack
 	for (i = 0; i < SPRITE_MAX_STACK; i++) {
 		gfx_sprite_stack[i].loaded = false;
-		for (j = 0; j < 5; j++) {
+
+		for (j = 0; j < SPRITE_SUBSPRITES_MAX; j++) {
 			gfx_sprite_stack[i].gfx[j].loaded = false;
+			gfx_sprite_stack[i].gfx[j].graphics_id = -1;
 		}
 	}
+
+	// Reset cursor sprite
+	gfx_sprite_cursor->loaded = false;
+	gfx_sprite_cursor->gfx[0].loaded = false;
+	gfx_sprite_cursor->gfx[0].graphics_id = -1;
+	gfx_sprite_cursor->gfx[1].loaded = false;
+	gfx_sprite_cursor->gfx[1].graphics_id = -1;
+	gfx_sprite_cursor->gfx[2].loaded = false;
+	gfx_sprite_cursor->gfx[2].graphics_id = -1;
+	gfx_sprite_cursor->gfx[3].loaded = false;
+	gfx_sprite_cursor->gfx[3].graphics_id = -1;
+	gfx_sprite_cursor->gfx[4].loaded = false;
+	gfx_sprite_cursor->gfx[4].graphics_id = -1;
+	gfx_sprite_cursor->gfx[5].loaded = false;
+	gfx_sprite_cursor->gfx[5].graphics_id = -1;
 }
 
 /** GFX :: Load sprite graphics on the stack
@@ -220,7 +253,6 @@ void GFX_SetSpriteGraphic(int spr_num, int index, int graphics_id, int offset_x,
 	gfx_sprite_stack[spr_num].gfx[index].screen_pos_x = gfx_sprite_stack[spr_num].screen_pos_x + offset_x;
 	gfx_sprite_stack[spr_num].gfx[index].screen_pos_y = gfx_sprite_stack[spr_num].screen_pos_y + offset_y;
 	gfx_sprite_stack[spr_num].gfx[index].unmasked = false;
-	gfx_sprite_stack[spr_num].gfx[index].invisible = false;
 	gfx_sprite_stack[spr_num].gfx[index].loaded = true;
 }
 
@@ -229,20 +261,21 @@ void GFX_SetSpriteCursorGraphic(int graphics_id, int offset_x, int offset_y) {
 	if (!gfx_sprite_graphics_stack[graphics_id].loaded) {
 		sprintf(engine.system_error_message1, "GFX_SetSpriteCursorGraphic function error");
 		sprintf(engine.system_error_message2, "Graphic id %u not loaded", graphics_id);
-		sprintf(engine.system_error_message3, "");
+		sprintf(engine.system_error_message3, "...");
 		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_GRAPHICS);
 	}
-	gfx_sprite_cursor.width_px = gfx_sprite_graphics_stack[graphics_id].width_px;
-	gfx_sprite_cursor.height_px = gfx_sprite_graphics_stack[graphics_id].height_px;
-	gfx_sprite_cursor.gfx[0].graphics_id = graphics_id;
-	gfx_sprite_cursor.gfx[0].width_px = gfx_sprite_graphics_stack[graphics_id].width_px;
-	gfx_sprite_cursor.gfx[0].heigth_px = gfx_sprite_graphics_stack[graphics_id].height_px;
-	gfx_sprite_cursor.gfx[0].invisible = false;
-	gfx_sprite_cursor.gfx[0].offset_x = offset_x;
-	gfx_sprite_cursor.gfx[0].offset_y = offset_y;
-	gfx_sprite_cursor.gfx[0].screen_pos_x = gfx_sprite_cursor.screen_pos_x + offset_x;
-	gfx_sprite_cursor.gfx[0].screen_pos_y = gfx_sprite_cursor.screen_pos_y + offset_y;
-	gfx_sprite_cursor.gfx[0].loaded = true;
+	gfx_sprite_cursor->width_px = gfx_sprite_graphics_stack[graphics_id].width_px;
+	gfx_sprite_cursor->height_px = gfx_sprite_graphics_stack[graphics_id].height_px;
+	gfx_sprite_cursor->gfx[0].graphics_id = graphics_id;
+	gfx_sprite_cursor->gfx[0].width_px = gfx_sprite_graphics_stack[graphics_id].width_px;
+	gfx_sprite_cursor->gfx[0].heigth_px = gfx_sprite_graphics_stack[graphics_id].height_px;
+	gfx_sprite_cursor->gfx[0].invisible = false;
+	gfx_sprite_cursor->gfx[0].offset_x = offset_x;
+	gfx_sprite_cursor->gfx[0].offset_y = offset_y;
+	gfx_sprite_cursor->gfx[0].screen_pos_x = gfx_sprite_cursor->screen_pos_x + offset_x;
+	gfx_sprite_cursor->gfx[0].screen_pos_y = gfx_sprite_cursor->screen_pos_y + offset_y;
+	gfx_sprite_cursor->gfx[0].loaded = true;
+	gfx_sprite_cursor->gfx[0].unmasked = true;
 }
 
 void GFX_SetPanelGraphics(StatusPanel *panel, int portait_graphics_id, int lifebar_graphics_id, int gun_graphics_id, int key_graphics_id) {
@@ -343,10 +376,13 @@ void GFX_UnloadSpriteGraphics(void) {
 	int i, j;
 	for (i = 0; i < SPRITE_MAX_STACK; i++) {
 		for (j = 0; j < SPRITE_SUBSPRITES_MAX; j++) {
-			gfx_sprite_stack[i].gfx[j].loaded = false;
+			if (gfx_sprite_stack[i].gfx[j].graphics_id != -1) {
+				sprintf(engine.system_error_message1, "GFX_UnloadSpriteGraphics function error");
+				sprintf(engine.system_error_message2, "Graphics assigned to sprites");
+				sprintf(engine.system_error_message3, "Impossible unload all graphics");
+				Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_GRAPHICS);
+			}
 		}
-		gfx_sprite_stack[i].loaded = false;
-		gfx_sprite_stack[i].shown = false;
 	}
 	for (i = 0; i < SPRITE_MAX_GRAPHICS; i++) {
 		gfx_sprite_graphics_stack[i].loaded = false;
@@ -402,13 +438,21 @@ void GFX_InitSprite(byte entity_id, byte entity_num, int number, byte priority, 
 		gfx_sprite_stack[number].gfx[i].screen_pos_y = -99;
 		gfx_sprite_stack[number].gfx[i].offset_x = 0;
 		gfx_sprite_stack[number].gfx[i].offset_y = 0;
-		gfx_sprite_stack[number].gfx_order[i] = i;
+
+		gfx_sprite_stack[number].gfx[i].anim_current_frame = 0;
+		gfx_sprite_stack[number].gfx[i].anim_counter = 0;
+		gfx_sprite_stack[number].gfx[i].anim_frames = 0;
+		gfx_sprite_stack[number].gfx[i].anim_end = false;
+		gfx_sprite_stack[number].gfx[i].anim_loop = false;
+		gfx_sprite_stack[number].gfx[i].anim_speed = 5;
 
 		for (j = 0; j < SPRITE_ANIMATION_MAX_FRAMES; j++) {
-			gfx_sprite_stack[number].animation[i].anim_data[j].frame = 0;
-			gfx_sprite_stack[number].animation[i].anim_data[j].offset_x = 0;
-			gfx_sprite_stack[number].animation[i].anim_data[j].offset_y = 0;
+			gfx_sprite_stack[number].gfx[i].anim_data[j].frame = 0;
+			gfx_sprite_stack[number].gfx[i].anim_data[j].offset_x = 0;
+			gfx_sprite_stack[number].gfx[i].anim_data[j].offset_y = 0;
 		}
+
+		gfx_sprite_stack[number].gfx_order[i] = i;
 	}
 }
 
@@ -417,35 +461,35 @@ void GFX_InitSprite(byte entity_id, byte entity_num, int number, byte priority, 
 void GFX_InitCursorSprite(byte entity_id, byte entity_num, int width_px, int height_px) {
 	int i;
 
-	if (gfx_sprite_cursor.loaded) {
+	if (gfx_sprite_cursor->loaded) {
 		sprintf(engine.system_error_message1, "GFX_InitCursorSprite function error");
 		sprintf(engine.system_error_message2, "Cursor sprite already loaded");
-		sprintf(engine.system_error_message3, "");
+		sprintf(engine.system_error_message3, "...");
 		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_GRAPHICS);
 	}
 
-	gfx_sprite_cursor.loaded = true;
-	gfx_sprite_cursor.entity_id = entity_id;
-	gfx_sprite_cursor.id = entity_num << 8 | entity_id;
-	gfx_sprite_cursor.priority = 0;
+	gfx_sprite_cursor->loaded = true;
+	gfx_sprite_cursor->entity_id = entity_id;
+	gfx_sprite_cursor->id = entity_num << 8 | entity_id;
+	gfx_sprite_cursor->priority = 0;
 
-	gfx_sprite_cursor.screen_pos_x = -99;
-	gfx_sprite_cursor.screen_pos_y = -99;
-	gfx_sprite_cursor.width_px = width_px;
-	gfx_sprite_cursor.height_px = height_px;
+	gfx_sprite_cursor->screen_pos_x = -99;
+	gfx_sprite_cursor->screen_pos_y = -99;
+	gfx_sprite_cursor->width_px = width_px;
+	gfx_sprite_cursor->height_px = height_px;
 
-	gfx_sprite_cursor.unmasked = false;
-	gfx_sprite_cursor.shown = false;
+	gfx_sprite_cursor->unmasked = false;
+	gfx_sprite_cursor->shown = false;
 
-	gfx_sprite_cursor.blink.active = false;
-	gfx_sprite_cursor.blink.blinked = false;
-	gfx_sprite_cursor.blink.counter = 0;
-	gfx_sprite_cursor.blink.time = 5;
+	gfx_sprite_cursor->blink.active = false;
+	gfx_sprite_cursor->blink.blinked = false;
+	gfx_sprite_cursor->blink.counter = 0;
+	gfx_sprite_cursor->blink.time = 5;
 
 	for (i = 0; i < SPRITE_SUBSPRITES_MAX; i++) {
-		gfx_sprite_cursor.gfx[i].loaded = false;
-		gfx_sprite_cursor.gfx[i].graphics_id = -1;
-		gfx_sprite_cursor.gfx_order[i] = i;
+		gfx_sprite_cursor->gfx[i].loaded = false;
+		gfx_sprite_cursor->gfx[i].graphics_id = -1;
+		gfx_sprite_cursor->gfx_order[i] = i;
 	}
 }
 
@@ -454,12 +498,21 @@ void GFX_InitCursorSprite(byte entity_id, byte entity_num, int width_px, int hei
 void GFX_UnloadSprite(int number) {
 	int i;
 
-	for (i = 0; i < SPRITE_SUBSPRITES_MAX; i++) {
-		gfx_sprite_stack[number].gfx[i].loaded = false;
-		gfx_sprite_stack[number].gfx[i].graphics_id = -1;
+	if (number > SPRITE_MAX_STACK) {
+		sprintf(engine.system_error_message1, "GFX_UnloadSprite function error");
+		sprintf(engine.system_error_message2, "Impossible unloading sprite number %u", number);
+		sprintf(engine.system_error_message3, "...");
+		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_GRAPHICS);
 	}
-	gfx_sprite_stack[number].loaded = false;
-	gfx_sprite_stack[number].shown = false;
+
+	if (number != -1) {
+		for (i = 0; i < SPRITE_SUBSPRITES_MAX; i++) {
+			gfx_sprite_stack[number].gfx[i].loaded = false;
+			gfx_sprite_stack[number].gfx[i].graphics_id = -1;
+		}
+		gfx_sprite_stack[number].loaded = false;
+		gfx_sprite_stack[number].shown = false;
+	}
 }
 
 /** GFX :: Unload all sprites 
@@ -513,11 +566,20 @@ void GFX_UpdateSprites(void) {
 
 			if ((gfx_sprite_stack[i].screen_pos_x + gfx_sprite_stack[i].width_px > 0)
 
-				&& (gfx_sprite_stack[i].screen_pos_x < camera.visible_width)
+				&& (gfx_sprite_stack[i].screen_pos_x < camera->visible_width)
 
 				&& ((gfx_sprite_stack[i].screen_pos_y + gfx_sprite_stack[i].height_px) > 0)
 
-				&& (gfx_sprite_stack[i].screen_pos_y < camera.visible_height)) {
+				&& (gfx_sprite_stack[i].screen_pos_y < camera->visible_height)) {
+
+				/*if ((gfx_sprite_stack[i].screen_pos_x > 0)
+
+				&& (gfx_sprite_stack[i].screen_pos_x + gfx_sprite_stack[i].width_px < camera->visible_width)
+
+				&& ((gfx_sprite_stack[i].screen_pos_y > 0)
+
+					&& (gfx_sprite_stack[i].screen_pos_y + gfx_sprite_stack[i].height_px) < camera->visible_height)) {*/
+
 
 				gfx_sprite_stack[i].shown = true;
 
@@ -583,25 +645,27 @@ void GFX_UpdateSprites(void) {
 			if (gfx_sprite_stack[index].gfx[j].loaded) {
 
 				// Update animation
-				gfx_sprite_stack[index].animation[j].counter++;
-				if (gfx_sprite_stack[index].animation[j].counter >= gfx_sprite_stack[index].animation[j].speed) {
-					gfx_sprite_stack[index].animation[j].counter = 0;
-					if (gfx_sprite_stack[index].animation[j].current_frame < gfx_sprite_stack[index].animation[j].frames - 1) {
-						gfx_sprite_stack[index].animation[j].current_frame++;
-					} else {
-						if (gfx_sprite_stack[index].animation[j].loop) {
-							gfx_sprite_stack[index].animation[j].current_frame = 0;
-						} else {
-							gfx_sprite_stack[index].animation[j].end = true;
+				if (!gfx_sprite_stack[index].gfx[j].anim_end) {
+					gfx_sprite_stack[index].gfx[j].anim_counter++;
+					if (gfx_sprite_stack[index].gfx[j].anim_counter >= gfx_sprite_stack[index].gfx[j].anim_speed) {
+						gfx_sprite_stack[index].gfx[j].anim_counter = 0;
+						gfx_sprite_stack[index].gfx[j].anim_current_frame++;
+						if (gfx_sprite_stack[index].gfx[j].anim_current_frame >= gfx_sprite_stack[index].gfx[j].anim_frames) {
+							if (gfx_sprite_stack[index].gfx[j].anim_loop) {
+								gfx_sprite_stack[index].gfx[j].anim_current_frame = 0;
+							} else {
+								gfx_sprite_stack[index].gfx[j].anim_end = true;
+								gfx_sprite_stack[index].gfx[j].anim_current_frame--;
+							}
 						}
 					}
 				}
 
 				// Set graphics frame data
-				gfx_sprite_stack[index].gfx[j].frame = gfx_sprite_stack[index].animation[j].anim_data[gfx_sprite_stack[index].animation[j].current_frame].frame;
-				gfx_sprite_stack[index].gfx[j].offset_x = gfx_sprite_stack[index].animation[j].anim_data[gfx_sprite_stack[index].animation[j].current_frame].offset_x;
-				gfx_sprite_stack[index].gfx[j].offset_y = gfx_sprite_stack[index].animation[j].anim_data[gfx_sprite_stack[index].animation[j].current_frame].offset_y;
-				gfx_sprite_stack[index].gfx[j].inverted = gfx_sprite_stack[index].animation[j].inverted;
+				gfx_sprite_stack[index].gfx[j].frame = gfx_sprite_stack[index].gfx[j].anim_data[gfx_sprite_stack[index].gfx[j].anim_current_frame].frame;
+				gfx_sprite_stack[index].gfx[j].offset_x = gfx_sprite_stack[index].gfx[j].anim_data[gfx_sprite_stack[index].gfx[j].anim_current_frame].offset_x;
+				gfx_sprite_stack[index].gfx[j].offset_y = gfx_sprite_stack[index].gfx[j].anim_data[gfx_sprite_stack[index].gfx[j].anim_current_frame].offset_y;
+				gfx_sprite_stack[index].gfx[j].inverted = gfx_sprite_stack[index].gfx[j].inverted;
 				gfx_sprite_stack[index].gfx[j].blink = gfx_sprite_stack[index].blink.blinked;
 
 				// update screen position
@@ -619,67 +683,72 @@ void GFX_UpdateCursorSprite(void) {
 
 	gfx_sprite_counter = 0;
 
-	if (gfx_sprite_cursor.loaded) {// Sprite loaded
+	if (gfx_sprite_cursor->loaded) {// Sprite loaded
 
-		if ((gfx_sprite_cursor.screen_pos_x + gfx_sprite_cursor.width_px > 0)
+		if ((gfx_sprite_cursor->screen_pos_x + gfx_sprite_cursor->width_px > 0)
 
-			&& (gfx_sprite_cursor.screen_pos_x < camera.visible_width)
+			&& (gfx_sprite_cursor->screen_pos_x < camera->visible_width)
 
-			&& ((gfx_sprite_cursor.screen_pos_y + gfx_sprite_cursor.height_px) > 0)
+			&& ((gfx_sprite_cursor->screen_pos_y + gfx_sprite_cursor->height_px) > 0)
 
-			&& (gfx_sprite_cursor.screen_pos_y < camera.visible_height)) {
+			&& (gfx_sprite_cursor->screen_pos_y < camera->visible_height)) {
 
-			gfx_sprite_cursor.shown = true;
+			gfx_sprite_cursor->shown = true;
 		} else {
-			gfx_sprite_cursor.shown = false;
+			gfx_sprite_cursor->shown = false;
 		}
 	} else {
-		gfx_sprite_cursor.shown = false;
+		gfx_sprite_cursor->shown = false;
 	}
 
 	//Check if it is blinking
 	// blink
-	if (gfx_sprite_cursor.blink.active) {
-		gfx_sprite_cursor.blink.counter++;
-		if (gfx_sprite_cursor.blink.counter > gfx_sprite_cursor.blink.time) {
-			gfx_sprite_cursor.blink.counter = 0;
-			if (gfx_sprite_cursor.blink.blinked) gfx_sprite_cursor.blink.blinked = false;
+	if (gfx_sprite_cursor->blink.active) {
+		gfx_sprite_cursor->blink.counter++;
+		if (gfx_sprite_cursor->blink.counter > gfx_sprite_cursor->blink.time) {
+			gfx_sprite_cursor->blink.counter = 0;
+			if (gfx_sprite_cursor->blink.blinked) gfx_sprite_cursor->blink.blinked = false;
 			else
-				gfx_sprite_cursor.blink.blinked = true;
+				gfx_sprite_cursor->blink.blinked = true;
 		}
 	} else {
-		gfx_sprite_cursor.blink.blinked = false;
+		gfx_sprite_cursor->blink.blinked = false;
 	}
 
 	// Update graphics
 	for (j = 0; j < SPRITE_SUBSPRITES_MAX; j++) {
-		if (gfx_sprite_cursor.gfx[j].loaded) {
+		if (gfx_sprite_cursor->gfx[j].loaded) {
 
 			// Update animation
-			gfx_sprite_cursor.animation[j].counter++;
-			if (gfx_sprite_cursor.animation[j].counter >= gfx_sprite_cursor.animation[j].speed) {
-				gfx_sprite_cursor.animation[j].counter = 0;
-				if (gfx_sprite_cursor.animation[j].current_frame < gfx_sprite_cursor.animation[j].frames - 1) {
-					gfx_sprite_cursor.animation[j].current_frame++;
-				} else {
-					if (gfx_sprite_cursor.animation[j].loop) {
-						gfx_sprite_cursor.animation[j].current_frame = 0;
-					} else {
-						gfx_sprite_cursor.animation[j].end = true;
+			if (!gfx_sprite_cursor->gfx[j].anim_end) {
+				gfx_sprite_cursor->gfx[j].anim_counter++;
+				if (gfx_sprite_cursor->gfx[j].anim_counter >= gfx_sprite_cursor->gfx[j].anim_speed) {
+					gfx_sprite_cursor->gfx[j].anim_counter = 0;
+					gfx_sprite_cursor->gfx[j].anim_current_frame++;
+
+					if (gfx_sprite_cursor->gfx[j].anim_current_frame >= gfx_sprite_cursor->gfx[j].anim_frames) {
+
+						if (gfx_sprite_cursor->gfx[j].anim_loop) {
+							gfx_sprite_cursor->gfx[j].anim_current_frame = 0;
+						} else {
+							gfx_sprite_cursor->gfx[j].anim_end = true;
+							gfx_sprite_cursor->gfx[j].anim_current_frame = gfx_sprite_cursor->gfx[j].anim_frames;
+							gfx_sprite_cursor->gfx[j].anim_current_frame = 0;
+						}
 					}
 				}
 			}
 
 			// Set graphics frame data
-			gfx_sprite_cursor.gfx[j].frame = gfx_sprite_cursor.animation[j].anim_data[gfx_sprite_cursor.animation[j].current_frame].frame;
-			gfx_sprite_cursor.gfx[j].offset_x = gfx_sprite_cursor.animation[j].anim_data[gfx_sprite_cursor.animation[j].current_frame].offset_x;
-			gfx_sprite_cursor.gfx[j].offset_y = gfx_sprite_cursor.animation[j].anim_data[gfx_sprite_cursor.animation[j].current_frame].offset_y;
-			gfx_sprite_cursor.gfx[j].inverted = gfx_sprite_cursor.animation[j].inverted;
-			gfx_sprite_cursor.gfx[j].blink = gfx_sprite_cursor.blink.blinked;
+			gfx_sprite_cursor->gfx[j].frame = gfx_sprite_cursor->gfx[j].anim_data[gfx_sprite_cursor->gfx[j].anim_current_frame].frame;
+			gfx_sprite_cursor->gfx[j].offset_x = gfx_sprite_cursor->gfx[j].anim_data[gfx_sprite_cursor->gfx[j].anim_current_frame].offset_x;
+			gfx_sprite_cursor->gfx[j].offset_y = gfx_sprite_cursor->gfx[j].anim_data[gfx_sprite_cursor->gfx[j].anim_current_frame].offset_y;
+			gfx_sprite_cursor->gfx[j].inverted = gfx_sprite_cursor->gfx[j].inverted;
+			gfx_sprite_cursor->gfx[j].blink = gfx_sprite_cursor->blink.blinked;
 
 			// update screen position
-			gfx_sprite_cursor.gfx[j].screen_pos_x = gfx_sprite_cursor.screen_pos_x + gfx_sprite_cursor.gfx[j].offset_x;
-			gfx_sprite_cursor.gfx[j].screen_pos_y = gfx_sprite_cursor.screen_pos_y + gfx_sprite_cursor.gfx[j].offset_y;
+			gfx_sprite_cursor->gfx[j].screen_pos_x = gfx_sprite_cursor->screen_pos_x + gfx_sprite_cursor->gfx[j].offset_x;
+			gfx_sprite_cursor->gfx[j].screen_pos_y = gfx_sprite_cursor->screen_pos_y + gfx_sprite_cursor->gfx[j].offset_y;
 		}
 	}
 }
@@ -689,8 +758,8 @@ void GFX_UpdateCursorSprite(void) {
 void GFX_DrawSprites(void) {
 	int i, j, sprite_num, gfx;
 	for (i = 0; i < gfx_sprites_priority_index; i++) {
-		if (gfx_sprite_stack[gfx_sprites_priority_stack[i]].shown) {
-			sprite_num = gfx_sprites_priority_stack[i];
+		sprite_num = gfx_sprites_priority_stack[i];
+		if (gfx_sprite_stack[sprite_num].shown) {
 			for (j = 0; j < SPRITE_SUBSPRITES_MAX; j++) {
 				gfx = gfx_sprite_stack[gfx_sprites_priority_stack[i]].gfx_order[j];
 				if (gfx_sprite_stack[gfx_sprites_priority_stack[i]].gfx[gfx].loaded) {
@@ -704,8 +773,8 @@ void GFX_DrawSprites(void) {
 /** GFX :: Draw cursor sprite
  */
 void GFX_DrawCursorSprite(void) {
-	if (gfx_sprite_cursor.shown) {
-		VIDEO_DrawSpriteToScreenBufferRLE(&gfx_sprite_graphics_stack[gfx_sprite_cursor.gfx[0].graphics_id], &gfx_sprite_cursor.gfx[0]);
+	if (gfx_sprite_cursor->shown) {
+		VIDEO_DrawSpriteToScreenBufferRLE(&gfx_sprite_graphics_stack[gfx_sprite_cursor->gfx[0].graphics_id], &gfx_sprite_cursor->gfx[0]);
 	}
 }
 
@@ -724,9 +793,9 @@ void GFX_LoadImage(const char *filename, const char *subfile, int size) {
 	src_index = 0;
 	dst_index = 0;
 	for (i = 0; i < height; i++) {
-		memcpy(&video.map_buffer[MAP_BACKGROUND_LAYER][dst_index], &dataLoaded[src_index], width);
+		memcpy(&video->map_buffer[MAP_BACKGROUND_LAYER][dst_index], &dataLoaded[src_index], width);
 		src_index += width;
-		dst_index += video.map_buffer_width;
+		dst_index += video->map_buffer_width;
 	}
 
 	MM_PopChunks(CT_TEMPORARY);
@@ -756,8 +825,8 @@ void GFX_LoadFont(const char *filename, const char *subfile, int size, word char
 	byte *dataLoaded = MM_PushChunk(size, CT_TEMPORARY);
 	FILE_LoadPCXImage(filename, subfile, dataLoaded, size, &width, &height);
 
-	gfx.font[font_number].char_width = char_w;
-	gfx.font[font_number].char_height = char_h;
+	gfx->font[font_number].char_width = char_w;
+	gfx->font[font_number].char_height = char_h;
 
 	num_char_columns = width / char_w;
 	num_char_rows = height / char_h;
@@ -771,7 +840,7 @@ void GFX_LoadFont(const char *filename, const char *subfile, int size, word char
 			for (j = 0; j < char_h; j++) {
 				for (k = 0; k < char_w; k++) {
 					src_index = ((width * char_h) * r) + (c * char_w) + (j * width) + k;
-					gfx.font[font_number].data[dst_index] = dataLoaded[src_index] + FONT_TRANSPARENT_COLOR;// Apply offset transparent color
+					gfx->font[font_number].data[dst_index] = dataLoaded[src_index] + FONT_TRANSPARENT_COLOR;// Apply offset transparent color
 					dst_index++;
 				}
 			}
@@ -784,7 +853,7 @@ void GFX_LoadFont(const char *filename, const char *subfile, int size, word char
 /** GFX :: Load palette
  */
 void GFX_LoadPalette(const char *dat_file, const char *asset_file, int size) {
-	FILE_LoadPCXPalette(dat_file, asset_file, gfx.palette_loaded, size);
+	FILE_LoadPCXPalette(dat_file, asset_file, gfx->palette_loaded, size);
 }
 
 /** GFX :: PCX Image to image buffer
@@ -821,10 +890,10 @@ void GFX_SetSpritePosition(int sprite_num, int screen_pos_x, int screen_pos_y) {
 }
 
 void GFX_SetCursorSpritePosition(int screen_pos_x, int screen_pos_y) {
-	gfx_sprite_cursor.screen_pos_x = screen_pos_x;
-	gfx_sprite_cursor.screen_pos_y = screen_pos_y;
-	gfx_sprite_cursor.gfx[0].screen_pos_x = screen_pos_x;
-	gfx_sprite_cursor.gfx[0].screen_pos_y = screen_pos_y;
+	gfx_sprite_cursor->screen_pos_x = screen_pos_x;
+	gfx_sprite_cursor->screen_pos_y = screen_pos_y;
+	gfx_sprite_cursor->gfx[0].screen_pos_x = screen_pos_x;
+	gfx_sprite_cursor->gfx[0].screen_pos_y = screen_pos_y;
 }
 
 /** GFX :: Set sprite frame
@@ -839,11 +908,11 @@ void GFX_SetSpriteFrame(int sprite_num, int anim_number, int frame) {
 		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_GRAPHICS);
 	}
 
-	gfx_sprite_stack[sprite_num].animation[anim_number].frames = 0;
-	gfx_sprite_stack[sprite_num].animation[anim_number].current_frame = 0;
-	gfx_sprite_stack[sprite_num].animation[anim_number].anim_data[0].frame = frame;
-	gfx_sprite_stack[sprite_num].animation[anim_number].anim_data[0].offset_x = 0;
-	gfx_sprite_stack[sprite_num].animation[anim_number].anim_data[0].offset_y = 0;
+	gfx_sprite_stack[sprite_num].gfx[anim_number].anim_frames = 0;
+	gfx_sprite_stack[sprite_num].gfx[anim_number].anim_current_frame = 0;
+	gfx_sprite_stack[sprite_num].gfx[anim_number].anim_data[0].frame = frame;
+	gfx_sprite_stack[sprite_num].gfx[anim_number].anim_data[0].offset_x = 0;
+	gfx_sprite_stack[sprite_num].gfx[anim_number].anim_data[0].offset_y = 0;
 }
 
 /** GFX :: Set cursor sprite frame
@@ -854,22 +923,22 @@ void GFX_SetCursorSpriteFrame(int anim_number, int frame) {
 	if (anim_number < 0 || anim_number >= SPRITE_SUBSPRITES_MAX) {
 		sprintf(engine.system_error_message1, "GFX_SetCursorSpriteFrame function error");
 		sprintf(engine.system_error_message2, "Invalid animation number %u", anim_number);
-		sprintf(engine.system_error_message3, "");
+		sprintf(engine.system_error_message3, "...");
 		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_GRAPHICS);
 	}
 
-	if (anim_number > gfx_sprite_graphics_stack[gfx_sprite_cursor.gfx[anim_number].graphics_id].num_frames) {
+	if (anim_number > gfx_sprite_graphics_stack[gfx_sprite_cursor->gfx[anim_number].graphics_id].num_frames) {
 		sprintf(engine.system_error_message1, "GFX_SetCursorSpriteFrame function error");
 		sprintf(engine.system_error_message2, "Frame number %u out of limits ", frame);
-		sprintf(engine.system_error_message3, "Max frame number %u", gfx_sprite_graphics_stack[gfx_sprite_cursor.gfx[anim_number].graphics_id].num_frames);
+		sprintf(engine.system_error_message3, "Max frame number %u", gfx_sprite_graphics_stack[gfx_sprite_cursor->gfx[anim_number].graphics_id].num_frames);
 		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_GRAPHICS);
 	}
 
-	gfx_sprite_cursor.animation[anim_number].frames = 0;
-	gfx_sprite_cursor.animation[anim_number].current_frame = 0;
-	gfx_sprite_cursor.animation[anim_number].anim_data[anim_number].frame = frame;
-	gfx_sprite_cursor.animation[anim_number].anim_data[anim_number].offset_x = 0;
-	gfx_sprite_cursor.animation[anim_number].anim_data[anim_number].offset_y = 0;
+	gfx_sprite_cursor->gfx[anim_number].anim_frames = 0;
+	gfx_sprite_cursor->gfx[anim_number].anim_current_frame = 0;
+	gfx_sprite_cursor->gfx[anim_number].anim_data[anim_number].frame = frame;
+	gfx_sprite_cursor->gfx[anim_number].anim_data[anim_number].offset_x = 0;
+	gfx_sprite_cursor->gfx[anim_number].anim_data[anim_number].offset_y = 0;
 }
 
 /** GFX :: Set default animation for a sprite
@@ -902,20 +971,20 @@ void GFX_SetDefaultAnimation(int sprite_num, bool inverted, bool loop, byte spee
 				Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_GRAPHICS);
 			}
 
-			gfx_sprite_stack[sprite_num].animation[i].current_frame = 0;
-			gfx_sprite_stack[sprite_num].animation[i].frames = gfx_sprite_graphics_stack[gfx_sprite_stack[sprite_num].gfx[i].graphics_id].num_frames;
+			gfx_sprite_stack[sprite_num].gfx[i].anim_current_frame = 0;
+			gfx_sprite_stack[sprite_num].gfx[i].anim_frames = gfx_sprite_graphics_stack[gfx_sprite_stack[sprite_num].gfx[i].graphics_id].num_frames;
 
 			// Set frames according to graphics frames
-			for (j = 0; j < gfx_sprite_stack[sprite_num].animation[i].frames; j++) {
-				gfx_sprite_stack[sprite_num].animation[i].anim_data[j].frame = j;
-				gfx_sprite_stack[sprite_num].animation[i].anim_data[j].offset_x = 0;
-				gfx_sprite_stack[sprite_num].animation[i].anim_data[j].offset_y = 0;
+			for (j = 0; j < gfx_sprite_stack[sprite_num].gfx[i].anim_frames; j++) {
+				gfx_sprite_stack[sprite_num].gfx[i].anim_data[j].frame = j;
+				gfx_sprite_stack[sprite_num].gfx[i].anim_data[j].offset_x = 0;
+				gfx_sprite_stack[sprite_num].gfx[i].anim_data[j].offset_y = 0;
 			}
-			gfx_sprite_stack[sprite_num].animation[i].counter = 0;
-			gfx_sprite_stack[sprite_num].animation[i].end = false;
-			gfx_sprite_stack[sprite_num].animation[i].inverted = inverted;
-			gfx_sprite_stack[sprite_num].animation[i].loop = loop;
-			gfx_sprite_stack[sprite_num].animation[i].speed = speed;
+			gfx_sprite_stack[sprite_num].gfx[i].anim_counter = 0;
+			gfx_sprite_stack[sprite_num].gfx[i].anim_end = false;
+			gfx_sprite_stack[sprite_num].gfx[i].inverted = inverted;
+			gfx_sprite_stack[sprite_num].gfx[i].anim_loop = loop;
+			gfx_sprite_stack[sprite_num].gfx[i].anim_speed = speed;
 		}
 	}
 }
@@ -927,43 +996,43 @@ void GFX_SetDefaultAnimation(int sprite_num, bool inverted, bool loop, byte spee
 void GFX_SetDefaultCursorAnimation(bool inverted, bool loop, byte speed) {
 	int i, j;
 	for (i = 0; i < SPRITE_SUBSPRITES_MAX; i++) {
-		if (gfx_sprite_cursor.gfx[i].loaded) {
+		if (gfx_sprite_cursor->gfx[i].loaded) {
 
-			if (gfx_sprite_cursor.gfx[i].graphics_id < 0 || gfx_sprite_cursor.gfx[i].graphics_id >= SPRITE_MAX_GRAPHICS) {
+			if (gfx_sprite_cursor->gfx[i].graphics_id < 0 || gfx_sprite_cursor->gfx[i].graphics_id >= SPRITE_MAX_GRAPHICS) {
 				sprintf(engine.system_error_message1, "GFX_SetDefaultCursorAnimation function error");
-				sprintf(engine.system_error_message2, "Graphics id %u out of bounds", gfx_sprite_cursor.gfx[i].graphics_id);
-				sprintf(engine.system_error_message3, "");
+				sprintf(engine.system_error_message2, "Graphics id %u out of bounds", gfx_sprite_cursor->gfx[i].graphics_id);
+				sprintf(engine.system_error_message3, "...");
 				Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_GRAPHICS);
 			}
 
-			if (!gfx_sprite_graphics_stack[gfx_sprite_cursor.gfx[i].graphics_id].loaded) {
+			if (!gfx_sprite_graphics_stack[gfx_sprite_cursor->gfx[i].graphics_id].loaded) {
 				sprintf(engine.system_error_message1, "GFX_SetDefaultCursorAnimation function error");
-				sprintf(engine.system_error_message2, "Graphics id %u not loaded", gfx_sprite_cursor.gfx[i].graphics_id);
-				sprintf(engine.system_error_message3, "");
+				sprintf(engine.system_error_message2, "Graphics id %u not loaded", gfx_sprite_cursor->gfx[i].graphics_id);
+				sprintf(engine.system_error_message3, "...");
 				Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_GRAPHICS);
 			}
 
-			if (gfx_sprite_graphics_stack[gfx_sprite_cursor.gfx[i].graphics_id].num_frames > SPRITE_ANIMATION_MAX_FRAMES) {
+			if (gfx_sprite_graphics_stack[gfx_sprite_cursor->gfx[i].graphics_id].num_frames > SPRITE_ANIMATION_MAX_FRAMES) {
 				sprintf(engine.system_error_message1, "GFX_SetDefaultCursorAnimation function error");
-				sprintf(engine.system_error_message2, "Number of frames in graphics id %u exceeds maximum animation frames", gfx_sprite_cursor.gfx[i].graphics_id);
-				sprintf(engine.system_error_message3, "");
+				sprintf(engine.system_error_message2, "Number of frames in graphics id %u exceeds maximum animation frames", gfx_sprite_cursor->gfx[i].graphics_id);
+				sprintf(engine.system_error_message3, "...");
 				Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_GRAPHICS);
 			}
 
-			gfx_sprite_cursor.animation[i].current_frame = 0;
-			gfx_sprite_cursor.animation[i].frames = gfx_sprite_graphics_stack[gfx_sprite_cursor.gfx[i].graphics_id].num_frames;
+			gfx_sprite_cursor->gfx[i].anim_current_frame = 0;
+			gfx_sprite_cursor->gfx[i].anim_frames = gfx_sprite_graphics_stack[gfx_sprite_cursor->gfx[i].graphics_id].num_frames;
 
 			// Set frames according to graphics frames
-			for (j = 0; j < gfx_sprite_cursor.animation[i].frames; j++) {
-				gfx_sprite_cursor.animation[i].anim_data[j].frame = j;
-				gfx_sprite_cursor.animation[i].anim_data[j].offset_x = 0;
-				gfx_sprite_cursor.animation[i].anim_data[j].offset_y = 0;
+			for (j = 0; j < gfx_sprite_cursor->gfx[i].anim_frames; j++) {
+				gfx_sprite_cursor->gfx[i].anim_data[j].frame = j;
+				gfx_sprite_cursor->gfx[i].anim_data[j].offset_x = 0;
+				gfx_sprite_cursor->gfx[i].anim_data[j].offset_y = 0;
 			}
-			gfx_sprite_cursor.animation[i].counter = 0;
-			gfx_sprite_cursor.animation[i].end = false;
-			gfx_sprite_cursor.animation[i].inverted = inverted;
-			gfx_sprite_cursor.animation[i].loop = loop;
-			gfx_sprite_cursor.animation[i].speed = speed;
+			gfx_sprite_cursor->gfx[i].anim_counter = 0;
+			gfx_sprite_cursor->gfx[i].anim_end = false;
+			gfx_sprite_cursor->gfx[i].inverted = inverted;
+			gfx_sprite_cursor->gfx[i].anim_loop = loop;
+			gfx_sprite_cursor->gfx[i].anim_speed = speed;
 		}
 	}
 }
@@ -974,6 +1043,20 @@ void GFX_SetDefaultCursorAnimation(bool inverted, bool loop, byte speed) {
 void GFX_SetSingleFrameAnimation(int sprite_num, int frame) {
 	int i, j;
 
+	if (gfx_sprite_stack[sprite_num].gfx[0].graphics_id < 0 || gfx_sprite_stack[sprite_num].gfx[0].graphics_id >= SPRITE_MAX_GRAPHICS) {
+		sprintf(engine.system_error_message1, "GFX_SetSingleFrameAnimation function error");
+		sprintf(engine.system_error_message2, "Graphics id %u out of bounds", gfx_sprite_stack[sprite_num].gfx[0].graphics_id);
+		sprintf(engine.system_error_message3, "Sprite number: %u, Sprite index: 0", sprite_num);
+		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_GRAPHICS);
+	}
+
+	if (!gfx_sprite_stack[sprite_num].gfx[0].loaded) {
+		sprintf(engine.system_error_message1, "GFX_SetSingleFrameAnimation function error");
+		sprintf(engine.system_error_message2, "Graphic number 0 is not loaded, graphics id %u", gfx_sprite_stack[sprite_num].gfx[0].graphics_id);
+		sprintf(engine.system_error_message3, "Sprite number: %u", sprite_num);
+		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_GRAPHICS);
+	}
+
 	if (frame > gfx_sprite_graphics_stack[gfx_sprite_stack[sprite_num].gfx[0].graphics_id].num_frames) {
 		sprintf(engine.system_error_message1, "GFX_SetSingleFrameAnimation function error");
 		sprintf(engine.system_error_message2, "Frame number %u exceeds number of frames in graphics id %u", frame, gfx_sprite_stack[sprite_num].gfx[0].graphics_id);
@@ -983,58 +1066,78 @@ void GFX_SetSingleFrameAnimation(int sprite_num, int frame) {
 
 	/// Clear all existing frames
 	for (i = 0; i < SPRITE_SUBSPRITES_MAX; i++) {
-		gfx_sprite_stack[sprite_num].animation[i].current_frame = 0;
-		gfx_sprite_stack[sprite_num].animation[i].frames = 0;
-		gfx_sprite_stack[sprite_num].animation[i].anim_data[0].frame = 0;
-		gfx_sprite_stack[sprite_num].animation[i].anim_data[0].offset_x = 0;
-		gfx_sprite_stack[sprite_num].animation[i].anim_data[0].offset_y = 0;
+		gfx_sprite_stack[sprite_num].gfx[i].anim_current_frame = 0;
+		gfx_sprite_stack[sprite_num].gfx[i].anim_frames = 0;
+		gfx_sprite_stack[sprite_num].gfx[i].anim_counter = 0;
+		gfx_sprite_stack[sprite_num].gfx[i].anim_end = false;
+		gfx_sprite_stack[sprite_num].gfx[i].inverted = false;
+		gfx_sprite_stack[sprite_num].gfx[i].anim_loop = false;
+		gfx_sprite_stack[sprite_num].gfx[i].anim_speed = 3;
 
 		for (j = 0; j < SPRITE_ANIMATION_MAX_FRAMES; j++) {
-			gfx_sprite_stack[sprite_num].animation[i].anim_data[j].frame = 0;
-			gfx_sprite_stack[sprite_num].animation[i].anim_data[j].offset_x = 0;
-			gfx_sprite_stack[sprite_num].animation[i].anim_data[j].offset_y = 0;
+			gfx_sprite_stack[sprite_num].gfx[i].anim_data[j].frame = 0;
+			gfx_sprite_stack[sprite_num].gfx[i].anim_data[j].offset_x = 0;
+			gfx_sprite_stack[sprite_num].gfx[i].anim_data[j].offset_y = 0;
 		}
-
-		gfx_sprite_stack[sprite_num].animation[i].counter = 0;
-		gfx_sprite_stack[sprite_num].animation[i].end = false;
-		gfx_sprite_stack[sprite_num].animation[i].inverted = false;
-		gfx_sprite_stack[sprite_num].animation[i].loop = false;
-		gfx_sprite_stack[sprite_num].animation[i].speed = 5;
 	}
 
+	gfx_sprite_stack[sprite_num].gfx[0].anim_current_frame = 0;
+	gfx_sprite_stack[sprite_num].gfx[0].anim_frames = 1;
+	gfx_sprite_stack[sprite_num].gfx[0].anim_counter = 0;
+	gfx_sprite_stack[sprite_num].gfx[0].anim_end = false;
+	gfx_sprite_stack[sprite_num].gfx[0].inverted = false;
+	gfx_sprite_stack[sprite_num].gfx[0].anim_loop = false;
+	gfx_sprite_stack[sprite_num].gfx[0].anim_speed = 5;
 
-	gfx_sprite_stack[sprite_num].animation[0].current_frame = 0;
-	gfx_sprite_stack[sprite_num].animation[0].frames = 0;
-	gfx_sprite_stack[sprite_num].animation[0].counter = 0;
-	gfx_sprite_stack[sprite_num].animation[0].end = false;
-	gfx_sprite_stack[sprite_num].animation[0].inverted = false;
-	gfx_sprite_stack[sprite_num].animation[0].loop = false;
-	gfx_sprite_stack[sprite_num].animation[0].speed = 3;
-
-	gfx_sprite_stack[sprite_num].animation[0].anim_data[0].frame = frame;
-	gfx_sprite_stack[sprite_num].animation[0].anim_data[0].offset_x = 0;
-	gfx_sprite_stack[sprite_num].animation[0].anim_data[0].offset_y = 0;
+	gfx_sprite_stack[sprite_num].gfx[0].anim_data[0].frame = frame;
+	gfx_sprite_stack[sprite_num].gfx[0].anim_data[0].offset_x = 0;
+	gfx_sprite_stack[sprite_num].gfx[0].anim_data[0].offset_y = 0;
 }
 
 void GFX_SetSpriteAnimation(int sprite_num, int anim_num, SpriteAnimation anim_data, bool reset_current_frame) {
-	int counter, current_frame;
-	counter = gfx_sprite_stack[sprite_num].animation[anim_num].counter;
-	current_frame = gfx_sprite_stack[sprite_num].animation[anim_num].current_frame;
+
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_end = false;
+
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_frames = anim_data.frames;
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_speed = anim_data.speed;
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_loop = anim_data.loop;
+	gfx_sprite_stack[sprite_num].gfx[anim_num].inverted = anim_data.inverted;
 
 	// Update data
-	gfx_sprite_stack[sprite_num].animation[anim_num] = anim_data;
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_data[0] = anim_data.anim_data[0];
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_data[1] = anim_data.anim_data[1];
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_data[2] = anim_data.anim_data[2];
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_data[3] = anim_data.anim_data[3];
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_data[4] = anim_data.anim_data[4];
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_data[5] = anim_data.anim_data[5];
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_data[6] = anim_data.anim_data[6];
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_data[7] = anim_data.anim_data[7];
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_data[8] = anim_data.anim_data[8];
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_data[9] = anim_data.anim_data[9];
 
 	if (reset_current_frame) {
-		gfx_sprite_stack[sprite_num].animation[anim_num].current_frame = 0;
-		gfx_sprite_stack[sprite_num].animation[anim_num].counter = 0;
-	} else {
-		gfx_sprite_stack[sprite_num].animation[anim_num].current_frame = current_frame;
-		gfx_sprite_stack[sprite_num].animation[anim_num].counter = counter;
+		gfx_sprite_stack[sprite_num].gfx[anim_num].anim_current_frame = 0;
+		gfx_sprite_stack[sprite_num].gfx[anim_num].anim_counter = 0;
 	}
 }
 
 void GFX_UpdateSpriteAnimation(int sprite_num, int anim_num, SpriteAnimation anim_data) {
-	gfx_sprite_stack[sprite_num].animation[anim_num] = anim_data;
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_counter = anim_data.counter;
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_current_frame = anim_data.current_frame;
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_frames = anim_data.frames;
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_end = anim_data.end;
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_loop = anim_data.loop;
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_speed = anim_data.speed;
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_data[0] = anim_data.anim_data[0];
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_data[1] = anim_data.anim_data[1];
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_data[2] = anim_data.anim_data[2];
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_data[3] = anim_data.anim_data[3];
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_data[4] = anim_data.anim_data[4];
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_data[5] = anim_data.anim_data[5];
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_data[6] = anim_data.anim_data[6];
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_data[7] = anim_data.anim_data[7];
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_data[8] = anim_data.anim_data[8];
+	gfx_sprite_stack[sprite_num].gfx[anim_num].anim_data[9] = anim_data.anim_data[9];
 }
 
 void GFX_SetSpriteUnmasked(int spr_num, bool value) {
@@ -1062,7 +1165,9 @@ int GFX_GetSpriteScreenPosX(int spr_num) {
 }
 
 bool GFX_IsSpriteAnimationEnded(int spr_num, int anim_num) {
-	return gfx_sprite_stack[spr_num].animation[anim_num].end;
+	if (gfx_sprite_stack[spr_num].gfx[anim_num].anim_end) return true;
+	if (!gfx_sprite_stack[spr_num].gfx[anim_num].loaded) return true;
+	return false;
 }
 
 int GFX_GetSpriteScreenPosY(int spr_num) {
@@ -1078,7 +1183,7 @@ void GFX_SetSpriteGraphicsId(int spr_num, int graphic_index, int graphics_id) {
 }
 
 int GFX_GetSpriteAnimationFrames(int spr_num, int anim_num) {
-	return gfx_sprite_stack[spr_num].animation[anim_num].frames;
+	return gfx_sprite_stack[spr_num].gfx[anim_num].anim_frames;
 }
 
 int GFX_GetSpriteGraphicsFrames(int gfx_id) {
@@ -1091,16 +1196,16 @@ void GFX_SetSpritePriority(int sprite_num, byte priority) {
 
 void GFX_HideCursorSprite(void) {
 	int i;
-	gfx_sprite_cursor.invisible = true;
+	gfx_sprite_cursor->invisible = true;
 	for (i = 0; i < SPRITE_SUBSPRITES_MAX; i++)
-		gfx_sprite_cursor.gfx[i].invisible = true;
+		gfx_sprite_cursor->gfx[i].invisible = true;
 }
 
 void GFX_ShowCursorSprite(void) {
 	int i;
-	gfx_sprite_cursor.invisible = false;
+	gfx_sprite_cursor->invisible = false;
 	for (i = 0; i < SPRITE_SUBSPRITES_MAX; i++)
-		gfx_sprite_cursor.gfx[i].invisible = false;
+		gfx_sprite_cursor->gfx[i].invisible = false;
 }
 
 void GFX_ShowSprite(int sprite_num) {

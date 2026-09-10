@@ -24,7 +24,7 @@
 #define VIDEO_SCREEN_BUFFER_FORE 1
 #define VIDEO_SCREEN_BUFFER_MASK 2
 
-extern Video video;
+extern Video *video;
 void VIDEO_Init(void);
 extern void (*VIDEO_VSync)(void);
 extern void (*VIDEO_ScreenBufferToVRAM)(void);

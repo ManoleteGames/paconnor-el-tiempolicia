@@ -385,6 +385,7 @@ typedef struct {
 	A2M_CH_MACRO_TABLE macro_table[20];
 } A2M_CHDATA;
 
+void A2M_Init(void);
 void A2M_UnpackFile(void);
 void A2M_LoadFile(const char *dat_name, const char *asset_name);
 void A2M_TimerHandler(Song *song);
@@ -395,6 +396,6 @@ void A2M_Process(Song *song);
 void A2M_MacroProcess(void);
 void A2M_Unload(Song *song);
 /// A2M.c //
-extern A2M_SONGINFO songinfo;
+extern A2M_SONGINFO *songinfo;
 
 #endif

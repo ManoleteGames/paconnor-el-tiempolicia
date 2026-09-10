@@ -545,9 +545,9 @@ void SB_Handler(SoundEffect *sound, Song *song) {
 		song->macro_ticklooper++;
 
 		// Reset ticks
-		if (song->ticklooper >= (TIMER_AUDIO_TIME / songinfo.tempo))//IRQ_freq/tempo
+		if (song->ticklooper >= (TIMER_AUDIO_TIME / songinfo->tempo))//IRQ_freq/tempo
 			song->ticklooper = 0;
-		if (song->macro_ticklooper >= (TIMER_AUDIO_TIME / (songinfo.tempo * song->macro_speedup)))//IRQ_freq / (tempo * _macro_speedup()))
+		if (song->macro_ticklooper >= (TIMER_AUDIO_TIME / (songinfo->tempo * song->macro_speedup)))//IRQ_freq / (tempo * _macro_speedup()))
 			song->macro_ticklooper = 0;
 	} else {
 		song->stop = true;
@@ -564,8 +564,8 @@ void SB_LoadSong(Song *song, int number) {
 			song->loaded = true;
 			song->current_line = 0;
 			song->current_order = 0;
-			song->speed = songinfo.speed;
-			song->tempo = songinfo.tempo;
+			song->speed = songinfo->speed;
+			song->tempo = songinfo->tempo;
 			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, song->tempo);
 			break;
 		case 2:
@@ -573,8 +573,8 @@ void SB_LoadSong(Song *song, int number) {
 			song->loaded = true;
 			song->current_line = 0;
 			song->current_order = 0;
-			song->speed = songinfo.speed;
-			song->tempo = songinfo.tempo;
+			song->speed = songinfo->speed;
+			song->tempo = songinfo->tempo;
 			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, song->tempo);
 			break;
 		case 3:
@@ -582,8 +582,8 @@ void SB_LoadSong(Song *song, int number) {
 			song->loaded = true;
 			song->current_line = 0;
 			song->current_order = 0;
-			song->speed = songinfo.speed;
-			song->tempo = songinfo.tempo;
+			song->speed = songinfo->speed;
+			song->tempo = songinfo->tempo;
 			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, song->tempo);
 			break;
 		case 4:

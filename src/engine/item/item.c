@@ -27,7 +27,7 @@ void ITEM_LoadItem(byte number, byte entity_id, byte graphics_id, int pos_x, int
 	if (!gfx_sprite_graphics_stack[graphics_id].loaded) {
 		sprintf(engine.system_error_message1, "ITEM_LoadItem function error");
 		sprintf(engine.system_error_message2, "Graphics id %u not loaded", graphics_id);
-		sprintf(engine.system_error_message3, "");
+		sprintf(engine.system_error_message3, "...");
 		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_GRAPHICS);
 	}
 
@@ -73,8 +73,8 @@ void ITEM_LoadItem(byte number, byte entity_id, byte graphics_id, int pos_x, int
 	}
 
 	// Set initial screen position
-	gfx_sprite_stack[item[number].num_sprite].screen_pos_x = pos_x - camera.pos_x;
-	gfx_sprite_stack[item[number].num_sprite].screen_pos_y = pos_y - camera.pos_y;
+	gfx_sprite_stack[item[number].num_sprite].screen_pos_x = pos_x - camera->pos_x;
+	gfx_sprite_stack[item[number].num_sprite].screen_pos_y = pos_y - camera->pos_y;
 
 	GFX_SetDefaultAnimation(item[number].num_sprite, false, true, 20);
 }
@@ -83,13 +83,6 @@ void ITEM_LoadItem(byte number, byte entity_id, byte graphics_id, int pos_x, int
  */
 void ITEM_UpdateItems(void) {
 	int i;
-	int sprite_num;
-	bool update_object;
-
-	item_update_counter++;
-	if (item_update_counter > 6) {
-		item_update_counter = 0;
-	}
 
 	item_counter = 0;
 	// Calculate screen pos and evaluate visibility
@@ -98,19 +91,13 @@ void ITEM_UpdateItems(void) {
 			item_counter++;
 
 			// Update enemy position on screen
-			GFX_SetSpritePosition(item[i].num_sprite, item[i].pos_x - camera.pos_x, item[i].pos_y - camera.pos_y);
+			GFX_SetSpritePosition(item[i].num_sprite, item[i].pos_x - camera->pos_x, item[i].pos_y - camera->pos_y);
 
 			// On screen
 			item[i].on_screen = GFX_IsSpriteOnScreen(item[i].num_sprite);
 
 			// DEBUG: Draw collision and hit pixels
 			//if (item[i].on_screen) ITEM_DrawColissionPixels(item[i]);
-
-			// Avoid to update items each cycle
-			update_object = (i + item_update_counter) & 1;
-			if (update_object) {
-				sprite_num = item[i].num_sprite;
-			}
 		}
 	}
 }

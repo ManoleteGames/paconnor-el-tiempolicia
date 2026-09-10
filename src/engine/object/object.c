@@ -2,9 +2,21 @@
 #include "../engine.h"
 #include "object.h"
 
-Object object[OBJECT_MAX_OBJECTS];
+Object *object;
+
 static byte object_update_counter;
 byte object_counter;
+
+void OBJECT_Init(void) {
+	int i;
+	object = MM_PushChunk(sizeof(Object) * OBJECT_MAX_OBJECTS, CT_ENGINE);
+
+	for (i = 0; i < OBJECT_MAX_OBJECTS; i++) {
+		object[i].cfg = MM_PushChunk(sizeof(SpriteConfig), CT_ENGINE);
+		object[i].num_sprite = -1;
+		object[i].is_loaded = false;
+	}
+}
 
 /** OBJECT :: Load object
  */
@@ -21,14 +33,14 @@ void OBJECT_LoadObject(const char *dat_name, byte number, byte entity_id, byte s
 	object[number].portait_graphics_id = portait_graphics_id;
 
 	// Load configuration
-	FILE_LoadSpriteConfigFile(dat_name, "OBJECT.CFG", &object[number].cfg);
+	FILE_LoadSpriteConfigFile(dat_name, "OBJECT.CFG", object[number].cfg);
 
-	object[number].width_px = object[number].cfg.width;
-	object[number].height_px = object[number].cfg.height;
+	object[number].width_px = object[number].cfg->width;
+	object[number].height_px = object[number].cfg->height;
 
 	// Load graphics
-	if (!gfx_sprite_graphics_stack[sprite_graphics_id].loaded) GFX_LoadSpriteGraphicsRLE(dat_name, "SPRITE.PCX", sprite_graphics_id, object[number].cfg.feet_width, object[number].cfg.feet_height, object[number].cfg.feet_frames, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_TEMPORARY_SPRITE);
-	if (!gfx_sprite_graphics_stack[portait_graphics_id].loaded) GFX_LoadSpriteGraphicsRLE(dat_name, "PORTAIT.PCX", portait_graphics_id, object[number].cfg.portait_width, object[number].cfg.portait_height, object[number].cfg.portait_frames, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_TEMPORARY_SPRITE);
+	if (!gfx_sprite_graphics_stack[sprite_graphics_id].loaded) GFX_LoadSpriteGraphicsRLE(dat_name, "SPRITE.PCX", sprite_graphics_id, object[number].cfg->feet_width, object[number].cfg->feet_height, object[number].cfg->feet_frames, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_TEMPORARY_SPRITE);
+	if (!gfx_sprite_graphics_stack[portait_graphics_id].loaded) GFX_LoadSpriteGraphicsRLE(dat_name, "PORTAIT.PCX", portait_graphics_id, object[number].cfg->portait_width, object[number].cfg->portait_height, object[number].cfg->portait_frames, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_TEMPORARY_SPRITE);
 
 	object[number].num_sprite = GFX_FindEmptySpriteSlot();
 	if (object[number].num_sprite == -1) {
@@ -99,8 +111,8 @@ void OBJECT_LoadObject(const char *dat_name, byte number, byte entity_id, byte s
 	}
 
 	// Set initial screen position
-	gfx_sprite_stack[object[number].num_sprite].screen_pos_x = pos_x - camera.pos_x;
-	gfx_sprite_stack[object[number].num_sprite].screen_pos_y = pos_y - camera.pos_y;
+	gfx_sprite_stack[object[number].num_sprite].screen_pos_x = pos_x - camera->pos_x;
+	gfx_sprite_stack[object[number].num_sprite].screen_pos_y = pos_y - camera->pos_y;
 
 	// Load object data
 	switch (entity_id) {
@@ -162,7 +174,7 @@ void OBJECT_UpdateObjects(void) {
 			object_counter++;
 
 			// Update enemy position on screen
-			GFX_SetSpritePosition(object[i].num_sprite, object[i].pos_x - camera.pos_x, object[i].pos_y - camera.pos_y);
+			GFX_SetSpritePosition(object[i].num_sprite, object[i].pos_x - camera->pos_x, object[i].pos_y - camera->pos_y);
 
 			// On screen
 			object[i].on_screen = GFX_IsSpriteOnScreen(object[i].num_sprite);
@@ -188,9 +200,9 @@ void OBJECT_UpdateObjects(void) {
 							// Check if hit by actor bullet and update enemy panel
 							switch (object[i].hit_by) {
 								case ENTITY_ID_ACTOR_BULLET:
-									GFX_SetPanelGraphics(&gfx_enemy_status_panel, object[i].portait_graphics_id, SPRITE_GRAPHICS_ID_LIFEBAR, SPRITE_GRAPHICS_ID_GUN0, SPRITE_GRAPHICS_ID_EMPTY);
-									GFX_UpdatePanel(&gfx_enemy_status_panel, object[i].life, object[i].life + object[i].damage, object[i].max_life, 1);
-									gfx_enemy_status_panel.shown = true;
+									GFX_SetPanelGraphics(gfx_enemy_status_panel, object[i].portait_graphics_id, SPRITE_GRAPHICS_ID_LIFEBAR, SPRITE_GRAPHICS_ID_GUN0, SPRITE_GRAPHICS_ID_EMPTY);
+									GFX_UpdatePanel(gfx_enemy_status_panel, object[i].life, object[i].life + object[i].damage, object[i].max_life, 1);
+									gfx_enemy_status_panel->shown = true;
 									break;
 								default:
 									break;
@@ -205,14 +217,14 @@ void OBJECT_UpdateObjects(void) {
 
 								gfx_sprite_stack[sprite_num].entity_id = ENTITY_ID_EXPLOSION;
 								gfx_sprite_stack[sprite_num].id = ENTITY_ID_EXPLOSION << 8 | i;
-								PARTICLE_InitParticle(SPRITE_GRAPHICS_ID_FIRE1, ENTITY_ID_EXPLOSION, object[i].pos_x - 8, object[i].pos_y + 16, object[i].pos_x - 10, object[i].pos_y, 1, 10, 8, 8);
-								PARTICLE_InitParticle(SPRITE_GRAPHICS_ID_FIRE1, ENTITY_ID_EXPLOSION, object[i].pos_x - 8, object[i].pos_y + 16, object[i].pos_x - 16, object[i].pos_y + 16, 1, 10, 8, 8);
-								PARTICLE_InitParticle(SPRITE_GRAPHICS_ID_FIRE1, ENTITY_ID_EXPLOSION, object[i].pos_x - 8, object[i].pos_y + 16, object[i].pos_x - 10, object[i].pos_y + 32, 1, 10, 8, 8);
-								PARTICLE_InitParticle(SPRITE_GRAPHICS_ID_FIRE1, ENTITY_ID_EXPLOSION, object[i].pos_x + 18, object[i].pos_y + 8, object[i].pos_x + 21, object[i].pos_y, 1, 10, 8, 8);
-								PARTICLE_InitParticle(SPRITE_GRAPHICS_ID_FIRE1, ENTITY_ID_EXPLOSION, object[i].pos_x + 18, object[i].pos_y + 16, object[i].pos_x + 24, object[i].pos_y + 16, 1, 10, 8, 8);
-								PARTICLE_InitParticle(SPRITE_GRAPHICS_ID_FIRE1, ENTITY_ID_EXPLOSION, object[i].pos_x + 18, object[i].pos_y + 32, object[i].pos_x + 21, object[i].pos_y + 32, 1, 10, 8, 8);
+								PARTICLE_LoadParticle(SPRITE_GRAPHICS_ID_FIRE1, ENTITY_ID_EXPLOSION, object[i].pos_x - 8, object[i].pos_y + 16, object[i].pos_x - 10, object[i].pos_y, 1, 10, 8, 8);
+								PARTICLE_LoadParticle(SPRITE_GRAPHICS_ID_FIRE1, ENTITY_ID_EXPLOSION, object[i].pos_x - 8, object[i].pos_y + 16, object[i].pos_x - 16, object[i].pos_y + 16, 1, 10, 8, 8);
+								PARTICLE_LoadParticle(SPRITE_GRAPHICS_ID_FIRE1, ENTITY_ID_EXPLOSION, object[i].pos_x - 8, object[i].pos_y + 16, object[i].pos_x - 10, object[i].pos_y + 32, 1, 10, 8, 8);
+								PARTICLE_LoadParticle(SPRITE_GRAPHICS_ID_FIRE1, ENTITY_ID_EXPLOSION, object[i].pos_x + 18, object[i].pos_y + 8, object[i].pos_x + 21, object[i].pos_y, 1, 10, 8, 8);
+								PARTICLE_LoadParticle(SPRITE_GRAPHICS_ID_FIRE1, ENTITY_ID_EXPLOSION, object[i].pos_x + 18, object[i].pos_y + 16, object[i].pos_x + 24, object[i].pos_y + 16, 1, 10, 8, 8);
+								PARTICLE_LoadParticle(SPRITE_GRAPHICS_ID_FIRE1, ENTITY_ID_EXPLOSION, object[i].pos_x + 18, object[i].pos_y + 32, object[i].pos_x + 21, object[i].pos_y + 32, 1, 10, 8, 8);
 
-								GFX_SetPanelPortait(&gfx_enemy_status_panel, 2);
+								GFX_SetPanelPortait(gfx_enemy_status_panel, 2);
 							}
 							object[i].damage = 0;
 

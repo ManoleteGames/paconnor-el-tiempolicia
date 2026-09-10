@@ -1,6 +1,7 @@
 #include "engine.h"
 #include "bullet/bullet.h"
 #include "dos.h"
+#include "effect/effect.h"
 #include "enemy/enemy.h"
 #include "gfx/gfx.h"
 #include "grenade/grenade.h"
@@ -128,8 +129,8 @@ static bool GetAvailableMouse(void) {
 
 /** ENGINE :: Checks if there is any compatible sound card
  */
-static bool GetAvailableAudio(void) {
-	engine.adlib_present = AUDIO_CheckAdlib();
+bool GetAvailableAudio(void) {
+	/*engine.adlib_present = AUDIO_CheckAdlib();
 
 	if (engine.adlib_present) {
 		ScreenSetCursor(14, 6);
@@ -141,8 +142,9 @@ static bool GetAvailableAudio(void) {
 		printf("%u", 0);
 		ScreenSetCursor(14, 25);
 		printf(" .................................Not available. \n");
-	}
+	}*/
 
+	/*
 	engine.sb_present = AUDIO_CheckSoundBlaster();
 
 	if (engine.sb_present) {
@@ -156,6 +158,7 @@ static bool GetAvailableAudio(void) {
 		ScreenSetCursor(15, 27);
 		printf(" ...............................Not available. \n");
 	}
+*/
 
 	// PC Speaker is always here for you!
 	engine.speaker_present = true;
@@ -274,7 +277,15 @@ bool AwaitDelayTime(void) {
 static void InitSubsystems(void) {
 	system("cls");
 
-	MM_Init();               // Initialize memory manager
+	MM_Init();   // Initialize memory manager
+	UI_Init();   // Initialize UI
+	ACTOR_Init();// Initialize actor variables
+	BOSS_Init();
+	BULLET_Init();
+	OBJECT_Init();
+	PARTICLE_Init();
+	NPC_Init();
+	ENEMY_Init();
 	MOUSE_Init();            // Install custom mouse interrupt handler
 	GFX_Init();              // Initialize graphics
 	AUDIO_Init();            // Initialize audio
@@ -338,11 +349,15 @@ void InitEngine(void) {
 	engine.mouseOK = GetAvailableMouse(); // Check if mouse is available
 	engine.audioOK = GetAvailableAudio(); // Check adlib/soundblaster audio available
 
+
 	ScreenSetCursor(21, 25);
+
+
 	SetDelayTime(2000);
 	while (!AwaitDelayTime()) {
 		// just wait
 	};
+
 	printf(" ...process done...");
 	SetDelayTime(2000);
 	while (!AwaitDelayTime()) {
@@ -383,6 +398,7 @@ void InitEngine(void) {
 		sprintf(engine.system_error_message3, " ");
 		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_MOUSE);
 	}
+
 
 	// Initialize everything else
 	InitSubsystems();
@@ -465,31 +481,38 @@ void Update(int player_follow) {
 
 	FPS();// Calculate fps
 
-	if (!ui.freeze) CAM_MainPositionControl(player_follow, &map.update_required);// Place new cam position
+	if (!ui->freeze) CAM_MainPositionControl(player_follow, &map->update_required);// Place new cam position
 	MAP_Update();
 
 	// Update
-	MOUSE_Update(actor.mode_combat, ui.freeze);
-	if (!ui.freeze) ACTOR_Update();
-	if (!ui.freeze) GRENADE_Update();
-	if (!ui.freeze) BULLET_Update();
-	if (!ui.freeze) OBJECT_UpdateObjects();
-	if (!ui.freeze) ITEM_UpdateItems();
+	MOUSE_Update(actor->mode_combat, ui->freeze);
+	if (!ui->freeze) ACTOR_Update();
+	if (!ui->freeze) GRENADE_Update();
+	if (!ui->freeze) BULLET_Update();
+	if (!ui->freeze) OBJECT_UpdateObjects();
+	if (!ui->freeze) ITEM_UpdateItems();
 	EFFECT_UpdateEffects();
-	if (!ui.freeze) PARTICLE_UpdateParticles();
-	if (!ui.freeze) ENEMY_Update();
-	if (!ui.freeze) BOSS_Update();
-	if (!ui.freeze) NPC_Update();
+	if (!ui->freeze) PARTICLE_UpdateParticles();
+	if (!ui->freeze) ENEMY_Update();
+	if (!ui->freeze) BOSS_Update();
+	if (!ui->freeze) NPC_Update();
 
 	// Draw all sprites and effects
-	if (!ui.freeze) GFX_UpdateSprites();
+	if (!ui->freeze) GFX_UpdateSprites();
 	GFX_DrawSprites();
-
-	UI_UpdateUI(actor.mode_combat);
-
+	UI_UpdateUI(actor->mode_combat);
 	GFX_DrawCursorSprite();
 
-	//UpdateStatusPannel();// Draws status pannel on the screen buffer
+
+	/*engine.debug1_INT = enemy_counter;
+	engine.debug2_INT = boss->status_behavior;
+	engine.debug3_INT = boss->pattern_step;
+	engine.debug4_INT = boss->boss_attack_pattern[0];
+	engine.debug5_INT = boss->boss_attack_pattern[1];
+	engine.debug6_INT = boss->boss_attack_pattern[2];
+
+
+	UpdateStatusPannel();// Draws status pannel on the screen buffer*/
 
 	LimitFPS(40);//25
 	engine.sample_time = TIMER_GetMilliseconds() - start_time;

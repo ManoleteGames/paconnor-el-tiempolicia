@@ -145,7 +145,6 @@ void MOUSE_InitCursorSprite(byte graphics_id) {
 
 	GFX_SetSpriteCursorGraphic(graphics_id, 0, 0);
 	GFX_SetDefaultCursorAnimation(false, false, 5);
-	gfx_sprite_cursor.gfx[0].unmasked = true;
 }
 
 void MOUSE_SetCursorGraphics(int graphics_id) {
@@ -254,8 +253,8 @@ int MOUSE_CheckCursorColission(void) {
 
 	/////// HOTSPOT COLISSIONS ///////////
 	hspot = 0;
-	if (map.loaded) {
-		hspot = MAP_CheckHotspotTile(camera.pos_x + cursor.pos_x, camera.pos_y + cursor.pos_y);
+	if (map->loaded) {
+		hspot = MAP_CheckHotspotTile(camera->pos_x + cursor.pos_x, camera->pos_y + cursor.pos_y);
 		if (hspot != 255) return ((hspot) << 8) | ENTITY_ID_HSPOT;
 		else
 			return 0;
@@ -294,7 +293,7 @@ void MOUSE_Update(bool combat_mode, bool freeze) {
 			MOUSE_SetCursorGraphics(SPRITE_GRAPHICS_ID_CURSOR);
 			cursor.point_on = MOUSE_CheckCursorColission();
 			// Left click
-			if (cursor.left_click_FP && !freeze) EFFECT_LoadEffect(ENTITY_ID_EMPTY, SPRITE_GRAPHICS_ID_CLICK, cursor.pos_x - 2 + camera.pos_x, cursor.pos_y - 2 + camera.pos_y, true, 0, false, false, 2);
+			if (cursor.left_click_FP && !freeze) EFFECT_LoadEffect(ENTITY_ID_EMPTY, SPRITE_GRAPHICS_ID_CLICK, cursor.pos_x - 2 + camera->pos_x, cursor.pos_y - 2 + camera->pos_y, true, 0, false, false, 2);
 
 		} else {
 			MOUSE_SetCursorGraphics(SPRITE_GRAPHICS_ID_AIM);

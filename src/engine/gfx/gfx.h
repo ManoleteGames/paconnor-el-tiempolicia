@@ -218,13 +218,15 @@
 #define SPRITE_GRAPHICS_ID_CHAT_BIG 204
 
 /// GFX.C ///
-extern Graphics gfx;
-extern Graphic gfx_sprite_graphics_stack[SPRITE_MAX_GRAPHICS];
-extern Sprite gfx_sprite_stack[SPRITE_MAX_STACK];
-extern Sprite gfx_sprite_cursor;
-extern StatusPanel gfx_actor_status_panel;
-extern StatusPanel gfx_enemy_status_panel;
-extern ChatPanel gfx_chat_panel;
+extern Graphics *gfx;
+extern StatusPanel *gfx_actor_status_panel;
+extern StatusPanel *gfx_enemy_status_panel;
+extern ChatPanel *gfx_chat_panel;
+
+extern Graphic *gfx_sprite_graphics_stack;
+extern Sprite *gfx_sprite_stack;
+extern Sprite *gfx_sprite_cursor;
+
 extern int gfx_sprite_counter;
 void GFX_Init(void);
 void GFX_LoadSpriteGraphicsRLE(const char *dat_name, const char *asset_name, int id, int width_px, int height_px, int num_frames, int transparent_color, int hit_color, int mem_type);

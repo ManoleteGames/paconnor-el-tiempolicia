@@ -4,29 +4,30 @@
 #include <stdlib.h>
 #include "npc.h"
 
-NPC npc[NPC_MAX_NPCS];
+NPC *npc;
 
 static byte npc_update_counter;
 byte npc_counter;
 
-static byte facing_array[8] = {ENEMY_FACING_RIGHT, ENEMY_FACING_LEFT, ENEMY_FACING_DOWN, ENEMY_FACING_DOWN_RIGHT, ENEMY_FACING_DOWN_LEFT, ENEMY_FACING_UP, ENEMY_FACING_UP_RIGHT, ENEMY_FACING_UP_LEFT};
-static byte hold_on_pattern[6] = {ENEMY_PATTERN_HOLD_ON, ENEMY_PATTERN_HOLD_ON, ENEMY_PATTERN_HOLD_ON, ENEMY_PATTERN_HOLD_ON, ENEMY_PATTERN_HOLD_ON, ENEMY_PATTERN_HOLD_ON};
-static byte walk_random_pattern[6] = {ENEMY_PATTERN_HOLD_ON, ENEMY_PATTERN_NPC_WALK_RANDOM, ENEMY_PATTERN_NPC_WALK_RANDOM, ENEMY_PATTERN_NPC_WALK_RANDOM, ENEMY_PATTERN_NPC_WALK_RANDOM, ENEMY_PATTERN_NPC_WALK_RANDOM};
-static byte walk_arround_pattern[6] = {ENEMY_PATTERN_HOLD_ON, ENEMY_PATTERN_NPC_WALK_UP, ENEMY_PATTERN_NPC_WALK_RIGHT, ENEMY_PATTERN_NPC_WALK_DOWN, ENEMY_PATTERN_NPC_WALK_LEFT, ENEMY_PATTERN_HOLD_ON};
-static byte walk_horizontal_pattern[6] = {ENEMY_PATTERN_HOLD_ON, ENEMY_PATTERN_NPC_WALK_RIGHT, ENEMY_PATTERN_NPC_WALK_LEFT, ENEMY_PATTERN_NPC_WALK_LEFT, ENEMY_PATTERN_NPC_WALK_RIGHT, ENEMY_PATTERN_HOLD_ON};
-static byte walk_vertical_pattern[6] = {ENEMY_PATTERN_HOLD_ON, ENEMY_PATTERN_NPC_WALK_UP, ENEMY_PATTERN_NPC_WALK_DOWN, ENEMY_PATTERN_NPC_WALK_DOWN, ENEMY_PATTERN_NPC_WALK_UP, ENEMY_PATTERN_HOLD_ON};
-static byte chase_pattern[6] = {ENEMY_PATTERN_WALK_FORWARD, ENEMY_PATTERN_WALK_FORWARD, ENEMY_PATTERN_WALK_FORWARD, ENEMY_PATTERN_WALK_ARROUND, ENEMY_PATTERN_WALK_FORWARD, ENEMY_PATTERN_WALK_FORWARD};
-static byte avoid_pattern[6] = {ENEMY_PATTERN_WALK_BACK, ENEMY_PATTERN_WALK_ARROUND, ENEMY_PATTERN_WALK_FORWARD, ENEMY_PATTERN_WALK_ARROUND, ENEMY_PATTERN_WALK_FORWARD, ENEMY_PATTERN_ATTACK};
-static byte hide_pattern[6] = {ENEMY_PATTERN_WALK_BACK, ENEMY_PATTERN_WALK_BACK, ENEMY_PATTERN_WALK_ARROUND, ENEMY_PATTERN_WALK_BACK, ENEMY_PATTERN_WALK_BACK, ENEMY_PATTERN_WALK_BACK};
-
+static int facing_array[8] = {ENEMY_FACING_RIGHT, ENEMY_FACING_LEFT, ENEMY_FACING_DOWN, ENEMY_FACING_DOWN_RIGHT, ENEMY_FACING_DOWN_LEFT, ENEMY_FACING_UP, ENEMY_FACING_UP_RIGHT, ENEMY_FACING_UP_LEFT};
+static int hold_on_pattern[6] = {ENEMY_PATTERN_HOLD_ON, ENEMY_PATTERN_HOLD_ON, ENEMY_PATTERN_HOLD_ON, ENEMY_PATTERN_HOLD_ON, ENEMY_PATTERN_HOLD_ON, ENEMY_PATTERN_HOLD_ON};
+static int walk_random_pattern[6] = {ENEMY_PATTERN_HOLD_ON, ENEMY_PATTERN_NPC_WALK_RANDOM, ENEMY_PATTERN_NPC_WALK_RANDOM, ENEMY_PATTERN_NPC_WALK_RANDOM, ENEMY_PATTERN_NPC_WALK_RANDOM, ENEMY_PATTERN_NPC_WALK_RANDOM};
+static int walk_arround_pattern[6] = {ENEMY_PATTERN_HOLD_ON, ENEMY_PATTERN_NPC_WALK_UP, ENEMY_PATTERN_NPC_WALK_RIGHT, ENEMY_PATTERN_NPC_WALK_DOWN, ENEMY_PATTERN_NPC_WALK_LEFT, ENEMY_PATTERN_HOLD_ON};
+static int walk_horizontal_pattern[6] = {ENEMY_PATTERN_HOLD_ON, ENEMY_PATTERN_NPC_WALK_RIGHT, ENEMY_PATTERN_NPC_WALK_LEFT, ENEMY_PATTERN_NPC_WALK_LEFT, ENEMY_PATTERN_NPC_WALK_RIGHT, ENEMY_PATTERN_HOLD_ON};
+static int walk_vertical_pattern[6] = {ENEMY_PATTERN_HOLD_ON, ENEMY_PATTERN_NPC_WALK_UP, ENEMY_PATTERN_NPC_WALK_DOWN, ENEMY_PATTERN_NPC_WALK_DOWN, ENEMY_PATTERN_NPC_WALK_UP, ENEMY_PATTERN_HOLD_ON};
+static int chase_pattern[6] = {ENEMY_PATTERN_WALK_FORWARD, ENEMY_PATTERN_WALK_FORWARD, ENEMY_PATTERN_WALK_FORWARD, ENEMY_PATTERN_WALK_ARROUND, ENEMY_PATTERN_WALK_FORWARD, ENEMY_PATTERN_WALK_FORWARD};
+static int avoid_pattern[6] = {ENEMY_PATTERN_WALK_BACK, ENEMY_PATTERN_WALK_ARROUND, ENEMY_PATTERN_WALK_FORWARD, ENEMY_PATTERN_WALK_ARROUND, ENEMY_PATTERN_WALK_FORWARD, ENEMY_PATTERN_ATTACK};
+static int hide_pattern[6] = {ENEMY_PATTERN_WALK_BACK, ENEMY_PATTERN_WALK_BACK, ENEMY_PATTERN_WALK_ARROUND, ENEMY_PATTERN_WALK_BACK, ENEMY_PATTERN_WALK_BACK, ENEMY_PATTERN_WALK_BACK};
 
 void NPC_Init(void) {
 	int i;
+
+	npc = MM_PushChunk(sizeof(NPC) * NPC_MAX_NPCS, CT_ENGINE);
 	for (i = 0; i < NPC_MAX_NPCS; i++) {
 		npc[i].is_loaded = false;
 		npc[i].sprite_num = -1;
+		npc[i].cfg = MM_PushChunk(sizeof(SpriteConfig), CT_ENGINE);
 	}
-	GFX_SetDefaultAnimation(ENTITY_ID_NPC, 0, 0, 0);
 }
 
 void NPC_Load(const char *dat_name, byte number, int x, int y, int face_gfx_id, int sprite_gfx_id, int facing, int behavior, int life) {
@@ -42,14 +43,14 @@ void NPC_Load(const char *dat_name, byte number, int x, int y, int face_gfx_id, 
 	}
 
 	// Load configuration
-	FILE_LoadSpriteConfigFile(dat_name, "NPC.CFG", &npc[number].cfg);
+	FILE_LoadSpriteConfigFile(dat_name, "NPC.CFG", npc[number].cfg);
 
-	npc[number].width_px = npc[number].cfg.width;
-	npc[number].height_px = npc[number].cfg.height;
+	npc[number].width_px = npc[number].cfg->width;
+	npc[number].height_px = npc[number].cfg->height;
 
 	// Load graphics
-	if (!gfx_sprite_graphics_stack[face_gfx_id].loaded) GFX_LoadSpriteGraphicsRLE(dat_name, "FACE.PCX", face_gfx_id, npc[number].cfg.face_width, npc[number].cfg.face_height, npc[number].cfg.face_frames, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_TEMPORARY_SPRITE);
-	if (!gfx_sprite_graphics_stack[sprite_gfx_id].loaded) GFX_LoadSpriteGraphicsRLE(dat_name, "SPRITE.PCX", sprite_gfx_id, npc[number].cfg.feet_width, npc[number].cfg.feet_height, npc[number].cfg.feet_frames, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_TEMPORARY_SPRITE);
+	if (!gfx_sprite_graphics_stack[face_gfx_id].loaded) GFX_LoadSpriteGraphicsRLE(dat_name, "FACE.PCX", face_gfx_id, npc[number].cfg->face_width, npc[number].cfg->face_height, npc[number].cfg->face_frames, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_TEMPORARY_SPRITE);
+	if (!gfx_sprite_graphics_stack[sprite_gfx_id].loaded) GFX_LoadSpriteGraphicsRLE(dat_name, "SPRITE.PCX", sprite_gfx_id, npc[number].cfg->feet_width, npc[number].cfg->feet_height, npc[number].cfg->feet_frames, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_TEMPORARY_SPRITE);
 
 	npc[number].is_loaded = true;
 
@@ -91,7 +92,7 @@ void NPC_Load(const char *dat_name, byte number, int x, int y, int face_gfx_id, 
 		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_GRAPHICS);
 	} else {
 		npc[number].sprite_num = sprite_slot;
-		GFX_InitSprite(ENTITY_ID_NPC, number, sprite_slot, 0, npc[number].cfg.width, npc[number].cfg.height);
+		GFX_InitSprite(ENTITY_ID_NPC, number, sprite_slot, 0, npc[number].cfg->width, npc[number].cfg->height);
 	}
 
 	// Set colission points
@@ -149,8 +150,8 @@ void NPC_Load(const char *dat_name, byte number, int x, int y, int face_gfx_id, 
 	GFX_SetSpriteGraphic(npc[number].sprite_num, 3, SPRITE_GRAPHICS_ID_EMPTY, 0, 0);// empty
 	GFX_SetSpriteGraphic(npc[number].sprite_num, 4, SPRITE_GRAPHICS_ID_EMPTY, 0, 0);// empty
 
-	gfx_sprite_stack[npc[number].sprite_num].screen_pos_x = npc[number].pos_x - camera.pos_x;
-	gfx_sprite_stack[npc[number].sprite_num].screen_pos_y = npc[number].pos_y - camera.pos_y;
+	gfx_sprite_stack[npc[number].sprite_num].screen_pos_x = npc[number].pos_x - camera->pos_x;
+	gfx_sprite_stack[npc[number].sprite_num].screen_pos_y = npc[number].pos_y - camera->pos_y;
 
 	// Patterns
 	npc[number].pattern_step = 0;
@@ -296,24 +297,24 @@ bool NPC_CheckUpColission(NPC n) {
 
 	/////// ACTOR COLISSIONS ///////////
 	//Point 1
-	if (point1_x <= actor.pos_x + actor.colission_area.points[3][0]
+	if (point1_x <= actor->pos_x + actor->colission_area.points[3][0]
 
-		&& point1_x >= actor.pos_x + actor.colission_area.points[2][0]
+		&& point1_x >= actor->pos_x + actor->colission_area.points[2][0]
 
-		&& point1_y >= actor.pos_y + actor.colission_area.points[1][1]
+		&& point1_y >= actor->pos_y + actor->colission_area.points[1][1]
 
-		&& point1_y <= actor.pos_y + actor.colission_area.points[3][1]) {
+		&& point1_y <= actor->pos_y + actor->colission_area.points[3][1]) {
 		return true;
 	}
 
 	//Point 2
-	if (point2_x <= actor.pos_x + actor.colission_area.points[3][0]
+	if (point2_x <= actor->pos_x + actor->colission_area.points[3][0]
 
-		&& point2_x >= actor.pos_x + actor.colission_area.points[2][0]
+		&& point2_x >= actor->pos_x + actor->colission_area.points[2][0]
 
-		&& point2_y >= actor.pos_y + actor.colission_area.points[1][1]
+		&& point2_y >= actor->pos_y + actor->colission_area.points[1][1]
 
-		&& point2_y <= actor.pos_y + actor.colission_area.points[3][1]) {
+		&& point2_y <= actor->pos_y + actor->colission_area.points[3][1]) {
 		return true;
 	}
 
@@ -423,24 +424,24 @@ bool NPC_CheckDownColission(NPC n) {
 
 	/////// ACTOR COLISSIONS ///////////
 	//Point 1
-	if (point1_x <= actor.pos_x + actor.colission_area.points[1][0]
+	if (point1_x <= actor->pos_x + actor->colission_area.points[1][0]
 
-		&& point1_x >= actor.pos_x + actor.colission_area.points[0][0]
+		&& point1_x >= actor->pos_x + actor->colission_area.points[0][0]
 
-		&& point1_y >= actor.pos_y + actor.colission_area.points[1][1]
+		&& point1_y >= actor->pos_y + actor->colission_area.points[1][1]
 
-		&& point1_y <= actor.pos_y + actor.colission_area.points[3][1]) {
+		&& point1_y <= actor->pos_y + actor->colission_area.points[3][1]) {
 		return true;
 	}
 
 	//Point 2
-	if (point2_x <= actor.pos_x + actor.colission_area.points[1][0]
+	if (point2_x <= actor->pos_x + actor->colission_area.points[1][0]
 
-		&& point2_x >= actor.pos_x + actor.colission_area.points[0][0]
+		&& point2_x >= actor->pos_x + actor->colission_area.points[0][0]
 
-		&& point2_y >= actor.pos_y + actor.colission_area.points[1][1]
+		&& point2_y >= actor->pos_y + actor->colission_area.points[1][1]
 
-		&& point2_y <= actor.pos_y + actor.colission_area.points[3][1]) {
+		&& point2_y <= actor->pos_y + actor->colission_area.points[3][1]) {
 		return true;
 	}
 
@@ -546,24 +547,24 @@ bool NPC_CheckLeftColission(NPC n) {
 
 	/////// ACTOR COLISSIONS ///////////
 	//Point 1
-	if (point1_x <= actor.pos_x + actor.colission_area.points[1][0]
+	if (point1_x <= actor->pos_x + actor->colission_area.points[1][0]
 
-		&& point1_x >= actor.pos_x + actor.colission_area.points[0][0]
+		&& point1_x >= actor->pos_x + actor->colission_area.points[0][0]
 
-		&& point1_y >= actor.pos_y + actor.colission_area.points[0][1]
+		&& point1_y >= actor->pos_y + actor->colission_area.points[0][1]
 
-		&& point1_y <= actor.pos_y + actor.colission_area.points[2][1]) {
+		&& point1_y <= actor->pos_y + actor->colission_area.points[2][1]) {
 		return true;
 	}
 
 	//Point 2
-	if (point2_x <= actor.pos_x + actor.colission_area.points[1][0]
+	if (point2_x <= actor->pos_x + actor->colission_area.points[1][0]
 
-		&& point2_x >= actor.pos_x + actor.colission_area.points[0][0]
+		&& point2_x >= actor->pos_x + actor->colission_area.points[0][0]
 
-		&& point2_y >= actor.pos_y + actor.colission_area.points[0][1]
+		&& point2_y >= actor->pos_y + actor->colission_area.points[0][1]
 
-		&& point2_y <= actor.pos_y + actor.colission_area.points[2][1]) {
+		&& point2_y <= actor->pos_y + actor->colission_area.points[2][1]) {
 		return true;
 	}
 
@@ -671,24 +672,24 @@ bool NPC_CheckRightColission(NPC n) {
 
 	/////// ACTOR COLISSIONS ///////////
 	//Point 1
-	if (point1_x <= actor.pos_x + actor.colission_area.points[1][0]
+	if (point1_x <= actor->pos_x + actor->colission_area.points[1][0]
 
-		&& point1_x >= actor.pos_x + actor.colission_area.points[0][0]
+		&& point1_x >= actor->pos_x + actor->colission_area.points[0][0]
 
-		&& point1_y >= actor.pos_y + actor.colission_area.points[0][1]
+		&& point1_y >= actor->pos_y + actor->colission_area.points[0][1]
 
-		&& point1_y <= actor.pos_y + actor.colission_area.points[2][1]) {
+		&& point1_y <= actor->pos_y + actor->colission_area.points[2][1]) {
 		return true;
 	}
 
 	//Point 2
-	if (point2_x <= actor.pos_x + actor.colission_area.points[1][0]
+	if (point2_x <= actor->pos_x + actor->colission_area.points[1][0]
 
-		&& point2_x >= actor.pos_x + actor.colission_area.points[0][0]
+		&& point2_x >= actor->pos_x + actor->colission_area.points[0][0]
 
-		&& point2_y >= actor.pos_y + actor.colission_area.points[0][1]
+		&& point2_y >= actor->pos_y + actor->colission_area.points[0][1]
 
-		&& point2_y <= actor.pos_y + actor.colission_area.points[2][1]) {
+		&& point2_y <= actor->pos_y + actor->colission_area.points[2][1]) {
 		return true;
 	}
 
@@ -716,8 +717,8 @@ void NPC_UpdateRangeStatus(int npc_number) {
 	int i, dx, dy, distance, pos_x, pos_y;
 	dword vx_FP, vy_FP, x_FP, y_FP;
 	if (gfx_sprite_stack[npc[npc_number].sprite_num].shown) {
-		dx = (actor.pos_x + actor.width_px) - (npc[npc_number].pos_x + npc[npc_number].width_px);
-		dy = (actor.pos_y + actor.height_px) - (npc[npc_number].pos_y + npc[npc_number].height_px);
+		dx = (actor->pos_x + actor->width_px) - (npc[npc_number].pos_x + npc[npc_number].width_px);
+		dy = (actor->pos_y + actor->height_px) - (npc[npc_number].pos_y + npc[npc_number].height_px);
 
 		// calculate steps
 		if (abs(dx) > abs(dy))
@@ -805,7 +806,7 @@ void NPC_Update(void) {
 			npc_counter++;
 
 			// Update npc position on screen
-			GFX_SetSpritePosition(npc[i].sprite_num, npc[i].pos_x - camera.pos_x, npc[i].pos_y - camera.pos_y);
+			GFX_SetSpritePosition(npc[i].sprite_num, npc[i].pos_x - camera->pos_x, npc[i].pos_y - camera->pos_y);
 
 			// On screen
 			npc[i].on_screen = GFX_IsSpriteOnScreen(npc[i].sprite_num);
@@ -934,7 +935,7 @@ void NPC_Update(void) {
 							npc[i].action_walk = true;
 							npc[i].action_stand = false;
 
-							NPC_RunAway(i, actor.pos_x, actor.pos_y, &npc[i].movement);
+							NPC_RunAway(i, actor->pos_x, actor->pos_y, &npc[i].movement);
 							npc[i].status_facing = npc[i].movement;
 							npc[i].action_step = 0;
 							npc[i].last_action = NPC_ACTION_WALK;
@@ -944,7 +945,7 @@ void NPC_Update(void) {
 							npc[i].action_walk = true;
 							npc[i].action_stand = false;
 
-							NPC_LookAt(i, actor.pos_x, actor.pos_y, &npc[i].status_facing);
+							NPC_LookAt(i, actor->pos_x, actor->pos_y, &npc[i].status_facing);
 							npc[i].movement = npc[i].status_facing;
 							npc[i].action_step = 0;
 							npc[i].last_action = NPC_ACTION_WALK;
@@ -954,7 +955,7 @@ void NPC_Update(void) {
 							npc[i].action_walk = true;
 							npc[i].action_stand = false;
 
-							NPC_LookAt(i, actor.pos_x + rand() % 0xF, actor.pos_y + rand() % 0xF, &npc[i].status_facing);
+							NPC_LookAt(i, actor->pos_x + rand() % 0xF, actor->pos_y + rand() % 0xF, &npc[i].status_facing);
 							npc[i].movement = npc[i].status_facing;
 							npc[i].action_step = 0;
 							npc[i].last_action = NPC_ACTION_WALK;

@@ -39,8 +39,10 @@
 #define UI_TXT_SCN6I 21
 #define UI_TXT_END 22
 
-extern UI ui;
-extern Button ui_button[UI_MAX_BUTTONS];
+
+extern UI *ui;
+extern Button *ui_button;
+void UI_Init(void);
 void UI_SetStatusPanels(void);
 void UI_SetDefaultLanguage(void);
 void UI_UpdateUI(bool combat_mode);

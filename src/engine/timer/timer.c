@@ -52,12 +52,12 @@ void TIMER_UpdateTimerTime(int timer, dword ms) {
 }
 
 void TIMER_AudioCallback(byte param) {
-	AUDIO_TimerHandler();
+	if (engine.audio_initialized) AUDIO_TimerHandler();
 }
 END_OF_FUNCTION(TIMER_AudioCallback);
 
 void TIMER_VideoCallback(byte param) {
-	VIDEO_TimerHandler();
+	if (engine.video_initialized) VIDEO_TimerHandler();
 }
 END_OF_FUNCTION(TIMER_VideoCallback);
 

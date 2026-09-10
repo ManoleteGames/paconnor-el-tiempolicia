@@ -72,6 +72,7 @@ typedef struct {
 	bool mouse_present;
 
 	// Video
+	bool video_initialized;
 	bool VGA_present;
 	bool EGA_present;
 	bool CGA_present;
@@ -265,24 +266,13 @@ typedef struct {
 
 	bool animation_frame;
 	int animation_counter;
+
+	bool *hotspot_enabling_room1;
+	bool *event_enabling_room1;
+	bool *hotspot_enabling_room2;
+	bool *event_enabling_room2;
+
 } Map;
-
-typedef struct {
-	int offset_x;
-	int offset_y;
-	int frame;
-} AnimData;
-
-typedef struct {
-	byte current_frame;
-	bool loop;
-	bool end;
-	bool inverted;
-	byte frames;
-	byte speed;
-	byte counter;
-	AnimData anim_data[20];
-} SpriteAnimation;
 
 typedef struct {
 	byte width;
@@ -318,12 +308,33 @@ typedef struct {
 	byte color;
 } SpriteBlink;
 
+
+typedef struct {
+	int offset_x;
+	int offset_y;
+	int frame;
+} AnimData;
+
+typedef struct {
+	byte current_frame;
+	bool loop;
+	bool end;
+	bool inverted;
+	byte frames;
+	byte speed;
+	byte counter;
+	AnimData anim_data[10];
+} SpriteAnimation;
+
 typedef struct {
 	bool loaded;
 	bool invisible;
 	bool blink;
 	bool inverted;
+	bool unmasked;
+
 	byte blink_color;
+
 	int graphics_id;
 	int width_px;
 	int heigth_px;
@@ -332,7 +343,14 @@ typedef struct {
 	int offset_x;
 	int offset_y;
 	int frame;
-	bool unmasked;
+
+	byte anim_current_frame;
+	bool anim_loop;
+	bool anim_end;
+	byte anim_frames;
+	byte anim_speed;
+	byte anim_counter;
+	AnimData anim_data[10];
 } SpriteGfx;
 
 typedef struct {
@@ -350,9 +368,8 @@ typedef struct {
 	int width_px;
 	int height_px;
 
-	SpriteAnimation animation[5];
 	SpriteBlink blink;
-	SpriteGfx gfx[5];
+	SpriteGfx *gfx;
 	byte gfx_order[5];
 } Sprite;
 
@@ -411,7 +428,7 @@ typedef struct {
 	byte speech_time;
 	unsigned char object_name[40];
 	unsigned char speech[40];
-	TextFile txt_file[25];
+	TextFile *txt_file[25];
 } UI;
 
 typedef struct {
@@ -534,7 +551,7 @@ typedef struct {
 	int sprite_graphics_id;
 	int portait_graphics_id;
 
-	SpriteConfig cfg;
+	SpriteConfig *cfg;
 	Area colission_area;
 	Area hit_area;
 } Object;
@@ -691,17 +708,17 @@ typedef struct {
 	Area colission_area;
 	Area hit_area;
 
-	Gun gun;
+	Gun *gun;
 	int new_gun;
 
 	int key_entity_id;
 	int key_graphics_id;
 
-	SpriteAnimation feet_animation[150];
-	SpriteAnimation body_animation[150];
-	SpriteAnimation head_animation[150];
-	SpriteAnimation left_arm_animation[150];
-	SpriteAnimation right_arm_animation[150];
+	SpriteAnimation *feet_animation;
+	SpriteAnimation *body_animation;
+	SpriteAnimation *head_animation;
+	SpriteAnimation *left_arm_animation;
+	SpriteAnimation *right_arm_animation;
 } Actor;
 
 typedef struct {
@@ -775,14 +792,14 @@ typedef struct {
 	Area colission_area;
 	Area hit_area;
 
-	Gun gun;
+	Gun *gun;
+	SpriteConfig *cfg;
 
-	SpriteConfig cfg;
-	SpriteAnimation feet_animation[68];
-	SpriteAnimation body_animation[68];
-	SpriteAnimation head_animation[68];
-	SpriteAnimation left_arm_animation[68];
-	SpriteAnimation right_arm_animation[68];
+	SpriteAnimation *feet_animation;
+	SpriteAnimation *body_animation;
+	SpriteAnimation *head_animation;
+	SpriteAnimation *left_arm_animation;
+	SpriteAnimation *right_arm_animation;
 } Enemy;
 
 typedef struct {
@@ -845,7 +862,7 @@ typedef struct {
 	Area colission_area;
 	Area hit_area;
 
-	SpriteConfig cfg;
+	SpriteConfig *cfg;
 } NPC;
 
 typedef struct {
@@ -888,6 +905,9 @@ typedef struct {
 
 	int blink_counter;
 
+	byte boss_update_counter;
+	byte boss_counter;
+
 	bool on_screen;
 	bool in_punch_range;
 	bool in_shoot_range;
@@ -911,14 +931,21 @@ typedef struct {
 	Area colission_area;
 	Area hit_area;
 
-	Gun gun;
+	Gun *gun;
 
-	SpriteConfig cfg;
-	SpriteAnimation feet_animation[10];
-	SpriteAnimation body_animation[10];
-	SpriteAnimation head_animation[10];
-	SpriteAnimation left_arm_animation[10];
-	SpriteAnimation right_arm_animation[10];
+	SpriteConfig *cfg;
+	SpriteAnimation *feet_animation;
+	SpriteAnimation *body_animation;
+	SpriteAnimation *head_animation;
+	SpriteAnimation *left_arm_animation;
+	SpriteAnimation *right_arm_animation;
+
+	int *boss_hold_on_pattern;
+	int *boss_chase_pattern;
+	int *boss_attack_pattern;
+	int *boss_rampage_pattern;
+	int *boss_static_pattern;
+
 } Boss;
 
 typedef enum {

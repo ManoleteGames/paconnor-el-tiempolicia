@@ -16,7 +16,7 @@ void EGA_ScreenMainBufferToVRAM(void) {
 
 	//disable();//disable interrupts
 
-	memcpy(EGA, video.screen_buffer[VIDEO_SCREEN_BUFFER_BACK], EGA_RESOLUTION_WIDTH * EGA_RESOLUTION_HEIGHT);
+	memcpy(EGA, video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], EGA_RESOLUTION_WIDTH * EGA_RESOLUTION_HEIGHT);
 	//enable();
 }
 

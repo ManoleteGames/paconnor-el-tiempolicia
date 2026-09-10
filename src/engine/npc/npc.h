@@ -52,7 +52,7 @@
 #define NPC_MOVING_DOWN 4
 #define NPC_MOVING_UP 8
 
-extern NPC npc[NPC_MAX_NPCS];
+extern NPC *npc;
 extern byte npc_counter;
 void NPC_Init(void);
 void NPC_Load(const char *dat_name, byte number, int x, int y, int face_gfx_id, int sprite_gfx_id, int facing, int behavior, int life);

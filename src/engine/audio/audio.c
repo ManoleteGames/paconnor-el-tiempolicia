@@ -11,6 +11,9 @@ static Song song;
 
 void AUDIO_Init(void) {
 	if (!engine.audio_initialized) {
+
+		A2M_Init();
+
 		switch (settings.sound_device) {
 			case AUDIO_DEVICE_NONE:
 				break;

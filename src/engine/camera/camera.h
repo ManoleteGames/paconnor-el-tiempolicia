@@ -12,7 +12,7 @@
 #define CAM_SPEED 1
 
 /// CAMERA.C ///
-extern Camera camera;
+extern Camera *camera;
 void CAM_Init(int x_limit, int y_limit, int x_pos, int y_pos);
 void CAM_MainPositionControl(bool player_follow, bool *map_update_flag);
 void CAM_SetPosition(int x, int y);

@@ -37,7 +37,7 @@ Set-Location -Path "$parentPath\images\menu"
 python3 "$PSScriptRoot/makedat.py" "IMENU.DAT" "MENUBACK.PCX"
 Write-Host Generating intro images DAT file....
 Set-Location -Path "$parentPath\images\intro"
-python3 "$PSScriptRoot/makedat.py" "INTRO.DAT" "INTRO1.PCX" "INTRO2.PCX" "INTRO3.PCX"
+python3 "$PSScriptRoot/makedat.py" "INTRO.DAT" "INTRO1.PCX" "INTRO2.PCX"
 Write-Host Generating ending images DAT file....
 Set-Location -Path "$parentPath\images\end"
 python3 "$PSScriptRoot/makedat.py" "END.DAT" "END1H.PCX" "END2H.PCX" "END2L.PCX" "END3H.PCX" "END4H.PCX" "END4L.PCX" "END5H.PCX" "END6H.PCX" "END7H.PCX" "END8H.PCX" "END9H.PCX"

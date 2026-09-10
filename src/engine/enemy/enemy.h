@@ -6,7 +6,7 @@
 
 #define ENEMY_TRANSP_COLOR 201
 
-#define ENEMY_MAX_ENEMIES 40
+#define ENEMY_MAX_ENEMIES 32
 
 #define ENEMY_BULLET_GFX_WIDTH 32
 #define ENEMY_BULLET_GFX_HEIGHT 8
@@ -138,7 +138,7 @@
 #define ENEMY_ANIM_DEAD_DOWN 47
 #define ENEMY_ANIM_DEAD_LEFT 48
 
-extern Enemy enemy[ENEMY_MAX_ENEMIES];
+extern Enemy *enemy;
 extern byte enemy_counter;
 void ENEMY_Init(void);
 void ENEMY_Load(const char *dat_name, byte number, int x, int y, int face_gfx_id, int portait_gfx_id, int feet_gfx_id, int body_gfx_id, int head_gfx_id, int larm_gfx_id, int rarm_gfx_id, int facing, int gun_type, int gun_graphics_id, int bullet_graphics_id, int behavior, int life);

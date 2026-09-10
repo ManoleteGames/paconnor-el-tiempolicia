@@ -5,8 +5,9 @@
 
 #define PARTICLE_MAX_PARTICLES 64
 
-extern Particle particle[PARTICLE_MAX_PARTICLES];
-void PARTICLE_InitParticle(int graphics_id, int entity_id, int source_x, int source_y, int target_x, int target_y, int speed, int damage, int range_x, int range_y);
+extern Particle *particle;
+void PARTICLE_Init(void);
+void PARTICLE_LoadParticle(int graphics_id, int entity_id, int source_x, int source_y, int target_x, int target_y, int speed, int damage, int range_x, int range_y);
 int PARTICLE_CheckParticleColission(Particle obj);
 void PARTICLE_UpdateParticles(void);
 void PARTICLE_DrawColissionPixels(Particle p);
