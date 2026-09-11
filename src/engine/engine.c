@@ -503,7 +503,6 @@ void Update(int player_follow) {
 	UI_UpdateUI(actor->mode_combat);
 	GFX_DrawCursorSprite();
 
-
 	/*engine.debug1_INT = enemy_counter;
 	engine.debug2_INT = boss->status_behavior;
 	engine.debug3_INT = boss->pattern_step;

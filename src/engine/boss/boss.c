@@ -225,7 +225,7 @@ void BOSS_Load(const char *dat_name, int x, int y, int type, int face_gfx_id, in
 	boss->gun->graphics_id = gun_graphics_id;
 	boss->gun->bullet_graphics_id = bullet_graphics_id;
 	boss->gun->max_accuracy = 4;
-	boss->gun->bullet_speed = 3;
+	boss->gun->bullet_speed = 5;
 	boss->gun->damage = 20;
 	boss->gun->max_distance = 300;
 
@@ -276,7 +276,7 @@ void BOSS_Load(const char *dat_name, int x, int y, int type, int face_gfx_id, in
 
 			boss->speed = 12;
 			boss->reaction_time = 6;
-			boss->punch_range = 16;
+			boss->punch_range = 32;
 			boss->shoot_range = 92;
 
 			break;
@@ -320,7 +320,7 @@ void BOSS_Load(const char *dat_name, int x, int y, int type, int face_gfx_id, in
 
 			boss->speed = 10;
 			boss->reaction_time = 8;
-			boss->punch_range = 16;
+			boss->punch_range = 32;
 			boss->shoot_range = 92;
 
 			break;
@@ -363,7 +363,7 @@ void BOSS_Load(const char *dat_name, int x, int y, int type, int face_gfx_id, in
 
 			boss->speed = 12;
 			boss->reaction_time = 12;
-			boss->punch_range = 16;
+			boss->punch_range = 32;
 			boss->shoot_range = 92;
 
 			break;
@@ -406,7 +406,7 @@ void BOSS_Load(const char *dat_name, int x, int y, int type, int face_gfx_id, in
 
 			boss->speed = 4;
 			boss->reaction_time = 8;
-			boss->punch_range = 16;
+			boss->punch_range = 32;
 			boss->shoot_range = 102;
 
 			break;
@@ -1507,10 +1507,6 @@ void BOSS_Update(void) {
 						break;
 					case 1:
 						EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_BLOOD, boss->pos_x + (rand() % 32), boss->pos_y + (rand() % 32), true, 0, false, false, 5);
-						boss->x_FP += boss->hit_vx_FP;
-						boss->y_FP += boss->hit_vy_FP;
-						boss->pos_x = boss->x_FP >> FP;
-						boss->pos_y = boss->y_FP >> FP;
 						if (GFX_IsSpriteAnimationEnded(boss->sprite_num, 0)) {
 							boss->action_step++;
 							boss->idle_counter = 0;
@@ -1518,7 +1514,7 @@ void BOSS_Update(void) {
 						break;
 					case 2:
 						boss->idle_counter++;
-						if (boss->idle_counter > BOSS_IDLE_TICKS) {
+						if (boss->idle_counter > 20) {
 							boss->action_step++;
 							boss->idle_counter = 0;
 							GFX_SetSpriteBlinkingProperties(boss->sprite_num, true, 5, SPRITE_TRANSP_COLOR);
@@ -1526,7 +1522,7 @@ void BOSS_Update(void) {
 						break;
 					case 3:// Unload enemy
 						boss->idle_counter++;
-						if (boss->idle_counter > BOSS_IDLE_TICKS) {
+						if (boss->idle_counter > 20) {
 							boss->action_step++;
 							boss->idle_counter = 0;
 						}
