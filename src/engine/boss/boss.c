@@ -361,8 +361,8 @@ void BOSS_Load(const char *dat_name, int x, int y, int type, int face_gfx_id, in
 			boss->boss_static_pattern[4] = BOSS_PATTERN_HOLD_ON;
 			boss->boss_static_pattern[5] = BOSS_PATTERN_HOLD_ON;
 
-			boss->speed = 12;
-			boss->reaction_time = 12;
+			boss->speed = 3;
+			boss->reaction_time = 15;
 			boss->punch_range = 32;
 			boss->shoot_range = 92;
 
@@ -993,7 +993,7 @@ void BOSS_Update(void) {
 
 		// DEBUG: Draw collision and hit pixels
 		//if (boss->on_screen) BOSS_DrawColissionPixels();
-		if (boss->on_screen) BOSS_DrawHitPixels();
+		//if (boss->on_screen) BOSS_DrawHitPixels();
 
 		// Avoid to update enemies each cycle
 		update_boss = (boss->boss_update_counter) & 1;

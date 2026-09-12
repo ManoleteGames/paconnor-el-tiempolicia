@@ -458,7 +458,7 @@ void MAP_DrawAnimatedTilesColumn(int logical_pos_x, int logical_pos_y, int tile_
 	logical_x = logical_pos_x;
 	logical_y = logical_pos_y;
 
-	for (i = 0; i < (camera->visible_height >> MAP_TILE_HEIGHT_BASE2) + 1; i++) {
+	for (i = 0; i < (camera->visible_height >> MAP_TILE_HEIGHT_BASE2) - 1; i++) {
 		tile_number = ((tile_y + i) * map->width) + tile_x;
 
 		switch (map->layer[MAP_ANIM_LAYER][tile_number]) {
@@ -582,7 +582,7 @@ void MAP_DrawAnimatedTilesToMapVideoBuffer(void) {
 	register int tile_x, tile_y;
 
 	// Draw column by column
-	for (i = 0; i < (video->map_buffer_width >> MAP_TILE_WIDTH_BASE2); i++) {
+	for (i = 1; i < (video->map_buffer_width >> MAP_TILE_WIDTH_BASE2) - 1; i++) {
 
 		pos_x = camera->pos_abs_x + (i << MAP_TILE_WIDTH_BASE2);
 		if (pos_x >= video->map_buffer_width) { pos_x = pos_x - video->map_buffer_width; }
@@ -607,6 +607,9 @@ void MAP_Update(void) {
 			map->animation_frame = !map->animation_frame;
 			MAP_DrawAnimatedTilesToMapVideoBuffer();
 		}
+
+		//MAP_DrawAnimatedTilesToMapVideoBuffer2();
+
 
 		// Displacement right
 		if ((map->update_required) && (camera->old_pos_x < camera->pos_x)) {

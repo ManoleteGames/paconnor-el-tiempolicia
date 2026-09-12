@@ -266,6 +266,8 @@ typedef struct {
 
 	bool animation_frame;
 	int animation_counter;
+	int animation_counter_x;
+	int animation_counter_y;
 
 	bool *hotspot_enabling_room1;
 	bool *event_enabling_room1;

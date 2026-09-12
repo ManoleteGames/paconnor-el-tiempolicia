@@ -509,9 +509,9 @@ void Update(int player_follow) {
 	engine.debug4_INT = boss->boss_attack_pattern[0];
 	engine.debug5_INT = boss->boss_attack_pattern[1];
 	engine.debug6_INT = boss->boss_attack_pattern[2];
+	*/
 
-
-	UpdateStatusPannel();// Draws status pannel on the screen buffer*/
+	//UpdateStatusPannel();// Draws status pannel on the screen buffer
 
 	LimitFPS(40);//25
 	engine.sample_time = TIMER_GetMilliseconds() - start_time;
