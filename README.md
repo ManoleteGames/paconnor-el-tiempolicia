@@ -166,6 +166,11 @@ Una máquina del tiempo. Una ciudad en decadencia. Y una última oportunidad par
 | Historia           | 🚧     |
 
 ---
+---
+---
+---
+
+
 
 ## 👨‍💻 Autor
 
