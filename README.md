@@ -2,6 +2,10 @@
 # PACONNOR, El tiempolicia
 
 > Un shooter de acción y aventura para MS-DOS, ambientado en un futuro distópico.
+> 
+> Pude descargarse el último release y utilizarlo en cualquier emulador como DOSBOX, PCem, 86Box, etc..
+> 
+> O jugar directamente en [Itch.io](https://manoletegames.itch.io/paconnor-el-tiempolicia)
 
 ![MS-DOS](https://img.shields.io/badge/Platform-MS--DOS-555555)
 ![Language](https://img.shields.io/badge/Language-C-blue)
