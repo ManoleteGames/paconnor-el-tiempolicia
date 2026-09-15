@@ -150,12 +150,14 @@ void UI_UpdateUI(bool combat_mode) {
 			ui->freeze = false;
 			ACTOR_SetFreeze(false);
 			VIDEO_SetPalette(gfx->palette_loaded);
+			AUDIO_ResumeSong();
 		} else {
 			ui->pause = true;
 			ui->freeze = true;
 			ACTOR_SetFreeze(true);
 			MOUSE_SetCursorGraphics(SPRITE_GRAPHICS_ID_CURSOR);
 			VIDEO_FadeOutPause(4);
+			AUDIO_PauseSong();
 		}
 		kbKeyState[SCANCODE_P] = false;
 	}
@@ -168,6 +170,7 @@ void UI_UpdateUI(bool combat_mode) {
 			ACTOR_SetFreeze(true);
 			MOUSE_SetCursorGraphics(SPRITE_GRAPHICS_ID_CURSOR);
 			VIDEO_FadeOutPause(4);
+			AUDIO_PauseSong();
 		}
 		kbKeyState[SCANCODE_ESC] = false;
 	}
@@ -198,16 +201,17 @@ void UI_UpdateUI(bool combat_mode) {
 		kbKeyState[SCANCODE_N] = false;
 		ui->exit_request = false;
 		VIDEO_SetPalette(gfx->palette_loaded);
+		AUDIO_ResumeSong();
 	}
 
 	// Show exit request
 	if (ui->exit_request) {
-		VIDEO_StringToScreenBuffer(110, 90, ui->txt_file[UI_TXT_GLOBAL]->line[8], FONT_BIG_WHITE);
+		VIDEO_StringToScreenBuffer(110, 90, ui->txt_file[UI_TXT_GLOBAL]->line[8], FONT_BIG_BLACK);
 	}
 
 	// Show pause
 	if (ui->pause) {
-		VIDEO_StringToScreenBuffer(110, 90, ui->txt_file[UI_TXT_GLOBAL]->line[7], FONT_BIG_WHITE);
+		VIDEO_StringToScreenBuffer(110, 90, ui->txt_file[UI_TXT_GLOBAL]->line[7], FONT_BIG_BLACK);
 	}
 
 	// Show description

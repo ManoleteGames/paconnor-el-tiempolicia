@@ -1229,6 +1229,10 @@ void FILE_LoadSpeakerSong(const char *dat_name, const char *asset_name, Song *so
 		}
 
 		if (duration == 'F') {
+			song->buffer[index] = 'F';
+			song->buffer[index + 1] = 'F';
+			song->buffer[index + 2] = 'F';
+			song->buffer[index + 3] = 'F';
 			eof = true;
 		}
 	}

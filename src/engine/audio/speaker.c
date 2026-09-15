@@ -470,3 +470,14 @@ void SPK_StopSong(Song *song) {
 	song->play = false;
 	SPK_Mute();
 }
+
+void SPK_PauseSong(Song *song) {
+	song->play = false;
+	SPK_Mute();
+}
+
+void SPK_ResumeSong(Song *song) {
+	if (song->loaded) {
+		song->play = true;
+	}
+}

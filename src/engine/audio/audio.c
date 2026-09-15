@@ -221,6 +221,52 @@ void AUDIO_StopSong(void) {
 	}
 }
 
+void AUDIO_PauseSong(void) {
+	switch (settings.music_device) {
+		case AUDIO_DEVICE_NONE:
+			song.loaded = false;
+			break;
+		case AUDIO_DEVICE_SPEAKER:// PC Speaker;
+			SPK_PauseSong(&song);
+			break;
+		case AUDIO_DEVICE_ADLIB:// Adlib
+			//ADLIB_PlaySong(&song);
+			break;
+		case AUDIO_DEVICE_SBLASTER:// Sound blaster
+			//SB_PlaySong(&song);
+			break;
+		default:
+			sprintf(engine.system_error_message1, "AUDIO_PauseSong function error");
+			sprintf(engine.system_error_message2, "Undefined music device number %u", settings.music_device);
+			sprintf(engine.system_error_message3, "Please run setup.exe to identify your audio card");
+			Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SOUND);
+			break;
+	}
+}
+
+void AUDIO_ResumeSong(void) {
+	switch (settings.music_device) {
+		case AUDIO_DEVICE_NONE:
+			song.loaded = false;
+			break;
+		case AUDIO_DEVICE_SPEAKER:// PC Speaker;
+			SPK_ResumeSong(&song);
+			break;
+		case AUDIO_DEVICE_ADLIB:// Adlib
+			//ADLIB_PlaySong(&song);
+			break;
+		case AUDIO_DEVICE_SBLASTER:// Sound blaster
+			//SB_PlaySong(&song);
+			break;
+		default:
+			sprintf(engine.system_error_message1, "AUDIO_ResumeSong function error");
+			sprintf(engine.system_error_message2, "Undefined music device number %u", settings.music_device);
+			sprintf(engine.system_error_message3, "Please run setup.exe to identify your audio card");
+			Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SOUND);
+			break;
+	}
+}
+
 int AUDIO_GetCurrentLine(void) {
 	return song.current_line;
 }

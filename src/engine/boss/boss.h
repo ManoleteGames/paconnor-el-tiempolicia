@@ -5,7 +5,7 @@
 
 #define BOSS_SPEED 5
 #define BOSS_RAMPAGE_SPEED 10
-#define BOSS_LIFE 3000
+#define BOSS_LIFE 2000
 #define BOSS_ANIMATION_SPEED 5
 
 #define BOSS_PUNCH_RANGE 16
@@ -50,10 +50,10 @@
 #define BOSS_ANIM_FALL 6
 #define BOSS_ANIM_DEAD 7
 
-#define BOSS_TYPE_FAST_SPEED 1
-#define BOSS_TYPE_MEDIUM_SPEED 2
-#define BOSS_TYPE_SLOW 3
-#define BOSS_TYPE_STRONG 4
+#define BOSS_TYPE_RAT 1
+#define BOSS_TYPE_SPIDER 2
+#define BOSS_TYPE_PRIEST 3
+#define BOSS_TYPE_MECHA 4
 
 extern Boss *boss;
 void BOSS_Init(void);

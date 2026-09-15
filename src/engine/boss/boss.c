@@ -123,6 +123,8 @@ void BOSS_Load(const char *dat_name, int x, int y, int type, int face_gfx_id, in
 
 	boss->is_loaded = true;
 
+	boss->type = type;
+
 	boss->pos_x = x;
 	boss->pos_y = y;
 	boss->x_FP = x << FP;
@@ -237,7 +239,7 @@ void BOSS_Load(const char *dat_name, int x, int y, int type, int face_gfx_id, in
 	BOSS_LoadAnimations(dat_name, 10);
 
 	switch (type) {
-		case BOSS_TYPE_FAST_SPEED:
+		case BOSS_TYPE_RAT:
 			// Load patterns
 			boss->boss_hold_on_pattern[0] = BOSS_PATTERN_HOLD_ON;
 			boss->boss_hold_on_pattern[1] = BOSS_PATTERN_WALK_ARROUND;
@@ -281,7 +283,7 @@ void BOSS_Load(const char *dat_name, int x, int y, int type, int face_gfx_id, in
 
 			break;
 
-		case BOSS_TYPE_MEDIUM_SPEED:
+		case BOSS_TYPE_SPIDER:
 			// Load patterns
 			boss->boss_hold_on_pattern[0] = BOSS_PATTERN_HOLD_ON;
 			boss->boss_hold_on_pattern[1] = BOSS_PATTERN_HOLD_ON;
@@ -324,7 +326,7 @@ void BOSS_Load(const char *dat_name, int x, int y, int type, int face_gfx_id, in
 			boss->shoot_range = 92;
 
 			break;
-		case BOSS_TYPE_SLOW:
+		case BOSS_TYPE_PRIEST:
 			// Load patterns
 			boss->boss_hold_on_pattern[0] = BOSS_PATTERN_HOLD_ON;
 			boss->boss_hold_on_pattern[1] = BOSS_PATTERN_HOLD_ON;
@@ -367,7 +369,7 @@ void BOSS_Load(const char *dat_name, int x, int y, int type, int face_gfx_id, in
 			boss->shoot_range = 92;
 
 			break;
-		case BOSS_TYPE_STRONG:
+		case BOSS_TYPE_MECHA:
 			// Load patterns
 			boss->boss_hold_on_pattern[0] = BOSS_PATTERN_HOLD_ON;
 			boss->boss_hold_on_pattern[1] = BOSS_PATTERN_HOLD_ON;
@@ -970,6 +972,7 @@ void BOSS_Unload(void) {
 void BOSS_Update(void) {
 	bool status_idle;
 	int update_boss;
+	int x, y;
 
 	boss->boss_update_counter++;
 	if (boss->boss_update_counter > 6) {
@@ -1166,31 +1169,85 @@ void BOSS_Update(void) {
 				switch (boss->action_step) {
 					case 0:// Calculate target
 
-						boss->gun->current_recoil = 0;
-						AUDIO_PlaySound(AUDIO_GUN_EFFECT, 1);
-						BOSS_SetShotAnimation();
-						boss->shoot_x = actor->pos_x + (actor->width_px >> 1) + 32;
-						boss->shoot_y = actor->pos_y + (actor->height_px >> 1);
-						BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x + (boss->width_px >> 1), boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
-						boss->shoot_x = actor->pos_x + (actor->width_px >> 1);
-						boss->shoot_y = actor->pos_y + (actor->height_px >> 1);
-						BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x + (boss->width_px >> 1), boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
-						boss->shoot_x = actor->pos_x + (actor->width_px >> 1) - 32;
-						boss->shoot_y = actor->pos_y + (actor->height_px >> 1);
-						BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x + (boss->width_px >> 1), boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
-						boss->action_step++;
+						switch (boss->type) {
+							case BOSS_TYPE_RAT:
+							case BOSS_TYPE_SPIDER:
+								boss->gun->current_recoil = 0;
+								AUDIO_PlaySound(AUDIO_GUN_EFFECT, 1);
+								BOSS_SetShotAnimation();
+								boss->shoot_x = actor->pos_x + (actor->width_px >> 1) + 32;
+								boss->shoot_y = actor->pos_y + (actor->height_px >> 1);
+								BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x + (boss->width_px >> 1), boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
+								boss->shoot_x = actor->pos_x + (actor->width_px >> 1);
+								boss->shoot_y = actor->pos_y + (actor->height_px >> 1);
+								BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x + (boss->width_px >> 1), boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
+								boss->shoot_x = actor->pos_x + (actor->width_px >> 1) - 32;
+								boss->shoot_y = actor->pos_y + (actor->height_px >> 1);
+								BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x + (boss->width_px >> 1), boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
+								boss->action_step++;
 
-						// Rampage add 2 more bullets
-						if (boss->status_behavior == BOSS_STATUS_RAMPAGE) {
-							boss->shoot_x = actor->pos_x + (actor->width_px >> 1) + 5;
-							boss->shoot_y = actor->pos_y + (actor->height_px >> 1) + 5;
-							BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x + (boss->width_px >> 1), boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
-							boss->shoot_x = actor->pos_x + (actor->width_px >> 1) - 5;
-							boss->shoot_y = actor->pos_y + (actor->height_px >> 1) + 5;
-							BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x + (boss->width_px >> 1), boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
+								// Rampage add 2 more bullets
+								if (boss->status_behavior == BOSS_STATUS_RAMPAGE) {
+									boss->shoot_x = actor->pos_x + (actor->width_px >> 1) + 5;
+									boss->shoot_y = actor->pos_y + (actor->height_px >> 1) + 5;
+									BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x + (boss->width_px >> 1), boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
+									boss->shoot_x = actor->pos_x + (actor->width_px >> 1) - 5;
+									boss->shoot_y = actor->pos_y + (actor->height_px >> 1) + 5;
+									BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x + (boss->width_px >> 1), boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
+								}
+								break;
+							case BOSS_TYPE_PRIEST:
+								boss->gun->current_recoil = 0;
+								AUDIO_PlaySound(AUDIO_GUN_EFFECT, 1);
+								BOSS_SetShotAnimation();
+								boss->shoot_x = actor->pos_x + (actor->width_px >> 1) + 32;
+								boss->shoot_y = actor->pos_y + (actor->height_px >> 1);
+								BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x + (boss->width_px >> 1), boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
+								boss->shoot_x = actor->pos_x + (actor->width_px >> 1);
+								boss->shoot_y = actor->pos_y + (actor->height_px >> 1);
+								BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x + (boss->width_px >> 1), boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
+								boss->shoot_x = actor->pos_x + (actor->width_px >> 1) - 32;
+								boss->shoot_y = actor->pos_y + (actor->height_px >> 1);
+								BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x + (boss->width_px >> 1), boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
+								boss->action_step++;
+
+								// Rampage add 2 more bullets
+								if (boss->status_behavior == BOSS_STATUS_RAMPAGE) {
+									boss->shoot_x = actor->pos_x + (actor->width_px >> 1) + 5;
+									boss->shoot_y = actor->pos_y + (actor->height_px >> 1) + 5;
+									BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x + (boss->width_px >> 1), boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
+									boss->shoot_x = actor->pos_x + (actor->width_px >> 1) - 5;
+									boss->shoot_y = actor->pos_y + (actor->height_px >> 1) + 5;
+									BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x + (boss->width_px >> 1), boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
+								}
+								break;
+							case BOSS_TYPE_MECHA:
+								boss->gun->current_recoil = 0;
+								AUDIO_PlaySound(AUDIO_SHOTGUN_EFFECT, 1);
+								BOSS_SetShotAnimation();
+								boss->shoot_x = actor->pos_x + (actor->width_px >> 1) + 32;
+								boss->shoot_y = actor->pos_y + (actor->height_px >> 1);
+								//BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x, boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
+								MISILE_LoadMisile(SPRITE_GRAPHICS_ID_MISILE1, SPRITE_GRAPHICS_ID_BULLET_SHADOW, ENTITY_ID_ENEMY_BULLET, boss->pos_x, boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, 10, 150);
+								boss->shoot_x = actor->pos_x + (actor->width_px >> 1);
+								boss->shoot_y = actor->pos_y + (actor->height_px >> 1);
+								BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x, boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
+								boss->shoot_x = actor->pos_x + (actor->width_px >> 1) - 32;
+								boss->shoot_y = actor->pos_y + (actor->height_px >> 1);
+								BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x, boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
+								boss->action_step++;
+
+								// Rampage add 2 more bullets
+								if (boss->status_behavior == BOSS_STATUS_RAMPAGE) {
+									boss->shoot_x = actor->pos_x + (actor->width_px >> 1) + 5;
+									boss->shoot_y = actor->pos_y + (actor->height_px >> 1) + 5;
+									BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x, boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
+									boss->shoot_x = actor->pos_x + (actor->width_px >> 1) - 5;
+									boss->shoot_y = actor->pos_y + (actor->height_px >> 1) + 5;
+									BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x, boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
+								}
+								break;
 						}
-
-
 						break;
 					case 1:// animation end
 						if (GFX_IsSpriteAnimationEnded(boss->sprite_num, 0)) boss->action_step++;
@@ -1450,28 +1507,27 @@ void BOSS_Update(void) {
 						boss->action_step++;
 						break;
 					case 1:
-						switch (boss->hit_by) {
-							case ENTITY_ID_ACTOR_BULLET:
+						switch (boss->type) {
+							case BOSS_TYPE_RAT:
+								EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_BLOOD, boss->pos_x + boss->width_px + (rand() % 32), boss->pos_y + boss->height_px + (rand() % 32), true, 0, false, false, 5);
+								EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_BLOOD, boss->pos_x - (rand() % 32), boss->pos_y + boss->height_px + (rand() % 32), true, 0, false, false, 5);
 								break;
-							case ENTITY_ID_ACTOR_PUNCH:
+							case BOSS_TYPE_SPIDER:
+								EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_BLOOD, boss->pos_x + boss->width_px + (rand() % 32), boss->pos_y + boss->height_px + (rand() % 32), true, 0, false, false, 5);
+								EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_BLOOD, boss->pos_x - (rand() % 32), boss->pos_y + boss->height_px + (rand() % 32), true, 0, false, false, 5);
 								break;
-							case ENTITY_ID_ACTOR_KICK:
-								boss->x_FP += boss->hit_vx_FP << 2;
-								boss->y_FP += boss->hit_vy_FP << 2;
-								boss->pos_x = boss->x_FP >> FP;
-								boss->pos_y = boss->y_FP >> FP;
+							case BOSS_TYPE_PRIEST:
+								EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_BLOOD, boss->pos_x + boss->width_px + (rand() % 32), boss->pos_y + boss->height_px + (rand() % 32), true, 0, false, false, 5);
+								EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_BLOOD, boss->pos_x - (rand() % 32), boss->pos_y + boss->height_px + (rand() % 32), true, 0, false, false, 5);
 								break;
-							default:
+							case BOSS_TYPE_MECHA:
+								EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_ELECTRIC1, boss->pos_x + (boss->width_px >> 1) + (rand() % 32), boss->pos_y + (boss->height_px >> 1) - (rand() % 32), true, 0, false, false, 5);
+								EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_ELECTRIC1, boss->pos_x + (boss->width_px >> 1) - (rand() % 32), boss->pos_y + (boss->height_px >> 1) + (rand() % 32), true, 0, false, false, 5);
 								break;
 						}
 						boss->action_step++;
 						break;
-					case 2:
-						EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_BLOOD, boss->pos_x + boss->width_px + (rand() % 32), boss->pos_y + boss->height_px + (rand() % 32), true, 0, false, false, 5);
-						EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_BLOOD, boss->pos_x - (rand() % 32), boss->pos_y + boss->height_px + (rand() % 32), true, 0, false, false, 5);
-						boss->action_step++;
-						break;
-					case 3:// Move back
+					case 2:// Move back
 						boss->x_FP += boss->hit_vx_FP << 1;
 						boss->y_FP += boss->hit_vy_FP << 1;
 						boss->pos_x = boss->x_FP >> FP;
@@ -1479,7 +1535,7 @@ void BOSS_Update(void) {
 						boss->reaction_counter = 0;
 						boss->action_step++;
 						break;
-					case 4:// finish action
+					case 3:// finish action
 						if (GFX_IsSpriteAnimationEnded(boss->sprite_num, 0)) boss->action_hit = false;
 						boss->reaction_counter++;
 						if (boss->reaction_counter > boss->reaction_time) {
@@ -1506,13 +1562,48 @@ void BOSS_Update(void) {
 						boss->action_step++;
 						break;
 					case 1:
-						EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_BLOOD, boss->pos_x + (rand() % 32), boss->pos_y + (rand() % 32), true, 0, false, false, 5);
+						switch (boss->type) {
+							case BOSS_TYPE_RAT:
+								EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_BLOOD, boss->pos_x + (rand() % 32), boss->pos_y + (rand() % 32), true, 0, false, false, 5);
+								break;
+							case BOSS_TYPE_SPIDER:
+								EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_BLOOD, boss->pos_x + (rand() % 32), boss->pos_y + (rand() % 32), true, 0, false, false, 5);
+								break;
+							case BOSS_TYPE_PRIEST:
+								EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_BLOOD, boss->pos_x + (rand() % 32), boss->pos_y + (rand() % 32), true, 0, false, false, 5);
+								break;
+							case BOSS_TYPE_MECHA:
+								x = boss->pos_x - 8 + (rand() % boss->width_px);
+								y = boss->pos_y + (rand() % boss->height_px);
+								PARTICLE_LoadParticle(SPRITE_GRAPHICS_ID_EXPLOSION1, ENTITY_ID_EXPLOSION, x, y, x, y, 3, 0, 20, 16);
+								break;
+							default:
+								break;
+						}
 						if (GFX_IsSpriteAnimationEnded(boss->sprite_num, 0)) {
 							boss->action_step++;
 							boss->idle_counter = 0;
 						}
 						break;
 					case 2:
+						switch (boss->type) {
+							case BOSS_TYPE_RAT:
+								EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_BLOOD, boss->pos_x + (rand() % 32), boss->pos_y + (rand() % 32), true, 0, false, false, 5);
+								break;
+							case BOSS_TYPE_SPIDER:
+								EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_BLOOD, boss->pos_x + (rand() % 32), boss->pos_y + (rand() % 32), true, 0, false, false, 5);
+								break;
+							case BOSS_TYPE_PRIEST:
+								EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_BLOOD, boss->pos_x + (rand() % 32), boss->pos_y + (rand() % 32), true, 0, false, false, 5);
+								break;
+							case BOSS_TYPE_MECHA:
+								x = boss->pos_x - 8 + (rand() % boss->width_px);
+								y = boss->pos_y + (rand() % boss->height_px);
+								PARTICLE_LoadParticle(SPRITE_GRAPHICS_ID_EXPLOSION1, ENTITY_ID_EXPLOSION, x, y, x, y, 3, 0, 20, 16);
+								break;
+							default:
+								break;
+						}
 						boss->idle_counter++;
 						if (boss->idle_counter > 20) {
 							boss->action_step++;
@@ -1521,6 +1612,24 @@ void BOSS_Update(void) {
 						}
 						break;
 					case 3:// Unload enemy
+						switch (boss->type) {
+							case BOSS_TYPE_RAT:
+								EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_BLOOD, boss->pos_x + (rand() % 32), boss->pos_y + (rand() % 32), true, 0, false, false, 5);
+								break;
+							case BOSS_TYPE_SPIDER:
+								EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_BLOOD, boss->pos_x + (rand() % 32), boss->pos_y + (rand() % 32), true, 0, false, false, 5);
+								break;
+							case BOSS_TYPE_PRIEST:
+								EFFECT_LoadEffect(ENTITY_ID_BLOOD, SPRITE_GRAPHICS_ID_BLOOD, boss->pos_x + (rand() % 32), boss->pos_y + (rand() % 32), true, 0, false, false, 5);
+								break;
+							case BOSS_TYPE_MECHA:
+								x = boss->pos_x - 8 + (rand() % boss->width_px);
+								y = boss->pos_y + (rand() % boss->height_px);
+								PARTICLE_LoadParticle(SPRITE_GRAPHICS_ID_EXPLOSION1, ENTITY_ID_EXPLOSION, x, y, x, y, 3, 0, 20, 16);
+								break;
+							default:
+								break;
+						}
 						boss->idle_counter++;
 						if (boss->idle_counter > 20) {
 							boss->action_step++;
@@ -1529,7 +1638,6 @@ void BOSS_Update(void) {
 						break;
 					case 4:
 						BOSS_Unload();
-
 						break;
 					default:
 						break;

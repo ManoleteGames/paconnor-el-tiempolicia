@@ -41,6 +41,7 @@
 #define AUDIO_SONG_5 5
 #define AUDIO_SONG_6 6
 #define AUDIO_SONG_7 7
+#define AUDIO_SONG_8 8
 
 void AUDIO_Init(void);
 void AUDIO_Shutdown(void);
@@ -52,6 +53,8 @@ void AUDIO_TimerHandler(void);
 void AUDIO_LoadSong(int song_number);
 void AUDIO_PlaySong(bool loop);
 void AUDIO_StopSong(void);
+void AUDIO_PauseSong(void);
+void AUDIO_ResumeSong(void);
 void AUDIO_UnloadSong(void);
 bool AUDIO_IsSongEnded(void);
 int AUDIO_GetCurrentLine(void);

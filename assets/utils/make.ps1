@@ -123,7 +123,7 @@ python3 "$PSScriptRoot/makedat.py" "PALETTES.DAT" "LDOSCLUB.PCX" "LMANOL.PCX" "L
 Write-Host ////////////////////////////// SOUND /////////////////////////////////
 Write-Host Generating music DAT file....
 Set-Location -Path "$parentPath\sounds"
-python3 "$PSScriptRoot/makedat.py" "MUSICSPK.DAT" "spk_song1.mus" "spk_song2.mus" "spk_song3.mus" "spk_song4.mus" "spk_song5.mus" "spk_song6.mus" "spk_song7.mus"
+python3 "$PSScriptRoot/makedat.py" "MUSICSPK.DAT" "spk_song1.mus" "spk_song2.mus" "spk_song3.mus" "spk_song4.mus" "spk_song5.mus" "spk_song6.mus" "spk_song7.mus" "spk_song8.mus"
 python3 "$PSScriptRoot/makedat.py" "MSCENE1.DAT" "intro1.a2m" "scene1.a2m"
 python3 "$PSScriptRoot/makedat.py" "MSCENE2.DAT" "intro2.a2m" "scene2.a2m"
 
@@ -138,7 +138,7 @@ Set-Location -Path "$parentPath\sprites\actor"
 python3 "$PSScriptRoot/makedat.py" "ACTOR.DAT" "FEET.PCX" "BODY.PCX" "HEAD.PCX" "LARM1.PCX" "RARM1.PCX" "RARM2.PCX" "RARM3.PCX" "RARM4.PCX" "RARM5.PCX" "FEET.ANI" "BODY.ANI" "HEAD.ANI" "LARM.ANI" "RARM.ANI" "FACE.PCX" "PORTAIT.PCX" "FEET.ANI" "BODY.ANI" "HEAD.ANI" "RARM.ANI" "LARM.ANI"
 Write-Host Generating bullet sprites DAT file....
 Set-Location -Path "$parentPath\sprites\bullets"
-python3 "$PSScriptRoot/makedat.py" "BULLETS.DAT" "BULLET1.PCX" "BULLET2.PCX" "BULLET3.PCX" "PUKE.PCX" "WEB.PCX" "WEBS.PCX" "RAY.PCX" "PUNCH1.PCX" "GRENADE1.PCX" "GRENADES.PCX"
+python3 "$PSScriptRoot/makedat.py" "BULLETS.DAT" "BULLET1.PCX" "BULLET2.PCX" "BULLET3.PCX" "PUKE.PCX" "WEB.PCX" "WEBS.PCX" "RAY.PCX" "PUNCH1.PCX" "GRENADE.PCX" "SHADOW.PCX" "ROCKET.PCX"
 
 Write-Host ////////////////////////////// ENEMIES SPRITES /////////////////////////////////
 Write-Host Generating enemy 1 sprites DAT file....
@@ -174,6 +174,9 @@ python3 "$PSScriptRoot/makedat.py" "ENEMY10.DAT" "FACE.PCX" "PORTAIT.PCX" "FEET.
 Write-Host Generating enemy 11 sprites DAT file....
 Set-Location -Path "$parentPath\sprites\enemies\enemy11"
 python3 "$PSScriptRoot/makedat.py" "ENEMY11.DAT" "FACE.PCX" "PORTAIT.PCX" "FEET.PCX" "BODY.PCX" "HEAD.PCX" "LARM.PCX" "RARM.PCX" "FEET.ANI" "BODY.ANI" "HEAD.ANI" "RARM.ANI" "LARM.ANI" "ENEMY.CFG"
+Write-Host Generating enemy 12 sprites DAT file....
+Set-Location -Path "$parentPath\sprites\enemies\enemy12"
+python3 "$PSScriptRoot/makedat.py" "ENEMY12.DAT" "FACE.PCX" "PORTAIT.PCX" "FEET.PCX" "BODY.PCX" "HEAD.PCX" "LARM.PCX" "RARM.PCX" "FEET.ANI" "BODY.ANI" "HEAD.ANI" "RARM.ANI" "LARM.ANI" "ENEMY.CFG"
 
 Write-Host ////////////////////////////// BOSS SPRITES /////////////////////////////////
 Write-Host Generating boss1 sprites DAT file....

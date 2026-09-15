@@ -47,7 +47,7 @@
 #include "item/item.h"
 #include "enemy/enemy.h"
 #include "boss/boss.h"
-
+#include "misile/misile.h"
 #include "grenade/grenade.h"
 #include "bullet/bullet.h"
 
@@ -131,3 +131,4 @@ void UpdateStatusPannel(void);
 void FPS(void);
 void SetDelayTime(int time);
 bool AwaitDelayTime(void);
+void LoadGlobalAssets(void);

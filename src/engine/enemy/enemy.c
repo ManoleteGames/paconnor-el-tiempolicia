@@ -71,8 +71,8 @@ void ENEMY_SetGun(int enemy_number, int type, int graphics_id, int bullet_graphi
 			enemy[enemy_number].gun->recoil_time = 10;
 			enemy[enemy_number].gun->max_distance = 100;
 			enemy[enemy_number].gun->accurate = false;
-			enemy[enemy_number].gun->shoots = 4;
-			enemy[enemy_number].gun->bullet_speed = 2;
+			enemy[enemy_number].gun->shoots = 3;
+			enemy[enemy_number].gun->bullet_speed = 4;
 			enemy[enemy_number].shoot_accuracy = 1;
 			enemy[enemy_number].shoot_range = 80;
 			break;
@@ -144,6 +144,14 @@ void ENEMY_Init(void) {
 void ENEMY_Load(const char *dat_name, byte number, int x, int y, int face_gfx_id, int portait_gfx_id, int feet_gfx_id, int body_gfx_id, int head_gfx_id, int larm_gfx_id, int rarm_gfx_id, int facing, int gun_type, int gun_graphics_id, int bullet_graphics_id, int behavior, int life) {
 
 	int sprite_slot;
+
+	// Check if enemy number is over maximum
+	if (number >= ENEMY_MAX_ENEMIES) {
+		sprintf(engine.system_error_message1, "ENEMY_Init function error");
+		sprintf(engine.system_error_message2, "Wrong enemy number %u", number);
+		sprintf(engine.system_error_message3, " ");
+		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SYSTEM);
+	}
 
 	// Check if enemy is already loaded
 	if (enemy[number].is_loaded) {
@@ -1179,7 +1187,7 @@ void ENEMY_UnloadEnemy(int enemy_number) {
  */
 void ENEMY_Update(void) {
 	bool status_idle;
-	int i, update_enemy;
+	int i, j, update_enemy;
 	int movement;
 
 	enemy_update_counter++;
@@ -1292,15 +1300,20 @@ void ENEMY_Update(void) {
 							enemy[i].pattern_step = 0;
 						}
 						break;
+					case ENEMY_STATUS_STATIC_SHOOTER:
+						if (enemy[i].is_hit) {
+							enemy[i].status_behavior = ENEMY_STATUS_WARNING;
+							enemy[i].pattern_step = 0;
+						}
+						break;
 					case ENEMY_STATUS_CHASE_NPC:
 					case ENEMY_STATUS_STATIC_NPC:
 					case ENEMY_STATUS_WALKING_ARROUND_NPC:
 					case ENEMY_STATUS_WALKING_HORIZONTAL_NPC:
 					case ENEMY_STATUS_WALKING_VERTICAL_NPC:
 					case ENEMY_STATUS_WALKING_RANDOM_NPC:
-					case ENEMY_STATUS_STATIC_SHOOTER:
 						if (enemy[i].is_hit) {
-							enemy[i].status_behavior = ENEMY_STATUS_WARNING;
+							enemy[i].status_behavior = ENEMY_STATUS_HIDE;
 							enemy[i].pattern_step = 0;
 						}
 						break;
@@ -1537,7 +1550,9 @@ void ENEMY_Update(void) {
 							enemy[i].gun->current_recoil = 0;
 							AUDIO_PlaySound(AUDIO_GUN_EFFECT, 1);
 							ENEMY_SetShotAnimation(i, enemy[i].status_facing);
-							BULLET_LoadBullet(enemy[i].gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 4, 4, enemy[i].pos_x + (enemy[i].width_px >> 1), enemy[i].pos_y + (enemy[i].height_px >> 1), enemy[i].shoot_x, enemy[i].shoot_y, enemy[i].shoot_accuracy, enemy[i].gun->max_distance, enemy[i].gun->bullet_speed, enemy[i].gun->damage);
+							for (j = 0; j < enemy[i].gun->shoots; j++) {
+								BULLET_LoadBullet(enemy[i].gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 4, 4, enemy[i].pos_x + (enemy[i].width_px >> 1), enemy[i].pos_y + (enemy[i].height_px >> 1), enemy[i].shoot_x, enemy[i].shoot_y, enemy[i].shoot_accuracy, enemy[i].gun->max_distance, enemy[i].gun->bullet_speed, enemy[i].gun->damage);
+							}
 							enemy[i].action_step++;
 							break;
 						case 1:// animation end

@@ -1,7 +1,14 @@
 #include "../engine.h"
 #include "grenade.h"
 
-Grenade grenade[GRENADE_MAX_GRENADES];
+Grenade *grenade;
+
+static byte grenade_update_counter;
+byte grenade_counter;
+
+void GRENADE_Init(void) {
+	grenade = MM_PushChunk(sizeof(Grenade) * GRENADE_MAX_GRENADES, CT_ENGINE);
+}
 
 /** GRENADE :: Draw colission pixels
  *  - Draws colission pixels just for debug
@@ -17,7 +24,7 @@ void GRENADE_DrawColissionPixels(Grenade g) {
 
 /** GRENADE :: Initialize grenade
  */
-int GRENADE_InitGrenade(int graphics_id, int entity_id, int pos_x, int pos_y, int max_time, int max_distance) {
+int GRENADE_LoadGrenade(int graphics_id, int entity_id, int pos_x, int pos_y, int max_time, int max_distance) {
 	int i, number, sprite_slot;
 
 	// Search free grenade slot
@@ -41,7 +48,7 @@ int GRENADE_InitGrenade(int graphics_id, int entity_id, int pos_x, int pos_y, in
 	grenade[number].pos_x = pos_x;
 	grenade[number].pos_y = pos_y;
 	grenade[number].pos_z = 1;
-	grenade[number].speed = 3;
+	grenade[number].speed = GRENADE_SPEED;
 	grenade[number].damage = GRENADE_DAMAGE;
 	grenade[number].graphics_id = graphics_id;
 
@@ -358,186 +365,200 @@ void GRENADE_UnloadGrenade(int number) {
  */
 void GRENADE_Update(void) {
 	int i, j;
-	int aux;
+	int aux, update_grenade;
 
+	grenade_update_counter++;
+	if (grenade_update_counter > 6) {
+		grenade_update_counter = 0;
+	}
+
+	grenade_counter = 0;
 	for (i = 0; i < GRENADE_MAX_GRENADES; i++) {
 		if (grenade[i].loaded) {
+			grenade_counter++;
 
-			// debug
-			//GRENADE_DrawColissionPixels(grenade[i]);
+			// Update sprite screen pos
+			gfx_sprite_stack[grenade[i].sprite_num].screen_pos_x = grenade[i].pos_x - camera->pos_x;
+			gfx_sprite_stack[grenade[i].sprite_num].screen_pos_y = grenade[i].pos_y - grenade[i].pos_z - camera->pos_y;
 
-			grenade[i].current_time_ms = TIMER_GetMilliseconds();
-			grenade[i].current_time = (grenade[i].end_time_ms - grenade[i].current_time_ms) / 1000;
 
-			// Blink
-			switch (grenade[i].current_time) {
-				case 5:
-					GFX_SetSpriteBlinkingProperties(grenade[i].sprite_num, true, 20, GRENADE_BLINK_COLOR);
-					gfx_sprite_stack[grenade[i].sprite_num].blink.time = 20;
-					break;
-				case 4:
-					GFX_SetSpriteBlinkingProperties(grenade[i].sprite_num, true, 15, GRENADE_BLINK_COLOR);
-					gfx_sprite_stack[grenade[i].sprite_num].blink.time = 15;
-					break;
-				case 3:
-					GFX_SetSpriteBlinkingProperties(grenade[i].sprite_num, true, 10, GRENADE_BLINK_COLOR);
-					gfx_sprite_stack[grenade[i].sprite_num].blink.time = 10;
-					break;
-				case 2:
-					GFX_SetSpriteBlinkingProperties(grenade[i].sprite_num, true, 5, GRENADE_BLINK_COLOR);
-					gfx_sprite_stack[grenade[i].sprite_num].blink.time = 5;
-					break;
-				case 1:
-					GFX_SetSpriteBlinkingProperties(grenade[i].sprite_num, true, 2, GRENADE_BLINK_COLOR);
-					gfx_sprite_stack[grenade[i].sprite_num].blink.time = 2;
-					break;
-				case 0:
-					GFX_SetSpriteBlinkingProperties(grenade[i].sprite_num, true, 1, GRENADE_BLINK_COLOR);
-					gfx_sprite_stack[grenade[i].sprite_num].blink.time = 1;
-					break;
-				default:
-					gfx_sprite_stack[grenade[i].sprite_num].blink.time = 1;
-					GFX_SetSpriteBlinkingProperties(grenade[i].sprite_num, true, 1, GRENADE_BLINK_COLOR);
-					break;
-			}
+			// Avoid to update enemies each cycle
+			update_grenade = (i + grenade_update_counter) & 1;
+			if (update_grenade) {
 
-			// Play tick tack sound
-			if (gfx_sprite_stack[grenade[i].sprite_num].blink.blinked && !grenade[i].tick_played) {
-				AUDIO_PlaySound(AUDIO_TICK_EFFECT, 0);
-				grenade[i].tick_played = true;
-				grenade[i].tack_played = false;
-			}
-			if (!gfx_sprite_stack[grenade[i].sprite_num].blink.blinked && !grenade[i].tack_played) {
-				AUDIO_PlaySound(AUDIO_TACK_EFFECT, 0);
-				grenade[i].tick_played = false;
-				grenade[i].tack_played = true;
-			}
+				// debug
+				//GRENADE_DrawColissionPixels(grenade[i]);
 
-			// Being hold
-			if (grenade[i].hold) {
-				switch (actor->last_facing) {
-					case ACTOR_FACING_UP:
-						grenade[i].pos_x = actor->pos_x - 2;
-						grenade[i].pos_y = actor->pos_y + 12;
-						GFX_SetSpritePriority(grenade[i].sprite_num, 0);
+				grenade[i].current_time_ms = TIMER_GetMilliseconds();
+				grenade[i].current_time = (grenade[i].end_time_ms - grenade[i].current_time_ms) / 1000;
+
+				// Blink
+				switch (grenade[i].current_time) {
+					case 5:
+						GFX_SetSpriteBlinkingProperties(grenade[i].sprite_num, true, 20, GRENADE_BLINK_COLOR);
+						gfx_sprite_stack[grenade[i].sprite_num].blink.time = 20;
 						break;
-					case ACTOR_FACING_UP_RIGHT:
-						grenade[i].pos_x = actor->pos_x + 4;
-						grenade[i].pos_y = actor->pos_y + 8;
-						GFX_SetSpritePriority(grenade[i].sprite_num, 0);
+					case 4:
+						GFX_SetSpriteBlinkingProperties(grenade[i].sprite_num, true, 15, GRENADE_BLINK_COLOR);
+						gfx_sprite_stack[grenade[i].sprite_num].blink.time = 15;
 						break;
-					case ACTOR_FACING_RIGHT:
-						grenade[i].pos_x = actor->pos_x + 18;
-						grenade[i].pos_y = actor->pos_y + 10;
-						GFX_SetSpritePriority(grenade[i].sprite_num, 16);
+					case 3:
+						GFX_SetSpriteBlinkingProperties(grenade[i].sprite_num, true, 10, GRENADE_BLINK_COLOR);
+						gfx_sprite_stack[grenade[i].sprite_num].blink.time = 10;
 						break;
-					case ACTOR_FACING_DOWN_RIGHT:
-						grenade[i].pos_x = actor->pos_x + 18;
-						grenade[i].pos_y = actor->pos_y + 10;
-						GFX_SetSpritePriority(grenade[i].sprite_num, 16);
+					case 2:
+						GFX_SetSpriteBlinkingProperties(grenade[i].sprite_num, true, 5, GRENADE_BLINK_COLOR);
+						gfx_sprite_stack[grenade[i].sprite_num].blink.time = 5;
 						break;
-					case ACTOR_FACING_DOWN:
-						grenade[i].pos_x = actor->pos_x + 18;
-						grenade[i].pos_y = actor->pos_y + 16;
-						GFX_SetSpritePriority(grenade[i].sprite_num, 16);
+					case 1:
+						GFX_SetSpriteBlinkingProperties(grenade[i].sprite_num, true, 2, GRENADE_BLINK_COLOR);
+						gfx_sprite_stack[grenade[i].sprite_num].blink.time = 2;
 						break;
-					case ACTOR_FACING_DOWN_LEFT:
-						grenade[i].pos_x = actor->pos_x + 18;
-						grenade[i].pos_y = actor->pos_y + 14;
-						GFX_SetSpritePriority(grenade[i].sprite_num, 16);
+					case 0:
+						GFX_SetSpriteBlinkingProperties(grenade[i].sprite_num, true, 1, GRENADE_BLINK_COLOR);
+						gfx_sprite_stack[grenade[i].sprite_num].blink.time = 1;
 						break;
-					case ACTOR_FACING_LEFT:
-						grenade[i].pos_x = actor->pos_x + 10;
-						grenade[i].pos_y = actor->pos_y + 17;
-						GFX_SetSpritePriority(grenade[i].sprite_num, 16);
-						break;
-					case ACTOR_FACING_UP_LEFT:
-						grenade[i].pos_x = actor->pos_x + 2;
-						grenade[i].pos_y = actor->pos_y + 16;
-						GFX_SetSpritePriority(grenade[i].sprite_num, 0);
+					default:
+						gfx_sprite_stack[grenade[i].sprite_num].blink.time = 1;
+						GFX_SetSpriteBlinkingProperties(grenade[i].sprite_num, true, 1, GRENADE_BLINK_COLOR);
 						break;
 				}
-				GFX_SetSpritePosition(grenade[i].sprite_num, grenade[i].pos_x - camera->pos_x, grenade[i].pos_y - camera->pos_y);
-			}
 
-			// Not on target
-			if (!grenade[i].hold && !grenade[i].on_target) {
-				// Calculate new pos
+				// Play tick tack sound
+				if (gfx_sprite_stack[grenade[i].sprite_num].blink.blinked && !grenade[i].tick_played) {
+					AUDIO_PlaySound(AUDIO_TICK_EFFECT, 0);
+					grenade[i].tick_played = true;
+					grenade[i].tack_played = false;
+				}
+				if (!gfx_sprite_stack[grenade[i].sprite_num].blink.blinked && !grenade[i].tack_played) {
+					AUDIO_PlaySound(AUDIO_TACK_EFFECT, 0);
+					grenade[i].tick_played = false;
+					grenade[i].tack_played = true;
+				}
 
-				for (j = 0; j < grenade[i].speed; j++) {
-					grenade[i].x_FP += grenade[i].vx_FP;
-					grenade[i].y_FP += grenade[i].vy_FP;
-					grenade[i].z_FP += grenade[i].vz_FP;
-					aux = (int) grenade[i].z_FP >> 8;// get int part of fixed value
-					if (aux > 0) {
-						grenade[i].vz_FP -= grenade[i].g_FP;
-					} else {
-						grenade[i].z_FP = 0 << FP;
-						grenade[i].vz_FP = (grenade[i].steps - grenade[i].current_step) << 10;
+				// Being hold
+				if (grenade[i].hold) {
+					switch (actor->last_facing) {
+						case ACTOR_FACING_UP:
+							grenade[i].pos_x = actor->pos_x - 2;
+							grenade[i].pos_y = actor->pos_y + 12;
+							GFX_SetSpritePriority(grenade[i].sprite_num, 0);
+							break;
+						case ACTOR_FACING_UP_RIGHT:
+							grenade[i].pos_x = actor->pos_x + 4;
+							grenade[i].pos_y = actor->pos_y + 8;
+							GFX_SetSpritePriority(grenade[i].sprite_num, 0);
+							break;
+						case ACTOR_FACING_RIGHT:
+							grenade[i].pos_x = actor->pos_x + 18;
+							grenade[i].pos_y = actor->pos_y + 10;
+							GFX_SetSpritePriority(grenade[i].sprite_num, 16);
+							break;
+						case ACTOR_FACING_DOWN_RIGHT:
+							grenade[i].pos_x = actor->pos_x + 18;
+							grenade[i].pos_y = actor->pos_y + 10;
+							GFX_SetSpritePriority(grenade[i].sprite_num, 16);
+							break;
+						case ACTOR_FACING_DOWN:
+							grenade[i].pos_x = actor->pos_x + 18;
+							grenade[i].pos_y = actor->pos_y + 16;
+							GFX_SetSpritePriority(grenade[i].sprite_num, 16);
+							break;
+						case ACTOR_FACING_DOWN_LEFT:
+							grenade[i].pos_x = actor->pos_x + 18;
+							grenade[i].pos_y = actor->pos_y + 14;
+							GFX_SetSpritePriority(grenade[i].sprite_num, 16);
+							break;
+						case ACTOR_FACING_LEFT:
+							grenade[i].pos_x = actor->pos_x + 10;
+							grenade[i].pos_y = actor->pos_y + 17;
+							GFX_SetSpritePriority(grenade[i].sprite_num, 16);
+							break;
+						case ACTOR_FACING_UP_LEFT:
+							grenade[i].pos_x = actor->pos_x + 2;
+							grenade[i].pos_y = actor->pos_y + 16;
+							GFX_SetSpritePriority(grenade[i].sprite_num, 0);
+							break;
 					}
+					GFX_SetSpritePosition(grenade[i].sprite_num, grenade[i].pos_x - camera->pos_x, grenade[i].pos_y - camera->pos_y);
+				}
 
-					grenade[i].pos_x = (grenade[i].x_FP >> FP);
-					grenade[i].pos_y = (grenade[i].y_FP >> FP);
-					grenade[i].pos_z = (grenade[i].z_FP >> FP);
+				// Not on target
+				if (!grenade[i].hold && !grenade[i].on_target) {
+					// Calculate new pos
 
-					if (grenade[i].pos_z < 0) grenade[i].pos_z = 0;
+					for (j = 0; j < grenade[i].speed; j++) {
+						grenade[i].x_FP += grenade[i].vx_FP;
+						grenade[i].y_FP += grenade[i].vy_FP;
+						grenade[i].z_FP += grenade[i].vz_FP;
+						aux = (int) grenade[i].z_FP >> 8;// get int part of fixed value
+						if (aux > 0) {
+							grenade[i].vz_FP -= grenade[i].g_FP;
+						} else {
+							grenade[i].z_FP = 0 << FP;
+							grenade[i].vz_FP = (grenade[i].steps - grenade[i].current_step) << 10;
+						}
 
+						grenade[i].pos_x = (grenade[i].x_FP >> FP);
+						grenade[i].pos_y = (grenade[i].y_FP >> FP);
+						grenade[i].pos_z = (grenade[i].z_FP >> FP);
+
+						if (grenade[i].pos_z < 0) grenade[i].pos_z = 0;
+
+
+						// Check if hits something
+						grenade[i].hit_on = GRENADE_CheckGrenadeColission(i);
+
+						// Check hit on background, object or enemy
+						switch (grenade[i].hit_on) {
+							case 1:// left
+								grenade[i].vx_FP *= -1;
+								break;
+							case 2:// right
+								grenade[i].vx_FP *= -1;
+								break;
+							case 3:// up
+								grenade[i].vy_FP *= -1;
+								break;
+							case 4:// down
+								grenade[i].vy_FP *= -1;
+								break;
+							default:
+								break;
+						}
+
+						grenade[i].current_step++;
+
+						if ((grenade[i].current_step >= grenade[i].steps) && (grenade[i].pos_z == 0)) {
+							grenade[i].on_target = true;
+							GFX_SetSingleFrameAnimation(grenade[i].sprite_num, 0);
+							break;
+						}
+					}
+				}
+
+				// On target
+				if (grenade[i].on_target) {
 					// Update sprite screen pos
 					gfx_sprite_stack[grenade[i].sprite_num].screen_pos_x = grenade[i].pos_x - camera->pos_x;
-					gfx_sprite_stack[grenade[i].sprite_num].screen_pos_y = grenade[i].pos_y - grenade[i].pos_z - camera->pos_y;
-
-					// Check if hits something
-					grenade[i].hit_on = GRENADE_CheckGrenadeColission(i);
-
-					// Check hit on background, object or enemy
-					switch (grenade[i].hit_on) {
-						case 1:// left
-							grenade[i].vx_FP *= -1;
-							break;
-						case 2:// right
-							grenade[i].vx_FP *= -1;
-							break;
-						case 3:// up
-							grenade[i].vy_FP *= -1;
-							break;
-						case 4:// down
-							grenade[i].vy_FP *= -1;
-							break;
-						default:
-							break;
-					}
-
-					grenade[i].current_step++;
-
-					if ((grenade[i].current_step >= grenade[i].steps) && (grenade[i].pos_z == 0)) {
-						grenade[i].on_target = true;
-						GFX_SetSingleFrameAnimation(grenade[i].sprite_num, 0);
-						break;
-					}
+					gfx_sprite_stack[grenade[i].sprite_num].screen_pos_y = grenade[i].pos_y - camera->pos_y;
+					grenade[i].pos_z = 0;
 				}
-			}
 
-			// On target
-			if (grenade[i].on_target) {
-				// Update sprite screen pos
-				gfx_sprite_stack[grenade[i].sprite_num].screen_pos_x = grenade[i].pos_x - camera->pos_x;
-				gfx_sprite_stack[grenade[i].sprite_num].screen_pos_y = grenade[i].pos_y - camera->pos_y;
-				grenade[i].pos_z = 0;
-			}
+				if (grenade[i].current_time <= 0) {
+					grenade[i].on_target = false;
+					grenade[i].shown = false;
+					grenade[i].hold = false;
+					grenade[i].current_step = 0;
 
-			if (grenade[i].current_time <= 0) {
-				grenade[i].on_target = false;
-				grenade[i].shown = false;
-				grenade[i].hold = false;
-				grenade[i].current_step = 0;
-
-				if (grenade[i].pos_z < 5) {// Explode on the floor
-					PARTICLE_LoadParticle(SPRITE_GRAPHICS_ID_EXPLOSION1, ENTITY_ID_EXPLOSION, grenade[i].pos_x - 16, grenade[i].pos_y - grenade[i].pos_z - 16, grenade[i].pos_x - 16, grenade[i].pos_y - grenade[i].pos_z - 16, 3, grenade[i].damage, 20, 16);
-				} else {// Explode on the air
-					PARTICLE_LoadParticle(SPRITE_GRAPHICS_ID_EXPLOSION1, ENTITY_ID_EXPLOSION, grenade[i].pos_x - 16, grenade[i].pos_y - grenade[i].pos_z - 16, grenade[i].pos_x - 16, grenade[i].pos_y - grenade[i].pos_z - 16, 3, 0, 0, 0);
+					if (grenade[i].pos_z < 5) {// Explode on the floor
+						PARTICLE_LoadParticle(SPRITE_GRAPHICS_ID_EXPLOSION1, ENTITY_ID_EXPLOSION, grenade[i].pos_x - 16, grenade[i].pos_y - grenade[i].pos_z - 16, grenade[i].pos_x - 16, grenade[i].pos_y - grenade[i].pos_z - 16, 3, grenade[i].damage, 20, 16);
+					} else {// Explode on the air
+						PARTICLE_LoadParticle(SPRITE_GRAPHICS_ID_EXPLOSION1, ENTITY_ID_EXPLOSION, grenade[i].pos_x - 16, grenade[i].pos_y - grenade[i].pos_z - 16, grenade[i].pos_x - 16, grenade[i].pos_y - grenade[i].pos_z - 16, 3, 0, 0, 0);
+					}
+					AUDIO_PlaySound(AUDIO_EXPLOSSION, 16);
+					GRENADE_UnloadGrenade(i);
 				}
-				AUDIO_PlaySound(AUDIO_EXPLOSSION, 16);
-				GRENADE_UnloadGrenade(i);
 			}
 		}
 	}

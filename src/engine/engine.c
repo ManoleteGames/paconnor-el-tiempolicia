@@ -275,28 +275,77 @@ bool AwaitDelayTime(void) {
  * - Memory reservation
  */
 static void InitSubsystems(void) {
-	system("cls");
+	ScreenSetCursor(21, 20);
+	printf("    ...initializing memory system...    ");
+	MM_Init();// Initialize memory manager
 
-	MM_Init();   // Initialize memory manager
-	UI_Init();   // Initialize UI
+	ScreenSetCursor(21, 20);
+	printf("         ...initializing ui...          ");
+	UI_Init();// Initialize UI
+
+	ScreenSetCursor(21, 20);
+	printf("       ...initializing actor...         ");
 	ACTOR_Init();// Initialize actor variables
+
+	ScreenSetCursor(21, 20);
+	printf("        ...initializing boss...         ");
 	BOSS_Init();
+
+	ScreenSetCursor(21, 20);
+	printf("      ...initializing bullets...        ");
 	BULLET_Init();
+
+	ScreenSetCursor(21, 20);
+	printf("      ...initializing grenades...        ");
+	GRENADE_Init();
+
+	ScreenSetCursor(21, 20);
+	printf("      ...initializing misiles...        ");
+	MISILE_Init();
+
+	ScreenSetCursor(21, 20);
+	printf("      ...initializing objects...        ");
 	OBJECT_Init();
+
+	ScreenSetCursor(21, 20);
+	printf("      ...initializing particles...      ");
 	PARTICLE_Init();
+
+	ScreenSetCursor(21, 20);
+	printf("         ...initializing NPC's...       ");
 	NPC_Init();
+
+	ScreenSetCursor(21, 20);
+	printf("       ...initializing enemies...       ");
 	ENEMY_Init();
-	MOUSE_Init();            // Install custom mouse interrupt handler
-	GFX_Init();              // Initialize graphics
-	AUDIO_Init();            // Initialize audio
-	MAP_Init();              // Initialize map
-	VIDEO_Init();            // Initialize video
-	EFFECT_InitEffects();    // Initialize effects
+
+	ScreenSetCursor(21, 20);
+	printf("       ...initializing mouse...         ");
+	MOUSE_Init();// Install custom mouse interrupt handler.
+
+	ScreenSetCursor(21, 20);
+	printf("   ...initializing graphics system...   ");
+	GFX_Init();// Initialize graphics
+
+	ScreenSetCursor(21, 20);
+	printf("     ...initializing audio system...    ");
+	AUDIO_Init();// Initialize audio
+
+	ScreenSetCursor(21, 20);
+	printf("     ...initializing map system...      ");
+	MAP_Init();// Initialize map
+
+	ScreenSetCursor(21, 20);
+	printf("    ...initializing video system...     ");
+	VIDEO_Init();// Initialize video
+
+	ScreenSetCursor(21, 20);
+	printf("      ...initializing effects...        ");
+	EFFECT_InitEffects();// Initialize effects
+
+	ScreenSetCursor(21, 20);
+	printf("       ...initializing camera...        ");
 	CAM_Init(320, 200, 0, 0);// Initialize camera
-	VGA_ClearPalette();
-	VGA_SetMode(VIDEO_GRAPHICS_MODE);   // Set graphics mode
-	UI_SetDefaultLanguage();            // Initialize UI
-	MOUSE_RestrictZone(0, 1280, 0, 800);// Restrict mouse zone
 }
 
 /* ENGINE :: Initialize engine
@@ -341,7 +390,7 @@ void InitEngine(void) {
 	VIDEO_BinaryImageToVRAM("BINARIES.DAT", "ENGINE.BIN");// Show engine loading screen
 
 	ScreenSetCursor(21, 25);
-	printf(" ...please wait...");
+	printf("     ...please wait...      ");
 
 	engine.dosVersionOK = GetDosVersion();// Get and check DOS version
 	engine.memOK = GetMemInfo();          // Get free memory
@@ -349,16 +398,14 @@ void InitEngine(void) {
 	engine.mouseOK = GetAvailableMouse(); // Check if mouse is available
 	engine.audioOK = GetAvailableAudio(); // Check adlib/soundblaster audio available
 
-
 	ScreenSetCursor(21, 25);
-
 
 	SetDelayTime(2000);
 	while (!AwaitDelayTime()) {
 		// just wait
 	};
 
-	printf(" ...process done...");
+	printf("    ...analysis complete...    ");
 	SetDelayTime(2000);
 	while (!AwaitDelayTime()) {
 		// just wait
@@ -399,9 +446,28 @@ void InitEngine(void) {
 		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_MOUSE);
 	}
 
-
-	// Initialize everything else
+	// Initialize all subsystems
+	ScreenSetCursor(21, 15);
+	printf("        ...initializing subsystems...      ");
 	InitSubsystems();
+
+	// Load global assets
+	ScreenSetCursor(21, 15);
+	printf("         ...loading global assets...       ");
+	LoadGlobalAssets();
+
+	ScreenSetCursor(21, 15);
+	printf("            ...process done...             ");
+	SetDelayTime(2000);
+	while (!AwaitDelayTime()) {
+		// just wait
+	};
+
+	// Set graphics mode and starts game
+	VGA_ClearPalette();
+	VGA_SetMode(VIDEO_GRAPHICS_MODE);   // Set graphics mode
+	UI_SetDefaultLanguage();            // Initialize UI
+	MOUSE_RestrictZone(0, 1280, 0, 800);// Restrict mouse zone
 }
 
 void LimitFPS(int time) {
@@ -489,6 +555,7 @@ void Update(int player_follow) {
 	if (!ui->freeze) ACTOR_Update();
 	if (!ui->freeze) GRENADE_Update();
 	if (!ui->freeze) BULLET_Update();
+	if (!ui->freeze) MISILE_Update();
 	if (!ui->freeze) OBJECT_UpdateObjects();
 	if (!ui->freeze) ITEM_UpdateItems();
 	EFFECT_UpdateEffects();

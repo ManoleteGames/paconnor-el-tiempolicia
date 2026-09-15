@@ -18,5 +18,7 @@ void SPK_PlaySound(SoundEffect *sound, int number);
 void SPK_LoadSong(Song *song, int number);
 void SPK_PlaySong(Song *song);
 void SPK_StopSong(Song *song);
+void SPK_PauseSong(Song *song);
+void SPK_ResumeSong(Song *song);
 
 #endif// _SPEAKER_H

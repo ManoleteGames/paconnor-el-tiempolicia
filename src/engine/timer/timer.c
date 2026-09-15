@@ -62,10 +62,15 @@ void TIMER_VideoCallback(byte param) {
 END_OF_FUNCTION(TIMER_VideoCallback);
 
 void TIMER_MiscCallback(byte param) {
-	if (kbKeyState[SCANCODE_SPACE]) {
+	if (kbKeyState[SCANCODE_SPACE] || kbKeyState[SCANCODE_ESC]) {
 		if (engine.sequence) {
 			SetDelayTime(0);
 			engine.sequence = false;
+		}
+
+		if (engine.logo) {
+			SetDelayTime(0);
+			engine.logo = false;
 		}
 	}
 }

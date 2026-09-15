@@ -506,6 +506,43 @@ typedef struct {
 	bool shown;
 	bool on_target;
 
+	int pos_x, pos_y, pos_z;
+	byte speed;
+	byte damage;
+	int hit_on;
+	int steps;
+	int current_step;
+	int target_x;
+	int target_y;
+	int facing;
+
+	int current_time;
+	int end_time_ms;
+	int current_time_ms;
+	bool tick_played, tack_played;
+
+	dword vx_FP;
+	dword vy_FP;
+	dword speed_FP;
+	dword x_FP, y_FP;
+
+	int sprite_num;
+	int graphics_id;
+	int shadow_graphic_id;
+	int width_px;
+	int height_px;
+
+	int direction_counter;
+
+	Area colission_area;
+
+} Misile;
+
+typedef struct {
+	bool loaded;
+	bool shown;
+	bool on_target;
+
 	int pos_x, pos_y;
 	byte speed;
 	int hit_on;
@@ -879,6 +916,7 @@ typedef struct {
 	bool action_dead;
 
 	int status_behavior;
+	int type;
 
 	int pos_x, pos_y;
 	int middle_x, middle_y;

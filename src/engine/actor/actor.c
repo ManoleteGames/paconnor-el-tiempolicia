@@ -2651,28 +2651,28 @@ void ACTOR_Update(void) {
 				} else {
 					switch (facing) {
 						case ACTOR_FACING_UP:
-							actor->grenade_index = GRENADE_InitGrenade(SPRITE_GRAPHICS_ID_GRENADE1, ENTITY_ID_ACTOR_GRENADE, actor->pos_x + 4, actor->pos_y + 16, actor->grenades_max_time, actor->grenades_max_distance);
+							actor->grenade_index = GRENADE_LoadGrenade(SPRITE_GRAPHICS_ID_GRENADE1, ENTITY_ID_ACTOR_GRENADE, actor->pos_x + 4, actor->pos_y + 16, actor->grenades_max_time, actor->grenades_max_distance);
 							break;
 						case ACTOR_FACING_UP_RIGHT:
-							actor->grenade_index = GRENADE_InitGrenade(SPRITE_GRAPHICS_ID_GRENADE1, ENTITY_ID_ACTOR_GRENADE, actor->pos_x, actor->pos_y + 8, actor->grenades_max_time, actor->grenades_max_distance);
+							actor->grenade_index = GRENADE_LoadGrenade(SPRITE_GRAPHICS_ID_GRENADE1, ENTITY_ID_ACTOR_GRENADE, actor->pos_x, actor->pos_y + 8, actor->grenades_max_time, actor->grenades_max_distance);
 							break;
 						case ACTOR_FACING_RIGHT:
-							actor->grenade_index = GRENADE_InitGrenade(SPRITE_GRAPHICS_ID_GRENADE1, ENTITY_ID_ACTOR_GRENADE, actor->pos_x + 18, actor->pos_y + 10, actor->grenades_max_time, actor->grenades_max_distance);
+							actor->grenade_index = GRENADE_LoadGrenade(SPRITE_GRAPHICS_ID_GRENADE1, ENTITY_ID_ACTOR_GRENADE, actor->pos_x + 18, actor->pos_y + 10, actor->grenades_max_time, actor->grenades_max_distance);
 							break;
 						case ACTOR_FACING_DOWN_RIGHT:
-							actor->grenade_index = GRENADE_InitGrenade(SPRITE_GRAPHICS_ID_GRENADE1, ENTITY_ID_ACTOR_GRENADE, actor->pos_x + 22, actor->pos_y + 10, actor->grenades_max_time, actor->grenades_max_distance);
+							actor->grenade_index = GRENADE_LoadGrenade(SPRITE_GRAPHICS_ID_GRENADE1, ENTITY_ID_ACTOR_GRENADE, actor->pos_x + 22, actor->pos_y + 10, actor->grenades_max_time, actor->grenades_max_distance);
 							break;
 						case ACTOR_FACING_DOWN:
-							actor->grenade_index = GRENADE_InitGrenade(SPRITE_GRAPHICS_ID_GRENADE1, ENTITY_ID_ACTOR_GRENADE, actor->pos_x + 12, actor->pos_y + 28, actor->grenades_max_time, actor->grenades_max_distance);
+							actor->grenade_index = GRENADE_LoadGrenade(SPRITE_GRAPHICS_ID_GRENADE1, ENTITY_ID_ACTOR_GRENADE, actor->pos_x + 12, actor->pos_y + 28, actor->grenades_max_time, actor->grenades_max_distance);
 							break;
 						case ACTOR_FACING_DOWN_LEFT:
-							actor->grenade_index = GRENADE_InitGrenade(SPRITE_GRAPHICS_ID_GRENADE1, ENTITY_ID_ACTOR_GRENADE, actor->pos_x + 32, actor->pos_y + 16, actor->grenades_max_time, actor->grenades_max_distance);
+							actor->grenade_index = GRENADE_LoadGrenade(SPRITE_GRAPHICS_ID_GRENADE1, ENTITY_ID_ACTOR_GRENADE, actor->pos_x + 32, actor->pos_y + 16, actor->grenades_max_time, actor->grenades_max_distance);
 							break;
 						case ACTOR_FACING_LEFT:
-							actor->grenade_index = GRENADE_InitGrenade(SPRITE_GRAPHICS_ID_GRENADE1, ENTITY_ID_ACTOR_GRENADE, actor->pos_x + 8, actor->pos_y + 16, actor->grenades_max_time, actor->grenades_max_distance);
+							actor->grenade_index = GRENADE_LoadGrenade(SPRITE_GRAPHICS_ID_GRENADE1, ENTITY_ID_ACTOR_GRENADE, actor->pos_x + 8, actor->pos_y + 16, actor->grenades_max_time, actor->grenades_max_distance);
 							break;
 						case ACTOR_FACING_UP_LEFT:
-							actor->grenade_index = GRENADE_InitGrenade(SPRITE_GRAPHICS_ID_GRENADE1, ENTITY_ID_ACTOR_GRENADE, actor->pos_x, actor->pos_y + 8, actor->grenades_max_time, actor->grenades_max_distance);
+							actor->grenade_index = GRENADE_LoadGrenade(SPRITE_GRAPHICS_ID_GRENADE1, ENTITY_ID_ACTOR_GRENADE, actor->pos_x, actor->pos_y + 8, actor->grenades_max_time, actor->grenades_max_distance);
 							break;
 					}
 					actor->current_grenades--;
