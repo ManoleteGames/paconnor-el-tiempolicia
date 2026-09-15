@@ -7,6 +7,7 @@
 #include "engine/engine.h"
 #include "engine/gfx/gfx.h"
 #include "engine/types/types.h"
+#include "engine/ui/ui.h"
 #include "scene1.h"
 #include "scene2.h"
 #include "scene3.h"
@@ -277,77 +278,90 @@ static void Logo(void) {
 				GFX_LoadPalette("PALETTES.DAT", "LMANOL.PCX", 256);
 				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 100, 50);
 				VIDEO_FadeIn(1);
-
-				SetDelayTime(500);
-
+				SetDelayTime(1000);
 				logo_step = 42;
 				break;
 			case 42:
-
 				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 100, 50);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				if (AwaitDelayTime()) {
-					SetDelayTime(500);
 					logo_step = 43;
 				}
 				break;
 			case 43:
-
+				SetDelayTime(500);
+				logo_step = 44;
+				break;
+			case 44:
 				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 100, 50);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				if (AwaitDelayTime()) {
-					SetDelayTime(500);
-					logo_step = 44;
+					logo_step = 45;
 				}
 				break;
-			case 44:
-
+			case 45:
+				SetDelayTime(500);
+				logo_step = 46;
+				break;
+			case 46:
 				VIDEO_BufferToScreenBuffer(gfx->image_buffer3, gfx->image_buffer3_width, gfx->image_buffer3_height, gfx->image_buffer3_width, gfx->image_buffer3_height, 100, 50);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				if (AwaitDelayTime()) {
-					SetDelayTime(500);
-					logo_step = 45;
-				}
-			case 45:
-
-				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 100, 50);
-				VIDEO_VSync();
-				VIDEO_ScreenBufferToVRAM();
-				if (AwaitDelayTime()) {
-					SetDelayTime(500);
-					logo_step = 46;
-				}
-				break;
-			case 46:
-				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 100, 50);
-				VIDEO_VSync();
-				VIDEO_ScreenBufferToVRAM();
-				if (AwaitDelayTime()) {
-					SetDelayTime(500);
 					logo_step = 47;
 				}
 				break;
 			case 47:
+				SetDelayTime(500);
+				logo_step = 48;
+				break;
+			case 48:
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 100, 50);
+				VIDEO_VSync();
+				VIDEO_ScreenBufferToVRAM();
+				if (AwaitDelayTime()) {
+					logo_step = 49;
+				}
+				break;
+			case 49:
+				SetDelayTime(500);
+				logo_step = 50;
+				break;
+			case 50:
+				VIDEO_BufferToScreenBuffer(gfx->image_buffer2, gfx->image_buffer2_width, gfx->image_buffer2_height, gfx->image_buffer2_width, gfx->image_buffer2_height, 100, 50);
+				VIDEO_VSync();
+				VIDEO_ScreenBufferToVRAM();
+				if (AwaitDelayTime()) {
+					logo_step = 51;
+				}
+				break;
+			case 51:
+				SetDelayTime(500);
+				logo_step = 52;
+				break;
+			case 52:
 				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 100, 50);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				char_counter = 0;
 				aux_counter = 0;
 				if (AwaitDelayTime()) {
-					SetDelayTime(500);
-					logo_step = 48;
+					logo_step = 53;
 				}
 				break;
-			case 48:
+			case 53:
+				SetDelayTime(500);
+				logo_step = 54;
+				break;
+			case 54:
 				VIDEO_ClearScreenBuffer();
 				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 100, 50);
 
 				if (VIDEO_StringToScreenBufferRand(40, 15, ui->txt_file[UI_TXT_INTRO]->line[3], FONT_BIG_WHITE, &char_counter, &aux_counter)) {
 					aux_counter = 0;
-					logo_step = 49;
+					logo_step = 55;
 				}
 				AUDIO_PlaySound(AUDIO_TICK_EFFECT, 1);
 
@@ -358,7 +372,7 @@ static void Logo(void) {
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				break;
-			case 49:
+			case 55:
 				SetDelayTime(80);
 				while (!AwaitDelayTime()) {
 					// Just wait
@@ -368,25 +382,26 @@ static void Logo(void) {
 				VIDEO_StringToScreenBuffer(40, 15, ui->txt_file[UI_TXT_INTRO]->line[3], FONT_BIG_WHITE);
 				if (VIDEO_StringToScreenBufferSteps(80, 30, ui->txt_file[UI_TXT_INTRO]->line[4], FONT_BIG_WHITE, &aux_counter)) {
 					aux_counter = 0;
-					logo_step = 50;
+					logo_step = 56;
 				}
 				AUDIO_PlaySound(AUDIO_TICK_EFFECT, 1);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				break;
-			case 50:
+			case 56:
 				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 100, 50);
 				VIDEO_StringToScreenBuffer(40, 15, ui->txt_file[UI_TXT_INTRO]->line[3], FONT_BIG_WHITE);
 				VIDEO_StringToScreenBuffer(80, 30, ui->txt_file[UI_TXT_INTRO]->line[4], FONT_BIG_WHITE);
 				AUDIO_PlaySound(AUDIO_CRASH_EFFECT, 1);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
-				logo_step = 51;
+				SetDelayTime(2000);
+				while (!AwaitDelayTime()) {
+					// Just wait
+				}
+				logo_step = 57;
 				break;
-			case 51:
-				logo_step = 52;
-				break;
-			case 52:
+			case 57:
 				engine.logo = false;
 				break;
 			default:
@@ -398,13 +413,9 @@ static void Logo(void) {
 	AUDIO_StopSong();
 	VIDEO_RotatePaletteEnd_Async();
 	SetDelayTime(0);
-
 	VIDEO_FadeOut(1);
-
 	GFX_UnloadSprites();
-
 	GFX_UnloadSpriteGraphic(SPRITE_GRAPHICS_ID_WORMS);
-
 	MM_PopChunks(CT_TEMPORARY_SPRITE);
 
 	// shares logo sequence is ended
@@ -734,6 +745,8 @@ static void Menu(void) {
 	unsigned char sound_volume[5];
 	unsigned char music_volume[5];
 
+	int idle_counter;
+
 	char password[13];
 	byte password_step;
 	byte key;
@@ -924,6 +937,7 @@ static void Menu(void) {
 		VIDEO_ScreenBufferToVRAM();
 	}
 
+	idle_counter = 0;
 	exit_menu = false;
 	show_main_menu = true;
 
@@ -932,6 +946,18 @@ static void Menu(void) {
 	GFX_SetSpritePosition(20, 20, 20);
 
 	while (!exit_menu) {
+
+		// Load intro if nothing happends
+		idle_counter++;
+		if (idle_counter > 1000) {
+			idle_counter = 0;
+			exit_menu = true;
+		}
+
+		// reset idle counter on mouse move
+		if (cursor.left_click || cursor.right_click) {
+			idle_counter = 0;
+		}
 
 		UI_UpdateUI(false);
 		MOUSE_Update(false, false);
@@ -1363,10 +1389,14 @@ static void Menu(void) {
 			case 11:// change language
 				settings.language++;
 				if (settings.language > 2) settings.language = 2;
+				UI_SetLanguage(settings.language);
+				LoadTexts();
 				break;
 			case 12:// change language
 				settings.language--;
 				if (settings.language < 0) settings.language = 0;
+				UI_SetLanguage(settings.language);
+				LoadTexts();
 				break;
 			case 13:// Password confirmation
 				// Chapter 1: Room 2: 'The travel' >> TRAVEL
@@ -1530,6 +1560,7 @@ void LoadGlobalAssets(void) {
 
 	ScreenSetCursor(21, 15);
 	printf("     ...loading text and dialogs ...       ");
+	UI_SetLanguage(settings.language);
 	LoadTexts();
 }
 
@@ -2004,15 +2035,12 @@ int main(int argc, char **argv) {
 
 	Logo();
 
-	Intro();
-
 	engine.exit_game = false;
 
 	engine.scene = 0;
 	engine.room = 1;
 
 	MOUSE_InitCursorSprite(SPRITE_GRAPHICS_ID_CURSOR);// Initialize mouse cursor
-
 
 	while (!engine.exit_game) {
 
@@ -2021,6 +2049,7 @@ int main(int argc, char **argv) {
 		switch (engine.scene) {
 			case 0:// main menu
 				engine.exit_menu = false;
+				Intro();
 				Menu();
 				break;
 			case 1:// scene 1 :: Mission 1 :: The travel. Pass: TRAVEL

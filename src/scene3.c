@@ -286,11 +286,7 @@ void Scene3_LoadAssets(void) {
 	ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
 	ACTOR_SetBulletStatus(99, 19, 199, 9, 9);
 
-	NPC_Init();
-
 	UI_SetStatusPanels();// Set status panels
-
-	AUDIO_LoadSong(AUDIO_SONG_3);// Load song
 }
 void Scene3_UnloadAssets(void) {
 	// Enemy 1
@@ -408,7 +404,6 @@ void Scene3_LoadRoom1(void) {
 	ITEM_LoadItem(8, ENTITY_ID_ITEM_AMMO2, SPRITE_GRAPHICS_ID_ITEM_AMMO2, 5 << 4, 3 << 4);
 
 	MAP_LoadMap("MAPSCN31.DAT", 70, 50, "TSCN31.DAT", "SCN3_1_BACK.PCX", "SCN3_1_FORE.PCX", "SCN3_1_MASK.PCX", 320 * 416, 128 * 256, 128 * 128);
-	GFX_LoadPalette("PALETTES.DAT", "SCN31.PCX", 256);
 
 	AUDIO_LoadSong(AUDIO_SONG_7);// Load song
 }
@@ -489,7 +484,6 @@ void Scene3_LoadRoom2(void) {
 
 
 	MAP_LoadMap("MAPSCN32.DAT", 57, 48, "TSCN32.DAT", "SCN3_2_BACK.PCX", "SCN3_2_FORE.PCX", "SCN3_2_MASK.PCX", 320 * 416, 128 * 256, 128 * 128);
-	GFX_LoadPalette("PALETTES.DAT", "SCN32.PCX", 256);
 
 	AUDIO_LoadSong(AUDIO_SONG_7);// Load song
 }
@@ -510,7 +504,6 @@ void Scene3_LoadRoom3(void) {
 	ENEMY_Load("ENEMY9.DAT", 6, 28 << 4, 37 << 4, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_ENEMY3_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY3_FEET, SPRITE_GRAPHICS_ID_ENEMY3_BODY, SPRITE_GRAPHICS_ID_ENEMY3_HEAD, SPRITE_GRAPHICS_ID_ENEMY3_LARM, SPRITE_GRAPHICS_ID_ENEMY3_RARM, ENEMY_FACING_UP_RIGHT, ENEMY_GUN_AK, SPRITE_GRAPHICS_ID_GUN1, SPRITE_GRAPHICS_ID_BULLET1, ENEMY_STATUS_RAMPAGE, 100);
 
 	MAP_LoadMap("MAPSCN31.DAT", 70, 50, "TSCN31.DAT", "SCN3_1_BACK.PCX", "SCN3_1_FORE.PCX", "SCN3_1_MASK.PCX", 320 * 416, 128 * 256, 128 * 128);
-	GFX_LoadPalette("PALETTES.DAT", "SCN31.PCX", 256);
 
 	AUDIO_LoadSong(AUDIO_SONG_7);// Load song
 }
@@ -676,60 +669,67 @@ void Scene3_Loop(void) {
 	Scene3_LoadAssets();
 	Scene3_SetHotspotsAndEvents();
 
-	while (!AwaitDelayTime()) {
-		// Just wait
+	// Initialize the Scene room
+	switch (engine.room) {
+		case 1:// Room 1. Lower floor
+			Scene3_LoadRoom1();
+			ACTOR_SetPosition(65 << 4, 8 << 4, ACTOR_FACING_LEFT);// Set actor position
+			ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_PISTOL);
+			ACTOR_SetCombatMode(true);
+			CAM_Init(map->width_px, map->height_px, 46 << 4, 0 << 4);// Initialize camera
+			MAP_DrawMapToMapVideoBuffer();
+			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 55);
+			break;
+		case 2:// Room 2. Upper floor
+			Scene3_LoadRoom2();
+			ACTOR_SetPosition(27 << 4, 23 << 4, ACTOR_FACING_UP);// Set actor position
+			ACTOR_SetCombatMode(true);
+			CAM_Init(map->width_px, map->height_px, 17 << 4, 14 << 4);// Initialize camera
+			MAP_DrawMapToMapVideoBuffer();
+			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 55);
+			break;
+		default:
+			Error("Scene3_Loop function error", "Undefined room", "", ERROR_SYSTEM);
+			break;
 	}
 
 	VIDEO_FadeOut(4);
+	VIDEO_ClearScreenBuffer();
+
+	// Set palette
+	switch (engine.room) {
+		case 1:// Room 1. First floor
+			GFX_LoadPalette("PALETTES.DAT", "SCN31.PCX", 256);
+			break;
+		case 2:// Room 2. Second floor
+			GFX_LoadPalette("PALETTES.DAT", "SCN32.PCX", 256);
+			break;
+		case 3:// Room 3. Back to First floor
+			GFX_LoadPalette("PALETTES.DAT", "SCN31.PCX", 256);
+			break;
+		default:
+			sprintf(engine.system_error_message1, "Scene3_Loop function error");
+			sprintf(engine.system_error_message2, "Undefined room");
+			sprintf(engine.system_error_message3, "Selected room: %u", engine.room);
+			Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SYSTEM);
+			break;
+	}
+
+	Update(true);
+	Update(true);
 
 	scene_step = 0;
 	sequence_step = 0;
 	end_sequence = false;
 	engine.ingame = true;
 
-	MOUSE_ShowCursor();
-
-	// Initialize the Scene room
-	switch (engine.room) {
-		case 1:// Room 1. Lower floor
-			Scene3_LoadRoom1();
-
-			ACTOR_SetPosition(65 << 4, 8 << 4, ACTOR_FACING_LEFT);// Set actor position
-			ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_PISTOL);
-			ACTOR_SetCombatMode(true);
-
-			CAM_Init(map->width_px, map->height_px, 46 << 4, 0 << 4);// Initialize camera
-			MAP_DrawMapToMapVideoBuffer();
-
-			Update(true);
-			Update(true);
-			VIDEO_FadeIn(1);
-
-			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 55);
-			AUDIO_PlaySong(true);
-
-			break;
-		case 2:// Room 2. Upper floor
-			Scene3_LoadRoom2();
-
-			ACTOR_SetPosition(27 << 4, 23 << 4, ACTOR_FACING_UP);// Set actor position
-			ACTOR_SetCombatMode(true);
-
-			CAM_Init(map->width_px, map->height_px, 17 << 4, 14 << 4);// Initialize camera
-			MAP_DrawMapToMapVideoBuffer();
-
-			Update(true);
-			Update(true);
-			VIDEO_FadeIn(1);
-
-			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 55);
-			AUDIO_PlaySong(true);
-
-			break;
-		default:
-			Error("Scene3_Loop function error", "Undefined room", "", ERROR_SYSTEM);
-			break;
+	while (!AwaitDelayTime()) {
+		// Just wait
 	}
+
+	AUDIO_PlaySong(true);
+	VIDEO_FadeIn(1);
+	MOUSE_ShowCursor();
 
 	// Loop until the game is over
 	while (engine.ingame) {
@@ -1054,6 +1054,7 @@ void Scene3_Loop(void) {
 							MAP_UnloadMap();
 
 							Scene3_LoadRoom2();
+							GFX_LoadPalette("PALETTES.DAT", "SCN32.PCX", 256);
 							ACTOR_SetPosition(27 << 4, 24 << 4, ACTOR_FACING_UP);     // Set actor position
 							CAM_Init(map->width_px, map->height_px, 17 << 4, 12 << 4);// Initialize camera
 							MAP_DrawMapToMapVideoBuffer();
@@ -1307,6 +1308,7 @@ void Scene3_Loop(void) {
 								MAP_UnloadMap();
 
 								Scene3_LoadRoom3();
+								GFX_LoadPalette("PALETTES.DAT", "SCN31.PCX", 256);
 								ACTOR_SetPosition(27 << 4, 32 << 4, ACTOR_FACING_DOWN);   // Set actor position
 								CAM_Init(map->width_px, map->height_px, 17 << 4, 28 << 4);// Initialize camera
 								MAP_DrawMapToMapVideoBuffer();
@@ -1425,6 +1427,7 @@ void Scene3_Loop(void) {
 	PARTICLE_UnloadParticles();
 	GRENADE_UnloadGrenades();
 	NPC_UnloadNpcs();
+	BOSS_Unload();
 	ITEM_UnloadItems();
 	ACTOR_UnloadActor();
 	MAP_UnloadMap();

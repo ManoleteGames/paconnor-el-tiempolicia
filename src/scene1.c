@@ -760,8 +760,6 @@ void Scene1_LoadRoom1(void) {
 
 	MAP_LoadMap("MAPSCN11.DAT", 80, 30, "TSCN11.DAT", "SCN1_1_BACK.PCX", "SCN1_1_FORE.PCX", "SCN1_1_MASK.PCX", 320 * 416, 128 * 128, 128 * 128);
 
-	GFX_LoadPalette("PALETTES.DAT", "SCN11.PCX", 256);
-
 	AUDIO_LoadSong(AUDIO_SONG_5);// Load song
 }
 void Scene1_LoadRoom2(void) {
@@ -800,8 +798,6 @@ void Scene1_LoadRoom2(void) {
 	OBJECT_LoadObject("OBJECT3.DAT", 4, ENTITY_ID_TARGET, SPRITE_GRAPHICS_ID_OBJECT2, SPRITE_GRAPHICS_ID_OBJECT2_PORTAIT, (19 << 4) + 8, 6 << 4);
 
 	MAP_LoadMap("MAPSCN12.DAT", 50, 60, "TSCN12.DAT", "SCN1_2_BACK.PCX", "SCN1_2_FORE.PCX", "SCN1_2_MASK.PCX", 320 * 416, 128 * 128, 128 * 128);
-
-	GFX_LoadPalette("PALETTES.DAT", "SCN12.PCX", 256);
 
 	AUDIO_LoadSong(AUDIO_SONG_5);// Load song
 }
@@ -952,7 +948,7 @@ void Scene1_Loop(void) {
 	int scene_step;
 
 	VIDEO_ClearScreenBuffer();
-	GFX_LoadPalette("PALETTES.DAT", "ISCN1.PCX", 256);
+	GFX_LoadPalette("PALETTES.DAT", "SCN11.PCX", 256);
 
 	VIDEO_StringToScreenBuffer(50, 60, ui->txt_file[UI_TXT_SCN1I]->line[10], FONT_BIG_BLACK);
 	VIDEO_StringToScreenBuffer(90, 85, ui->txt_file[UI_TXT_SCN1I]->line[11], FONT_BIG_BLACK);
@@ -968,44 +964,23 @@ void Scene1_Loop(void) {
 	Scene1_LoadAssets();
 	Scene1_SetHotspotsAndEvents();
 
-	while (!AwaitDelayTime()) {
-		// Just wait
-	}
-
-	VIDEO_FadeOut(4);
-	VIDEO_ClearScreenBuffer();
-
-	tutorial = false;
-	scene_step = 0;
-	sequence_step = 0;
-	end_sequence = false;
-	engine.ingame = true;
-
-	MOUSE_ShowCursor();
-
 	// Initialize the Scene room
 	switch (engine.room) {
 		case 1:// Room 1. Outside doscity
 			Scene1_LoadRoom1();
 			ACTOR_SetPosition(1 << 4, 22 << 4, ACTOR_FACING_RIGHT);
+			ACTOR_SetCombatMode(false);
 			CAM_Init(map->width_px, map->height_px, 0 << 4, 18 << 4);// Initialize camera
 			MAP_DrawMapToMapVideoBuffer();
-			Update(true);
-			Update(true);
-			VIDEO_FadeIn(1);
 			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 55);
-			AUDIO_PlaySong(true);
 			break;
 		case 2:// Room 2. Inside police office
 			Scene1_LoadRoom2();
 			ACTOR_SetPosition(46 << 4, 49 << 4, ACTOR_FACING_LEFT);
+			ACTOR_SetCombatMode(false);
 			CAM_Init(map->width_px, map->height_px, 30 << 4, 42 << 4);// Initialize camera
 			MAP_DrawMapToMapVideoBuffer();
-			Update(true);
-			Update(true);
-			VIDEO_FadeIn(1);
 			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 55);
-			AUDIO_PlaySong(true);
 			break;
 		default:
 			sprintf(engine.system_error_message1, "Scene1_Loop function error");
@@ -1014,6 +989,42 @@ void Scene1_Loop(void) {
 			Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SYSTEM);
 			break;
 	}
+
+	VIDEO_FadeOut(4);
+	VIDEO_ClearScreenBuffer();
+
+	// Set palette
+	switch (engine.room) {
+		case 1:// Room 1. Outside doscity
+			GFX_LoadPalette("PALETTES.DAT", "SCN11.PCX", 256);
+			break;
+		case 2:// Room 2. Inside police office
+			GFX_LoadPalette("PALETTES.DAT", "SCN12.PCX", 256);
+			break;
+		default:
+			sprintf(engine.system_error_message1, "Scene1_Loop function error");
+			sprintf(engine.system_error_message2, "Undefined room");
+			sprintf(engine.system_error_message3, "Selected room: %u", engine.room);
+			Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SYSTEM);
+			break;
+	}
+
+	Update(true);
+	Update(true);
+
+	tutorial = false;
+	scene_step = 0;
+	sequence_step = 0;
+	end_sequence = false;
+	engine.ingame = true;
+
+	while (!AwaitDelayTime()) {
+		// Just wait
+	}
+
+	AUDIO_PlaySong(true);
+	VIDEO_FadeIn(1);
+	MOUSE_ShowCursor();
 
 	// Loop until the game is over
 	while (engine.ingame) {
@@ -1193,6 +1204,7 @@ void Scene1_Loop(void) {
 								MAP_UnloadMap();
 
 								Scene1_LoadRoom2();
+								GFX_LoadPalette("PALETTES.DAT", "SCN12.PCX", 256);
 
 								AUDIO_LoadSong(AUDIO_SONG_5);
 

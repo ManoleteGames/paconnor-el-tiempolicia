@@ -393,9 +393,7 @@ void Scene4_LoadRoom1(void) {
 	ITEM_LoadItem(4, ENTITY_ID_ITEM_GRENADE, SPRITE_GRAPHICS_ID_ITEM_GRENADE, 1 << 4, 8 << 4);
 
 	MAP_LoadMap("MAPSCN41.DAT", 50, 50, "TSCN41.DAT", "SCN4_1_BACK.PCX", "SCN4_1_FORE.PCX", "SCN4_1_MASK.PCX", 320 * 416, 128 * 128, 128 * 128);
-	GFX_LoadPalette("PALETTES.DAT", "SCN41.PCX", 256);
-
-	AUDIO_LoadSong(AUDIO_SONG_7);// Load song
+	AUDIO_LoadSong(AUDIO_SONG_7);// Load sonG
 }
 void Scene4_LoadRoom2(void) {
 
@@ -414,8 +412,6 @@ void Scene4_LoadRoom2(void) {
 	ITEM_LoadItem(4, ENTITY_ID_ITEM_GRENADE, SPRITE_GRAPHICS_ID_ITEM_GRENADE, 45 << 4, 9 << 4);
 
 	MAP_LoadMap("MAPSCN42.DAT", 47, 32, "TSCN42.DAT", "SCN4_2_BACK.PCX", "SCN4_2_FORE.PCX", "SCN4_2_MASK.PCX", 320 * 416, 128 * 128, 128 * 128);
-	GFX_LoadPalette("PALETTES.DAT", "SCN42.PCX", 256);
-
 	AUDIO_LoadSong(AUDIO_SONG_7);// Load sonG
 }
 void Scene4_SetHotspotsAndEvents(void) {
@@ -571,7 +567,6 @@ void Scene4_Loop(void) {
 	VIDEO_StringToScreenBuffer(90, 135, ui->txt_file[UI_TXT_SCN4I]->line[42], FONT_SLIM_WHITE);
 	VIDEO_StringToScreenBuffer(160, 135, ui->txt_file[UI_TXT_SCN4I]->line[43], FONT_SLIM_WHITE);
 
-
 	VIDEO_VSync();
 	VIDEO_ScreenBufferToVRAM();
 	VIDEO_FadeIn(4);
@@ -581,38 +576,70 @@ void Scene4_Loop(void) {
 	Scene4_LoadAssets();
 	Scene4_SetHotspotsAndEvents();
 
-	while (!AwaitDelayTime()) {
-		// Just wait
+	// Initialize the Scene room
+	switch (engine.room) {
+		case 1:// Room 1. Garden
+			Scene4_LoadRoom1();
+			ACTOR_SetPosition(9 << 4, 47 << 4, ACTOR_FACING_UP);// Set actor position
+			ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_PISTOL);
+			ACTOR_SetCombatMode(true);
+			ACTOR_Reload();
+			CAM_Init(map->width_px, map->height_px, 0 << 4, 37 << 4);// Initialize camera
+			MAP_DrawMapToMapVideoBuffer();
+			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 55);
+			break;
+		case 2:// Room 2. Church
+			Scene4_LoadRoom2();
+			ACTOR_SetPosition(23 << 4, 29 << 4, ACTOR_FACING_UP);// Set actor position
+			ACTOR_SetCombatMode(true);
+			ACTOR_Reload();
+			CAM_Init(map->width_px, map->height_px, 13 << 4, 20 << 4);// Initialize camera
+			MAP_DrawMapToMapVideoBuffer();
+			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 55);
+			break;
+		default:
+			Error("Scene4_Loop function error", "Undefined room", "", ERROR_SYSTEM);
+			break;
 	}
 
 	VIDEO_FadeOut(4);
+	VIDEO_ClearScreenBuffer();
+
+	// Set palette
+	switch (engine.room) {
+		case 1:// Room 1. First floor
+			GFX_LoadPalette("PALETTES.DAT", "SCN41.PCX", 256);
+			break;
+		case 2:// Room 2. Second floor
+			GFX_LoadPalette("PALETTES.DAT", "SCN42.PCX", 256);
+			break;
+		default:
+			sprintf(engine.system_error_message1, "Scene4_Loop function error");
+			sprintf(engine.system_error_message2, "Undefined room");
+			sprintf(engine.system_error_message3, "Selected room: %u", engine.room);
+			Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SYSTEM);
+			break;
+	}
+
+	Update(true);
+	Update(true);
 
 	scene_step = 0;
 	sequence_step = 0;
 	end_sequence = false;
 	engine.ingame = true;
 
+	while (!AwaitDelayTime()) {
+		// Just wait
+	}
+
+	AUDIO_PlaySong(true);
+	VIDEO_FadeIn(1);
 	MOUSE_ShowCursor();
 
-	// Initialize the Scene room
+	// Pre-loop
 	switch (engine.room) {
-		case 1:// Room 1. Garden
-			Scene4_LoadRoom1();
-
-			ACTOR_SetPosition(9 << 4, 47 << 4, ACTOR_FACING_UP);// Set actor position
-			ACTOR_SetCombatMode(true);
-
-			CAM_Init(map->width_px, map->height_px, 0 << 4, 37 << 4);// Initialize camera
-			MAP_DrawMapToMapVideoBuffer();
-
-			Update(true);
-			Update(true);
-
-			VIDEO_FadeIn(1);
-
-			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 55);
-			AUDIO_PlaySong(true);
-
+		case 1:
 			sequence_step = 0;
 			end_sequence = false;
 			while (!end_sequence) {
@@ -634,31 +661,14 @@ void Scene4_Loop(void) {
 			}
 			end_sequence = false;
 
-			ACTOR_SetCombatMode(true);
 			ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_PISTOL);
+			ACTOR_SetCombatMode(true);
 			ACTOR_Reload();
 
 			break;
-		case 2:// Room 2. Church
-			Scene4_LoadRoom2();
-
-			ACTOR_SetPosition(23 << 4, 29 << 4, ACTOR_FACING_UP);     // Set actor position
-			CAM_Init(map->width_px, map->height_px, 13 << 4, 20 << 4);// Initialize camera
-			MAP_DrawMapToMapVideoBuffer();
-
-			Update(true);
-			Update(true);
-			VIDEO_FadeIn(1);
-
-			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 55);
-			AUDIO_PlaySong(true);
-
-			ACTOR_SetCombatMode(true);
-			ACTOR_Reload();
-
+		case 2:
 			break;
 		default:
-			Error("Scene4_Loop function error", "Undefined room", "", ERROR_SYSTEM);
 			break;
 	}
 
@@ -735,6 +745,7 @@ void Scene4_Loop(void) {
 							MAP_UnloadMap();
 
 							Scene4_LoadRoom2();
+							GFX_LoadPalette("PALETTES.DAT", "SCN42.PCX", 256);
 							ACTOR_SetPosition(23 << 4, 29 << 4, ACTOR_FACING_UP);     // Set actor position
 							CAM_Init(map->width_px, map->height_px, 13 << 4, 20 << 4);// Initialize camera
 							MAP_DrawMapToMapVideoBuffer();

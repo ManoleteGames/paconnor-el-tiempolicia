@@ -1102,6 +1102,9 @@ void FILE_LoadSettingsFile(const char *config_file) {
 			case 6:// Mouse enabled
 				fscanf(f, " %d,", &settings.mouse_enabled);
 				break;
+			case 7:// Language
+				fscanf(f, " %d,", &settings.language);
+				break;
 			case 10:// Up key
 				fscanf(f, " %d,", &settings.up_key);
 				break;

@@ -52,7 +52,11 @@ void UI_SetStatusPanels(void) {
 }
 
 void UI_SetDefaultLanguage(void) {
-	ui->language = 0;// set ES as default
+	ui->language = 1;// set EN as default
+}
+
+void UI_SetLanguage(int language) {
+	ui->language = language;
 }
 
 void UI_ButtonOver(int button_number) {

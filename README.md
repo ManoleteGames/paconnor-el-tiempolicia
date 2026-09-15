@@ -1,9 +1,19 @@
+<<<<<<< HEAD
 # PACONNOR, El tiempolicia
 
 > Un shooter de acción y aventura para MS-DOS, ambientado en un futuro distópico.
 >
 > Pude descargarse el último release y utilizarlo en cualquier emulador como DOSBOX, PCem, 86Box, etc..
 >
+=======
+
+# PACONNOR, El tiempolicia
+
+> Un shooter de acción y aventura para MS-DOS, ambientado en un futuro distópico.
+> 
+> Pude descargarse el último release y utilizarlo en cualquier emulador como DOSBOX, PCem, 86Box, etc..
+> 
+>>>>>>> 8ff3198c407f1eff06c88294bca23fc1f632acf9
 > O jugar directamente en [Itch.io](https://manoletegames.itch.io/paconnor-el-tiempolicia)
 
 ![MS-DOS](https://img.shields.io/badge/Platform-MS--DOS-555555)
@@ -14,6 +24,7 @@
 
 ## 📖 Índice
 
+<<<<<<< HEAD
 - [🎮 Descripción](#-descripción)
 - [✨ Características](#-características)
 - [🕹️ Controles](#️-controles)
@@ -24,6 +35,18 @@
 - [📜 Historia](#-historia)
 - [📋 Estado del desarrollo](#-estado-del-desarrollo)
 - [👨‍💻 Autor](#-autor)
+=======
+* [🎮 Descripción](#-descripción)
+* [✨ Características](#-características)
+* [🕹️ Controles](#️-controles)
+* [🖥️ Requisitos](#️-requisitos)
+* [🛠️ Compilación](#️-compilación)
+* [📁 Estructura del proyecto](#-estructura-del-proyecto)
+* [📸 Capturas](#-capturas)
+* [📜 Historia](#-historia)
+* [📋 Estado del desarrollo](#-estado-del-desarrollo)
+* [👨‍💻 Autor](#-autor)
+>>>>>>> 8ff3198c407f1eff06c88294bca23fc1f632acf9
 
 ---
 
@@ -37,6 +60,7 @@ El proyecto está desarrollado en **C con DJGPP**, utilizando gráficos VGA de 3
 
 ## ✨ Características
 
+<<<<<<< HEAD
 - 🎯 Acción con teclado y ratón.
 - 🕹️ Perspectiva cenital (_top-down_).
 - 🖥️ Gráficos VGA de 320×200.
@@ -45,11 +69,22 @@ El proyecto está desarrollado en **C con DJGPP**, utilizando gráficos VGA de 3
 - 🤖 Ciudad futurista y decadente.
 - ⏳ Viajes en el tiempo.
 - 🎵 Música y efectos de sonido retro (PC Speaker)
+=======
+* 🎯 Acción con teclado y ratón.
+* 🕹️ Perspectiva cenital (*top-down*).
+* 🖥️ Gráficos VGA de 320×200.
+* 💾 Compatible con MS-DOS.
+* 🔫 Armas, enemigos y proyectiles.
+* 🤖 Ciudad futurista y decadente.
+* ⏳ Viajes en el tiempo.
+* 🎵 Música y efectos de sonido retro (PC Speaker)
+>>>>>>> 8ff3198c407f1eff06c88294bca23fc1f632acf9
 
 ---
 
 ## 🕹️ Controles
 
+<<<<<<< HEAD
 | Acción         | Tecla              |
 | -------------- | ------------------ |
 | Moverse        | W S A D            |
@@ -65,16 +100,41 @@ El proyecto está desarrollado en **C con DJGPP**, utilizando gráficos VGA de 3
 | Rifle          | 5                  |
 | Pausa          | P                  |
 | Salir          | ESC                |
+=======
+| Acción         | Tecla               |
+| -------------- | ------------------- |
+| Moverse        | W S A D             |
+| Esquivar       | SPACE               |
+| Apuntar        | 🖱️ Ratón           |
+| Disparar       | 🖱️ Botón izquierdo |
+| Lanzar granada | 🖱️ Botón derecho   |
+| Recargar arma  | R                   |
+| Puños          | 1                   |
+| Pistola        | 2                   |
+| Escopeta       | 3                   |
+| UZI            | 4                   |
+| Rifle          | 5                   |
+| Pausa          | P                   |
+| Salir          | ESC                 |
+>>>>>>> 8ff3198c407f1eff06c88294bca23fc1f632acf9
 
 ---
 
 ## 🖥️ Requisitos
 
+<<<<<<< HEAD
 - PC compatible con MS-DOS.
 - Procesador 486-DX2 66MHz o superior.
 - Tarjeta gráfica VGA.
 - Ratón compatible con MS-DOS.
 - PC Speaker.
+=======
+* PC compatible con MS-DOS.
+* Procesador 486-DX2 66MHz o superior.
+* Tarjeta gráfica VGA.
+* Ratón compatible con MS-DOS.
+* PC Speaker.
+>>>>>>> 8ff3198c407f1eff06c88294bca23fc1f632acf9
 
 ---
 
@@ -152,6 +212,7 @@ Una máquina del tiempo. Una ciudad en decadencia. Y una última oportunidad par
 
 | Sistema            | Estado |
 | ------------------ | ------ |
+<<<<<<< HEAD
 | Motor gráfico      | ✅     |
 | Scroll del mapa    | ✅     |
 | Gestión de memoria | ✅     |
@@ -160,17 +221,35 @@ Una máquina del tiempo. Una ciudad en decadencia. Y una última oportunidad par
 | Colisiones         | ✅     |
 | IA enemiga         | ✅     |
 | Sonidos Speaker    | ✅     |
+=======
+| Motor gráfico      | ✅      |
+| Scroll del mapa    | ✅      |
+| Gestión de memoria | ✅      |
+| Teclado            | ✅      |
+| Ratón              | ✅      |
+| Colisiones         | ✅      |
+| IA enemiga         | ✅      |
+| Sonidos Speaker    | ✅      |
+>>>>>>> 8ff3198c407f1eff06c88294bca23fc1f632acf9
 | Música AdLib       | 🚧     |
 | Sound blaster      | 🚧     |
 | Historia           | 🚧     |
 
 ---
+<<<<<<< HEAD
 
 ---
 
 ---
 
 ---
+=======
+---
+---
+---
+
+
+>>>>>>> 8ff3198c407f1eff06c88294bca23fc1f632acf9
 
 ## 👨‍💻 Autor
 

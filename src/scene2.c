@@ -699,11 +699,6 @@ void Scene2_UnloadAssets(void) {
 	MM_PopChunks(CT_TEMPORARY_SPRITE);
 }
 void Scene2_LoadRoom1(void) {
-
-	MAP_LoadMap("MAPSCN21.DAT", 80, 57, "TSCN21.DAT", "SCN2_1_BACK.PCX", "SCN2_1_FORE.PCX", "SCN2_1_MASK.PCX", 320 * 416, 128 * 128, 128 * 128);
-
-	GFX_LoadPalette("PALETTES.DAT", "SCN21.PCX", 256);
-
 	ENEMY_Load("ENEMY6.DAT", 0, 57 << 4, 2 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_SLEEP, 1);
 	ENEMY_Load("ENEMY6.DAT", 1, 58 << 4, 2 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_SLEEP, 1);
 	ENEMY_Load("ENEMY6.DAT", 2, 67 << 4, 8 << 4, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_ENEMY1_PORTAIT, SPRITE_GRAPHICS_ID_ENEMY1_FEET, SPRITE_GRAPHICS_ID_ENEMY1_BODY, SPRITE_GRAPHICS_ID_ENEMY1_HEAD, SPRITE_GRAPHICS_ID_ENEMY1_LARM, SPRITE_GRAPHICS_ID_ENEMY1_RARM, ENEMY_FACING_DOWN, ENEMY_GUN_BARE_HANDS, SPRITE_GRAPHICS_ID_PUNCH, SPRITE_GRAPHICS_ID_PUNCH, ENEMY_STATUS_SLEEP, 1);
@@ -733,6 +728,8 @@ void Scene2_LoadRoom1(void) {
 
 	ITEM_LoadItem(11, ENTITY_ID_ITEM_AMMO2, SPRITE_GRAPHICS_ID_ITEM_AMMO2, 20 << 4, 17 << 4);
 	ITEM_LoadItem(12, ENTITY_ID_ITEM_AMMO3, SPRITE_GRAPHICS_ID_ITEM_AMMO3, 27 << 4, 39 << 4);
+
+	MAP_LoadMap("MAPSCN21.DAT", 80, 57, "TSCN21.DAT", "SCN2_1_BACK.PCX", "SCN2_1_FORE.PCX", "SCN2_1_MASK.PCX", 320 * 416, 128 * 128, 128 * 128);
 
 	AUDIO_LoadSong(AUDIO_SONG_5);// Load song
 }
@@ -830,20 +827,6 @@ void Scene2_Loop(void) {
 	Scene2_LoadAssets();
 	Scene2_SetHotspotsAndEvents();
 
-	while (!AwaitDelayTime()) {
-		// Just wait
-	}
-
-	VIDEO_FadeOut(4);
-
-	scene_step = 0;
-	sequence_step = 0;
-	scene_counter = 0;
-	end_sequence = false;
-	engine.ingame = true;
-
-	MOUSE_ShowCursor();
-
 	// Initialize the Scene room
 	switch (engine.room) {
 		case 1:// Room 1. Sewer
@@ -864,6 +847,39 @@ void Scene2_Loop(void) {
 			Error("Scene2_Loop function error", "Undefined room", "", ERROR_SYSTEM);
 			break;
 	}
+
+	VIDEO_FadeOut(4);
+	VIDEO_ClearScreenBuffer();
+
+	// Set palette
+	switch (engine.room) {
+		case 1:// Room 1. Outside doscity
+			GFX_LoadPalette("PALETTES.DAT", "SCN21.PCX", 256);
+			break;
+		default:
+			sprintf(engine.system_error_message1, "Scene2_Loop function error");
+			sprintf(engine.system_error_message2, "Undefined room");
+			sprintf(engine.system_error_message3, "Selected room: %u", engine.room);
+			Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SYSTEM);
+			break;
+	}
+
+	Update(true);
+	Update(true);
+
+	scene_step = 0;
+	sequence_step = 0;
+	scene_counter = 0;
+	end_sequence = false;
+	engine.ingame = true;
+
+	while (!AwaitDelayTime()) {
+		// Just wait
+	}
+
+	AUDIO_PlaySong(true);
+	VIDEO_FadeIn(1);
+	MOUSE_ShowCursor();
 
 	// Loop until the game is over
 	while (engine.ingame) {

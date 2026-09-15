@@ -59,5 +59,6 @@ void UI_UnloadButtons(void);
 bool UI_IsSpeechFinished(void);
 void UI_ShowLoadingScreen(void);
 void UI_HideLoadingScreen(void);
+void UI_SetLanguage(int language);
 
 #endif
