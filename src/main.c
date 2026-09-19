@@ -2169,7 +2169,7 @@ static void EndCredits(void) {
 /** MAIN FUNCTION*******
  */
 int main(int argc, char **argv) {
-	gdb_start();
+	//gdb_start();
 
 	engine.good_mode = false;
 	engine.debug_mode = false;
@@ -2228,7 +2228,7 @@ int main(int argc, char **argv) {
 
 	while (!engine.exit_game) {
 
-		if (ui->pause) gdb_checkpoint();
+		//if (ui->pause) gdb_checkpoint();
 
 		switch (engine.scene) {
 			case 0:// main menu
