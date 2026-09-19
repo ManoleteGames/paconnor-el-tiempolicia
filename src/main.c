@@ -4,8 +4,11 @@
 * (c) 2025-2026 by J.Martin
 ***********************************************/
 
+#include "engine/audio/audio.h"
 #include "engine/engine.h"
+#include "engine/file/file.h"
 #include "engine/gfx/gfx.h"
+#include "engine/keyb/keyb.h"
 #include "engine/types/types.h"
 #include "engine/ui/ui.h"
 #include "scene1.h"
@@ -32,6 +35,15 @@ static void LoadTexts(void) {
 			break;
 		case 2:// FR
 			sprintf(language, "DIALOGFR.DAT");
+			break;
+		case 3:// GR
+			sprintf(language, "DIALOGGR.DAT");
+			break;
+		default:
+			sprintf(engine.system_error_message1, "LoadTexts function error");
+			sprintf(engine.system_error_message2, "Unknown language %u", ui->language);
+			sprintf(engine.system_error_message3, " ");
+			Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_GRAPHICS);
 			break;
 	}
 
@@ -60,7 +72,6 @@ static void LoadTexts(void) {
 	FILE_LoadTextFile(language, "SCN6I.TXT", ui->txt_file[UI_TXT_SCN6I]);
 	FILE_LoadTextFile(language, "END.TXT", ui->txt_file[UI_TXT_END]);
 }
-
 /** Main logo sequence
  */
 static void Logo(void) {
@@ -421,7 +432,6 @@ static void Logo(void) {
 	// shares logo sequence is ended
 	engine.logo = false;
 }
-
 static void Intro(void) {
 	int step;
 	int i, scroll_counter;
@@ -729,7 +739,6 @@ static void Intro(void) {
 	EFFECT_UnloadEffects();
 	GFX_UnloadSprites();
 }
-
 /** Main menu
  */
 static void Menu(void) {
@@ -739,7 +748,9 @@ static void Menu(void) {
 	bool show_options_menu, hide_options_menu, options_menu_shown, options_menu_hidden;
 	bool show_password_menu, hide_password_menu, password_menu_shown, password_menu_hidden;
 	bool show_credits, hide_credits, credits_shown, credits_hidden;
+	bool redefine_keys;
 	int credits_step;
+	int redefine_step;
 	int i;
 	int title_spr_num1, title_spr_num2, opt_pnl_spr_num, pass_pnl_spr_num, chat_pnl_spr_num;
 	unsigned char sound_volume[5];
@@ -773,6 +784,7 @@ static void Menu(void) {
 	credits_shown = false;
 	credits_hidden = true;
 	credits_step = 0;
+	redefine_step = 0;
 
 	int char_number = 0;
 	char aux_string[40];
@@ -878,13 +890,16 @@ static void Menu(void) {
 	GFX_SetSpriteGraphic(opt_pnl_spr_num, 0, SPRITE_GRAPHICS_ID_PNL_OPTIONS, 0, 0);
 	GFX_SetSpritePosition(opt_pnl_spr_num, 320, 5);
 
-	UI_LoadButton(6, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_BACK, 345, 135);  // Back
-	UI_LoadButton(7, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_LEFT, 324, 35);   // Sound volume left
-	UI_LoadButton(8, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_RIGHT, 365, 35);  // Sound volume right
-	UI_LoadButton(9, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_LEFT, 324, 75);   // Music volume left
-	UI_LoadButton(10, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_RIGHT, 365, 75); // Music volume right
-	UI_LoadButton(11, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_LEFT, 324, 115); // Language left
-	UI_LoadButton(12, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_RIGHT, 365, 116);// Language right
+	UI_LoadButton(6, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_BACK, 409, 70);         // Back
+	UI_LoadButton(7, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_SOUND, 324, 9);         // Sound
+	UI_LoadButton(8, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_LEFT, 324, 31);         // Sound volume left
+	UI_LoadButton(9, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_RIGHT, 365, 31);        // Sound volume right
+	UI_LoadButton(10, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_MUSIC_SCENES, 385, 9); // Scenes music
+	UI_LoadButton(11, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_MUSIC_INGAME, 385, 31);// Ingame music
+	UI_LoadButton(12, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_LEFT, 385, 53);        // Music volume left
+	UI_LoadButton(13, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_RIGHT, 426, 53);       // Music volume right
+	UI_LoadButton(14, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_LANGUAGE, 324, 46);    // Language
+	UI_LoadButton(15, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_KEYS, 324, 68);        // Redefine keys
 
 	// Password assets
 	pass_pnl_spr_num = GFX_FindEmptySpriteSlot();
@@ -897,8 +912,8 @@ static void Menu(void) {
 	GFX_InitSprite(0, 0, pass_pnl_spr_num, 0, gfx_sprite_graphics_stack[SPRITE_GRAPHICS_ID_PNL_PASS].width_px, gfx_sprite_graphics_stack[SPRITE_GRAPHICS_ID_PNL_OPTIONS].height_px);
 	GFX_SetSpriteGraphic(pass_pnl_spr_num, 0, SPRITE_GRAPHICS_ID_PNL_PASS, 0, 0);
 	GFX_SetSpritePosition(pass_pnl_spr_num, 320, 10);
-	UI_LoadButton(13, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_OK, 321, 55);  // OK
-	UI_LoadButton(14, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_BACK, 410, 55);// Back
+	UI_LoadButton(16, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_OK, 321, 55);  // OK
+	UI_LoadButton(17, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_BACK, 410, 55);// Back
 
 	// Credits assets
 	chat_pnl_spr_num = GFX_FindEmptySpriteSlot();
@@ -940,15 +955,12 @@ static void Menu(void) {
 	idle_counter = 0;
 	exit_menu = false;
 	show_main_menu = true;
-
-	GFX_InitSprite(ENTITY_ID_EMPTY, 0, 20, 1, 7, 12);
-	GFX_SetSpriteGraphic(20, 0, SPRITE_GRAPHICS_ID_CURSOR, 0, 0);
-	GFX_SetSpritePosition(20, 20, 20);
+	redefine_keys = false;
 
 	while (!exit_menu) {
 
 		// Load intro if nothing happends
-		idle_counter++;
+		if (main_menu_shown) idle_counter++;
 		if (idle_counter > 1000) {
 			idle_counter = 0;
 			exit_menu = true;
@@ -1011,8 +1023,11 @@ static void Menu(void) {
 			UI_SetButtonPosition(10, UI_GetButtonXPosition(10) - 4, UI_GetButtonYPosition(10));
 			UI_SetButtonPosition(11, UI_GetButtonXPosition(11) - 4, UI_GetButtonYPosition(11));
 			UI_SetButtonPosition(12, UI_GetButtonXPosition(12) - 4, UI_GetButtonYPosition(12));
+			UI_SetButtonPosition(13, UI_GetButtonXPosition(13) - 4, UI_GetButtonYPosition(13));
+			UI_SetButtonPosition(14, UI_GetButtonXPosition(14) - 4, UI_GetButtonYPosition(14));
+			UI_SetButtonPosition(15, UI_GetButtonXPosition(15) - 4, UI_GetButtonYPosition(15));
 
-			if (gfx_sprite_stack[opt_pnl_spr_num].screen_pos_x <= 250) {
+			if (gfx_sprite_stack[opt_pnl_spr_num].screen_pos_x <= 188) {
 				show_options_menu = false;
 				hide_options_menu = false;
 				options_menu_hidden = false;
@@ -1022,27 +1037,153 @@ static void Menu(void) {
 
 		// Options menu shown
 		if (options_menu_shown) {
-			// Sound volume
-			sprintf(sound_volume, "%03d\n", settings.sound_volume);
-			VIDEO_StringToScreenBuffer(268, 40, sound_volume, FONT_SLIM_WHITE);
-
-			// Music volume
-			sprintf(music_volume, "%03d\n", settings.music_volume);
-			VIDEO_StringToScreenBuffer(268, 80, music_volume, FONT_SLIM_WHITE);
-
-			// Language
-			switch (settings.language) {
-				case UI_LANGUAGE_ES:// spanish
-					VIDEO_StringToScreenBuffer(266, 120, ui->txt_file[UI_TXT_GLOBAL]->line[18], FONT_SLIM_WHITE);
+			// Sound option
+			switch (settings.sound_device) {
+				case 0:// no sound
+					VIDEO_StringToScreenBuffer(206, 18, ui->txt_file[UI_TXT_GLOBAL]->line[13], FONT_SLIM_WHITE);
 					break;
-				case UI_LANGUAGE_EN:// english
-					VIDEO_StringToScreenBuffer(266, 120, ui->txt_file[UI_TXT_GLOBAL]->line[19], FONT_SLIM_WHITE);
+				case 1:// speaker
+					VIDEO_StringToScreenBuffer(206, 18, ui->txt_file[UI_TXT_GLOBAL]->line[14], FONT_SLIM_WHITE);
 					break;
-				case UI_LANGUAGE_FR:// French
-					VIDEO_StringToScreenBuffer(266, 120, ui->txt_file[UI_TXT_GLOBAL]->line[20], FONT_SLIM_WHITE);
+				case 2:// adlib
+					VIDEO_StringToScreenBuffer(206, 18, ui->txt_file[UI_TXT_GLOBAL]->line[15], FONT_SLIM_WHITE);
+					break;
+				case 3:// sound blaster
+					VIDEO_StringToScreenBuffer(206, 18, ui->txt_file[UI_TXT_GLOBAL]->line[16], FONT_SLIM_WHITE);
 					break;
 				default:
 					break;
+			}
+
+			// Sound volume
+			sprintf(sound_volume, "%03d\n", settings.sound_volume);
+			VIDEO_StringToScreenBuffer(208, 35, sound_volume, FONT_SLIM_WHITE);
+
+			// Scene Music option
+			switch (settings.scenes_music) {
+				case 0:// music OFF
+					VIDEO_StringToScreenBuffer(268, 18, ui->txt_file[UI_TXT_GLOBAL]->line[13], FONT_SLIM_WHITE);
+					break;
+				case 1:// music ON
+					VIDEO_StringToScreenBuffer(268, 18, ui->txt_file[UI_TXT_GLOBAL]->line[17], FONT_SLIM_WHITE);
+					break;
+				default:
+					break;
+			}
+
+			// Ingame Music option
+			switch (settings.ingame_music) {
+				case 0:// music OFF
+					VIDEO_StringToScreenBuffer(268, 40, ui->txt_file[UI_TXT_GLOBAL]->line[13], FONT_SLIM_WHITE);
+					break;
+				case 1:// music ON
+					VIDEO_StringToScreenBuffer(268, 40, ui->txt_file[UI_TXT_GLOBAL]->line[17], FONT_SLIM_WHITE);
+					break;
+				default:
+					break;
+			}
+
+			// Music volume
+			sprintf(music_volume, "%03d\n", settings.music_volume);
+			VIDEO_StringToScreenBuffer(269, 56, music_volume, FONT_SLIM_WHITE);
+
+			// Language option
+			switch (settings.language) {
+				case 0:// SP
+					VIDEO_StringToScreenBuffer(208, 55, ui->txt_file[UI_TXT_GLOBAL]->line[18], FONT_SLIM_WHITE);
+					break;
+				case 1:// EN
+					VIDEO_StringToScreenBuffer(208, 55, ui->txt_file[UI_TXT_GLOBAL]->line[19], FONT_SLIM_WHITE);
+					break;
+				case 2:// FR
+					VIDEO_StringToScreenBuffer(208, 55, ui->txt_file[UI_TXT_GLOBAL]->line[20], FONT_SLIM_WHITE);
+					break;
+				case 3:// GR
+					VIDEO_StringToScreenBuffer(208, 55, ui->txt_file[UI_TXT_GLOBAL]->line[21], FONT_SLIM_WHITE);
+					break;
+				default:
+					break;
+			}
+
+			if (redefine_keys) {
+				switch (redefine_step) {
+					case 0:// Up key
+						VIDEO_StringToScreenBuffer(60, 55, ui->txt_file[UI_TXT_GLOBAL]->line[30], FONT_BIG_BLACK);
+						if (KEYB_IsAnyKeyPressed()) {
+							kbBindingUp = KEYB_GetLastKeyPressed_CODE();
+							redefine_step++;
+						}
+						break;
+					case 1:
+						if (!KEYB_IsAnyKeyPressed()) redefine_step++;
+						break;
+					case 2:// Down key
+						VIDEO_StringToScreenBuffer(60, 55, ui->txt_file[UI_TXT_GLOBAL]->line[31], FONT_BIG_BLACK);
+						if (KEYB_IsAnyKeyPressed()) {
+							kbBindingDown = KEYB_GetLastKeyPressed_CODE();
+							redefine_step++;
+						}
+						break;
+					case 3:
+						if (!KEYB_IsAnyKeyPressed()) redefine_step++;
+						break;
+					case 4:// Left key
+						VIDEO_StringToScreenBuffer(60, 55, ui->txt_file[UI_TXT_GLOBAL]->line[32], FONT_BIG_BLACK);
+						if (KEYB_IsAnyKeyPressed()) {
+							kbBindingLeft = KEYB_GetLastKeyPressed_CODE();
+							redefine_step++;
+						}
+						break;
+					case 5:
+						if (!KEYB_IsAnyKeyPressed()) redefine_step++;
+						break;
+					case 6:// Right key
+						VIDEO_StringToScreenBuffer(60, 55, ui->txt_file[UI_TXT_GLOBAL]->line[33], FONT_BIG_BLACK);
+						if (KEYB_IsAnyKeyPressed()) {
+							kbBindingRight = KEYB_GetLastKeyPressed_CODE();
+							redefine_step++;
+						}
+						break;
+					case 7:
+						if (!KEYB_IsAnyKeyPressed()) redefine_step++;
+						break;
+					case 8:// Shoot key
+						VIDEO_StringToScreenBuffer(60, 55, ui->txt_file[UI_TXT_GLOBAL]->line[34], FONT_BIG_BLACK);
+						if (KEYB_IsAnyKeyPressed()) {
+							kbBindingFire = KEYB_GetLastKeyPressed_CODE();
+							redefine_step++;
+						}
+						break;
+					case 9:
+						if (!KEYB_IsAnyKeyPressed()) redefine_step++;
+						break;
+					case 10:// Thrown key
+						VIDEO_StringToScreenBuffer(60, 55, ui->txt_file[UI_TXT_GLOBAL]->line[35], FONT_BIG_BLACK);
+						if (KEYB_IsAnyKeyPressed()) {
+							kbBindingThrow = KEYB_GetLastKeyPressed_CODE();
+							redefine_step++;
+						}
+						break;
+					case 11:
+						if (!KEYB_IsAnyKeyPressed()) redefine_step++;
+						break;
+					case 12:// Jump key
+						VIDEO_StringToScreenBuffer(60, 55, ui->txt_file[UI_TXT_GLOBAL]->line[36], FONT_BIG_BLACK);
+						if (KEYB_IsAnyKeyPressed()) {
+							kbBindingLoop = KEYB_GetLastKeyPressed_CODE();
+							redefine_step++;
+						}
+						break;
+					case 13:
+						if (!KEYB_IsAnyKeyPressed()) redefine_step++;
+						break;
+					case 14:
+						redefine_keys = false;
+						break;
+					default:
+						redefine_keys = false;
+						break;
+				}
 			}
 		}
 
@@ -1057,6 +1198,9 @@ static void Menu(void) {
 			UI_SetButtonPosition(10, UI_GetButtonXPosition(10) + 4, UI_GetButtonYPosition(10));
 			UI_SetButtonPosition(11, UI_GetButtonXPosition(11) + 4, UI_GetButtonYPosition(11));
 			UI_SetButtonPosition(12, UI_GetButtonXPosition(12) + 4, UI_GetButtonYPosition(12));
+			UI_SetButtonPosition(13, UI_GetButtonXPosition(13) + 4, UI_GetButtonYPosition(13));
+			UI_SetButtonPosition(14, UI_GetButtonXPosition(14) + 4, UI_GetButtonYPosition(14));
+			UI_SetButtonPosition(15, UI_GetButtonXPosition(15) + 4, UI_GetButtonYPosition(15));
 			if (gfx_sprite_stack[opt_pnl_spr_num].screen_pos_x >= 320) {
 				show_options_menu = false;
 				hide_options_menu = false;
@@ -1067,8 +1211,8 @@ static void Menu(void) {
 		// Show password menu
 		if (show_password_menu && main_menu_hidden && credits_hidden && options_menu_hidden) {
 			GFX_SetSpritePosition(pass_pnl_spr_num, gfx_sprite_stack[pass_pnl_spr_num].screen_pos_x - 4, gfx_sprite_stack[pass_pnl_spr_num].screen_pos_y);
-			UI_SetButtonPosition(13, UI_GetButtonXPosition(13) - 4, UI_GetButtonYPosition(13));
-			UI_SetButtonPosition(14, UI_GetButtonXPosition(14) - 4, UI_GetButtonYPosition(14));
+			UI_SetButtonPosition(16, UI_GetButtonXPosition(16) - 4, UI_GetButtonYPosition(16));
+			UI_SetButtonPosition(17, UI_GetButtonXPosition(17) - 4, UI_GetButtonYPosition(17));
 
 			if (gfx_sprite_stack[pass_pnl_spr_num].screen_pos_x <= 190) {
 				show_password_menu = false;
@@ -1106,7 +1250,7 @@ static void Menu(void) {
 						key = KEYB_GetLastKeyPressed_ASCII();
 						if (key != 0) {
 							password[0] = key;
-							SetDelayTime(200);
+							SetDelayTime(300);
 							password_step++;
 						} else {
 							AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 0);
@@ -1114,19 +1258,19 @@ static void Menu(void) {
 					}
 					break;
 				case 2:// wait
-					if (AwaitDelayTime()) password_step++;
+					if (!KEYB_IsAnyKeyPressed()) password_step++;
 					break;
 				case 3:// 2nd char
 					if (KEYB_IsAnyKeyPressed()) {
 						if (kbKeyState[SCANCODE_BACKSPACE]) {
 							password[0] = '*';
 							password_step = 0;
-							SetDelayTime(200);
+							SetDelayTime(300);
 						} else {
 							key = KEYB_GetLastKeyPressed_ASCII();
 							if (key != 0) {
 								password[2] = key;
-								SetDelayTime(200);
+								SetDelayTime(300);
 								password_step++;
 							} else {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 0);
@@ -1135,19 +1279,19 @@ static void Menu(void) {
 					}
 					break;
 				case 4:// wait
-					if (AwaitDelayTime()) password_step++;
+					if (!KEYB_IsAnyKeyPressed()) password_step++;
 					break;
 				case 5:// 3rd char
 					if (KEYB_IsAnyKeyPressed()) {
 						if (kbKeyState[SCANCODE_BACKSPACE]) {
 							password[2] = '*';
 							password_step = 2;
-							SetDelayTime(200);
+							SetDelayTime(300);
 						} else {
 							key = KEYB_GetLastKeyPressed_ASCII();
 							if (key != 0) {
 								password[4] = key;
-								SetDelayTime(200);
+								SetDelayTime(300);
 								password_step++;
 							} else {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 0);
@@ -1156,19 +1300,19 @@ static void Menu(void) {
 					}
 					break;
 				case 6:// wait
-					if (AwaitDelayTime()) password_step++;
+					if (!KEYB_IsAnyKeyPressed()) password_step++;
 					break;
 				case 7:// 4th char
 					if (KEYB_IsAnyKeyPressed()) {
 						if (kbKeyState[SCANCODE_BACKSPACE]) {
 							password[4] = '*';
 							password_step = 4;
-							SetDelayTime(200);
+							SetDelayTime(300);
 						} else {
 							key = KEYB_GetLastKeyPressed_ASCII();
 							if (key != 0) {
 								password[6] = key;
-								SetDelayTime(200);
+								SetDelayTime(300);
 								password_step++;
 							} else {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 0);
@@ -1177,19 +1321,19 @@ static void Menu(void) {
 					}
 					break;
 				case 8:// wait
-					if (AwaitDelayTime()) password_step++;
+					if (!KEYB_IsAnyKeyPressed()) password_step++;
 					break;
 				case 9:// 5th char
 					if (KEYB_IsAnyKeyPressed()) {
 						if (kbKeyState[SCANCODE_BACKSPACE]) {
 							password[6] = '*';
 							password_step = 6;
-							SetDelayTime(200);
+							SetDelayTime(300);
 						} else {
 							key = KEYB_GetLastKeyPressed_ASCII();
 							if (key != 0) {
 								password[8] = key;
-								SetDelayTime(200);
+								SetDelayTime(300);
 								password_step++;
 							} else {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 0);
@@ -1198,19 +1342,19 @@ static void Menu(void) {
 					}
 					break;
 				case 10:// wait
-					if (AwaitDelayTime()) password_step++;
+					if (!KEYB_IsAnyKeyPressed()) password_step++;
 					break;
 				case 11:// 6th char
 					if (KEYB_IsAnyKeyPressed()) {
 						if (kbKeyState[SCANCODE_BACKSPACE]) {
 							password[8] = '*';
 							password_step = 8;
-							SetDelayTime(200);
+							SetDelayTime(300);
 						} else {
 							key = KEYB_GetLastKeyPressed_ASCII();
 							if (key != 0) {
 								password[10] = key;
-								SetDelayTime(200);
+								SetDelayTime(300);
 								password_step++;
 							} else {
 								AUDIO_PlaySound(AUDIO_SHOT_FAIL_EFFECT, 0);
@@ -1219,7 +1363,7 @@ static void Menu(void) {
 					}
 					break;
 				case 12:// wait
-					if (AwaitDelayTime()) password_step++;
+					if (!KEYB_IsAnyKeyPressed()) password_step++;
 					break;
 				case 13:// All chars done
 					if (kbKeyState[SCANCODE_BACKSPACE]) {
@@ -1236,8 +1380,8 @@ static void Menu(void) {
 		if (hide_password_menu) {
 			password_menu_shown = false;
 			GFX_SetSpritePosition(pass_pnl_spr_num, gfx_sprite_stack[pass_pnl_spr_num].screen_pos_x + 4, gfx_sprite_stack[pass_pnl_spr_num].screen_pos_y);
-			UI_SetButtonPosition(13, UI_GetButtonXPosition(13) + 4, UI_GetButtonYPosition(13));
-			UI_SetButtonPosition(14, UI_GetButtonXPosition(14) + 4, UI_GetButtonYPosition(14));
+			UI_SetButtonPosition(16, UI_GetButtonXPosition(16) + 4, UI_GetButtonYPosition(16));
+			UI_SetButtonPosition(17, UI_GetButtonXPosition(17) + 4, UI_GetButtonYPosition(17));
 			if (gfx_sprite_stack[pass_pnl_spr_num].screen_pos_x >= 320) {
 				show_password_menu = false;
 				hide_password_menu = false;
@@ -1371,34 +1515,70 @@ static void Menu(void) {
 				engine.exit_game = true;
 				break;
 			case 6:// hide options menu
+				redefine_keys = false;
 				hide_options_menu = true;
 				show_main_menu = true;
+				FILE_SaveSettingsFile("SETTINGS.CFG");
 				break;
-			case 7:// decrease sound volume
+			case 7:// Sound setting
+				settings.sound_device++;
+				if (settings.sound_device == 1) AUDIO_StopSong();
+				if (settings.sound_device > 1) settings.sound_device = 0;
+				if (settings.sound_device == 0) AUDIO_StopSong();
+				if (settings.sound_device == 1) {
+					AUDIO_LoadSong(AUDIO_SONG_2);
+					AUDIO_PlaySong(true);
+				}
+
+				SetDelayTime(300);
+				while (!AwaitDelayTime()) {
+					// Just wait
+				}
+				break;
+			case 8:// decrease sound volume
 				if (settings.sound_volume > 0) settings.sound_volume--;
 				break;
-			case 8:// increase sound volume
+			case 9:// increase sound volume
 				if (settings.sound_volume < 100) settings.sound_volume++;
 				break;
-			case 9:// decrease music volume
+			case 10:// Scenes-music setting
+				settings.scenes_music++;
+				if (settings.scenes_music > 1) settings.scenes_music = 0;
+				SetDelayTime(300);
+				while (!AwaitDelayTime()) {
+					// Just wait
+				}
+				break;
+			case 11:// Ingame-music setting
+				settings.ingame_music++;
+				if (settings.ingame_music > 1) settings.ingame_music = 0;
+				SetDelayTime(300);
+				while (!AwaitDelayTime()) {
+					// Just wait
+				}
+				break;
+			case 12:// decrease music volume
 				if (settings.music_volume > 0) settings.music_volume--;
 				break;
-			case 10:// increase music volume
+			case 13:// increase music volume
 				if (settings.music_volume < 100) settings.music_volume++;
 				break;
-			case 11:// change language
+
+			case 14:// change language
 				settings.language++;
-				if (settings.language > 2) settings.language = 2;
+				if (settings.language > 3) settings.language = 0;
 				UI_SetLanguage(settings.language);
 				LoadTexts();
+				SetDelayTime(300);
+				while (!AwaitDelayTime()) {
+					// Just wait
+				}
 				break;
-			case 12:// change language
-				settings.language--;
-				if (settings.language < 0) settings.language = 0;
-				UI_SetLanguage(settings.language);
-				LoadTexts();
+			case 15:// Redefine keys
+				redefine_keys = true;
+				redefine_step = 0;
 				break;
-			case 13:// Password confirmation
+			case 16:// Password confirmation
 				// Chapter 1: Room 2: 'The travel' >> TRAVEL
 				if ((password[0] == 'T') && (password[2] == 'R') && (password[4] == 'A') && (password[6] == 'V') && (password[8] == 'E') && (password[10] == 'L')) {
 					exit_menu = true;
@@ -1445,7 +1625,7 @@ static void Menu(void) {
 				}
 
 				break;
-			case 14:// Hide password menu
+			case 17:// Hide password menu
 				hide_password_menu = true;
 				show_main_menu = true;
 				break;
@@ -1465,7 +1645,6 @@ static void Menu(void) {
 	AUDIO_StopSong();
 	AUDIO_UnloadSong();
 }
-
 void LoadGlobalAssets(void) {
 	ScreenSetCursor(21, 15);
 	printf("       ...loading effects graphics...       ");
@@ -1553,7 +1732,14 @@ void LoadGlobalAssets(void) {
 	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "BTNOK.PCX", SPRITE_GRAPHICS_ID_BTN_OK, 31, 15, 3, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "BTNRIGHT.PCX", SPRITE_GRAPHICS_ID_BTN_RIGHT, 15, 15, 3, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "BTNLEFT.PCX", SPRITE_GRAPHICS_ID_BTN_LEFT, 15, 15, 3, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
-	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "POPTIONS.PCX", SPRITE_GRAPHICS_ID_PNL_OPTIONS, 62, 130, 1, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
+
+	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "BTNSOUND.PCX", SPRITE_GRAPHICS_ID_BTN_SOUND, 55, 21, 3, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
+	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "BTNSMUS.PCX", SPRITE_GRAPHICS_ID_BTN_MUSIC_SCENES, 55, 21, 3, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
+	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "BTNIMUS.PCX", SPRITE_GRAPHICS_ID_BTN_MUSIC_INGAME, 55, 21, 3, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
+	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "BTNLANG.PCX", SPRITE_GRAPHICS_ID_BTN_LANGUAGE, 55, 21, 3, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
+	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "BTNKEYS.PCX", SPRITE_GRAPHICS_ID_BTN_KEYS, 55, 21, 3, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
+
+	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "POPTIONS.PCX", SPRITE_GRAPHICS_ID_PNL_OPTIONS, 124, 86, 1, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "PPASS.PCX", SPRITE_GRAPHICS_ID_PNL_PASS, 120, 41, 1, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "MTITLE.PCX", SPRITE_GRAPHICS_ID_TITLE, 243, 41, 1, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "MCHAT.PCX", SPRITE_GRAPHICS_ID_MCHAT, 136, 88, 1, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
@@ -1563,7 +1749,6 @@ void LoadGlobalAssets(void) {
 	UI_SetLanguage(settings.language);
 	LoadTexts();
 }
-
 /** End credits
  */
 static void EndCredits(void) {
@@ -1981,7 +2166,6 @@ static void EndCredits(void) {
 	engine.scene = 0;
 	engine.room = 1;
 }
-
 /** MAIN FUNCTION*******
  */
 int main(int argc, char **argv) {

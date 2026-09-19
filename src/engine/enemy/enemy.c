@@ -67,7 +67,7 @@ void ENEMY_SetGun(int enemy_number, int type, int graphics_id, int bullet_graphi
 			break;
 		case ENEMY_GUN_SHOTGUN:
 			enemy[enemy_number].gun->max_accuracy = 1;
-			enemy[enemy_number].gun->damage = 40;
+			enemy[enemy_number].gun->damage = 20;
 			enemy[enemy_number].gun->recoil_time = 10;
 			enemy[enemy_number].gun->max_distance = 100;
 			enemy[enemy_number].gun->accurate = false;
@@ -1302,6 +1302,10 @@ void ENEMY_Update(void) {
 						break;
 					case ENEMY_STATUS_STATIC_SHOOTER:
 						if (enemy[i].is_hit) {
+							enemy[i].status_behavior = ENEMY_STATUS_WARNING;
+							enemy[i].pattern_step = 0;
+						}
+						if (enemy[i].can_see_actor) {
 							enemy[i].status_behavior = ENEMY_STATUS_WARNING;
 							enemy[i].pattern_step = 0;
 						}

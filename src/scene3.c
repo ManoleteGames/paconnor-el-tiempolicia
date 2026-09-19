@@ -324,6 +324,10 @@ void Scene3_UnloadAssets(void) {
 	GFX_UnloadSpriteGraphic(SPRITE_GRAPHICS_ID_NPC_CHEF);
 	GFX_UnloadSpriteGraphic(SPRITE_GRAPHICS_ID_NPC_CHEF_CHAT);
 
+	// Object
+	GFX_UnloadSpriteGraphic(SPRITE_GRAPHICS_ID_OBJECT2);
+	GFX_UnloadSpriteGraphic(SPRITE_GRAPHICS_ID_OBJECT2_PORTAIT);
+
 	MM_PopChunks(CT_TEMPORARY_SPRITE);
 }
 void Scene3_LoadRoom1(void) {
@@ -1295,6 +1299,7 @@ void Scene3_Loop(void) {
 									Update(false);
 								}
 								end_sequence = false;
+								ACTOR_SetCombatMode(true);
 							} else {// Go back to floor 1
 
 								VIDEO_FadeOut(4);

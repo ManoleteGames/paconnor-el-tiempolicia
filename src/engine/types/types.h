@@ -15,7 +15,8 @@ typedef struct {
 	int video_mode;
 	int sound_device;
 	int sound_volume;
-	int music_device;
+	int scenes_music;
+	int ingame_music;
 	int music_volume;
 	int mouse_enabled;
 
@@ -29,7 +30,6 @@ typedef struct {
 	int fire_key;
 	int throw_key;
 	int change_gun_key;
-	int combat_mode_key;
 
 } Settings;
 

@@ -223,7 +223,7 @@ void SPK_PlaySound(SoundEffect *sound, int number) {
 		default:
 			sprintf(engine.system_error_message1, "SPK_PlaySound function error");
 			sprintf(engine.system_error_message2, "Undefined sound number %u", number);
-			sprintf(engine.system_error_message3, "");
+			sprintf(engine.system_error_message3, " ");
 			Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SOUND);
 			break;
 	}
@@ -453,7 +453,7 @@ void SPK_LoadSong(Song *song, int number) {
 		default:
 			sprintf(engine.system_error_message1, "SPK_LoadSong function error");
 			sprintf(engine.system_error_message2, "Undefined speaker music number %u", number);
-			sprintf(engine.system_error_message3, "");
+			sprintf(engine.system_error_message3, " ");
 			Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SOUND);
 			break;
 	}

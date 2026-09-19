@@ -152,7 +152,7 @@ void AUDIO_TimerHandler(void) {
 }
 
 void AUDIO_LoadSong(int song_number) {
-	switch (settings.music_device) {
+	switch (settings.sound_device) {
 		case AUDIO_DEVICE_NONE:
 			song.loaded = false;
 			break;
@@ -167,7 +167,7 @@ void AUDIO_LoadSong(int song_number) {
 			break;
 		default:
 			sprintf(engine.system_error_message1, "AUDIO_LoadSong function error");
-			sprintf(engine.system_error_message2, "Undefined music device number %u", settings.music_device);
+			sprintf(engine.system_error_message2, "Undefined music device number %u", settings.sound_device);
 			sprintf(engine.system_error_message3, "Please run setup.exe to identify your audio card");
 			Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SOUND);
 			break;
@@ -176,7 +176,7 @@ void AUDIO_LoadSong(int song_number) {
 
 void AUDIO_PlaySong(bool loop) {
 	song.loop = loop;
-	switch (settings.music_device) {
+	switch (settings.sound_device) {
 		case AUDIO_DEVICE_NONE:
 			song.loaded = false;
 			break;
@@ -191,7 +191,7 @@ void AUDIO_PlaySong(bool loop) {
 			break;
 		default:
 			sprintf(engine.system_error_message1, "AUDIO_PlaySong function error");
-			sprintf(engine.system_error_message2, "Undefined music device number %u", settings.music_device);
+			sprintf(engine.system_error_message2, "Undefined music device number %u", settings.sound_device);
 			sprintf(engine.system_error_message3, "Please run setup.exe to identify your audio card");
 			Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SOUND);
 			break;
@@ -199,7 +199,7 @@ void AUDIO_PlaySong(bool loop) {
 }
 
 void AUDIO_StopSong(void) {
-	switch (settings.music_device) {
+	switch (settings.sound_device) {
 		case AUDIO_DEVICE_NONE:
 			song.loaded = false;
 			break;
@@ -214,7 +214,7 @@ void AUDIO_StopSong(void) {
 			break;
 		default:
 			sprintf(engine.system_error_message1, "AUDIO_StopSong function error");
-			sprintf(engine.system_error_message2, "Undefined music device number %u", settings.music_device);
+			sprintf(engine.system_error_message2, "Undefined music device number %u", settings.sound_device);
 			sprintf(engine.system_error_message3, "Please run setup.exe to identify your audio card");
 			Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SOUND);
 			break;
@@ -222,7 +222,7 @@ void AUDIO_StopSong(void) {
 }
 
 void AUDIO_PauseSong(void) {
-	switch (settings.music_device) {
+	switch (settings.sound_device) {
 		case AUDIO_DEVICE_NONE:
 			song.loaded = false;
 			break;
@@ -237,7 +237,7 @@ void AUDIO_PauseSong(void) {
 			break;
 		default:
 			sprintf(engine.system_error_message1, "AUDIO_PauseSong function error");
-			sprintf(engine.system_error_message2, "Undefined music device number %u", settings.music_device);
+			sprintf(engine.system_error_message2, "Undefined music device number %u", settings.sound_device);
 			sprintf(engine.system_error_message3, "Please run setup.exe to identify your audio card");
 			Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SOUND);
 			break;
@@ -245,7 +245,7 @@ void AUDIO_PauseSong(void) {
 }
 
 void AUDIO_ResumeSong(void) {
-	switch (settings.music_device) {
+	switch (settings.sound_device) {
 		case AUDIO_DEVICE_NONE:
 			song.loaded = false;
 			break;
@@ -260,7 +260,7 @@ void AUDIO_ResumeSong(void) {
 			break;
 		default:
 			sprintf(engine.system_error_message1, "AUDIO_ResumeSong function error");
-			sprintf(engine.system_error_message2, "Undefined music device number %u", settings.music_device);
+			sprintf(engine.system_error_message2, "Undefined music device number %u", settings.sound_device);
 			sprintf(engine.system_error_message3, "Please run setup.exe to identify your audio card");
 			Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SOUND);
 			break;

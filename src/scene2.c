@@ -831,20 +831,17 @@ void Scene2_Loop(void) {
 	switch (engine.room) {
 		case 1:// Room 1. Sewer
 			Scene2_LoadRoom1();
-
 			ACTOR_SetPosition(78 << 4, 3 << 4, ACTOR_FACING_LEFT);   // Set actor position
 			CAM_Init(map->width_px, map->height_px, 60 << 4, 0 << 4);// Initialize camera
 			MAP_DrawMapToMapVideoBuffer();
-
-			Update(true);
-			Update(true);
-			VIDEO_FadeIn(1);
-
 			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 55);
 			AUDIO_PlaySong(true);
 			break;
 		default:
-			Error("Scene2_Loop function error", "Undefined room", "", ERROR_SYSTEM);
+			sprintf(engine.system_error_message1, "Scene2_Loop function error");
+			sprintf(engine.system_error_message2, "Undefined room");
+			sprintf(engine.system_error_message3, "Selected room: %u", engine.room);
+			Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SYSTEM);
 			break;
 	}
 

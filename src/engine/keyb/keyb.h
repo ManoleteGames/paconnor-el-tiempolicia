@@ -122,5 +122,6 @@ void KEYB_Init(void);
 void KEYB_Free(void);
 bool KEYB_IsAnyKeyPressed(void);
 byte KEYB_GetLastKeyPressed_ASCII(void);
+byte KEYB_GetLastKeyPressed_CODE(void);
 
 #endif

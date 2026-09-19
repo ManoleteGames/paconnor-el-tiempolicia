@@ -3,6 +3,7 @@
 #include "fcntl.h"
 #include "string.h"
 #include "unistd.h"
+#include <stdio.h>
 #include "file.h"
 
 /** FILE :: Seek files offset inside a DAT file (custom format similar to WAD)
@@ -237,20 +238,6 @@ void FILE_LoadPCXImage(const char *dat_name, const char *asset_name, byte *buffe
 	h = yMax - yMin + 1;
 	*height = h;
 
-	/*if (w > 320) {
-		_dos_close(fileHandler);
-		sprintf(engine.system_error_message1, "FILE_LoadPCXImage function error");
-		sprintf(engine.system_error_message2, "Excesive width on image file %s ", asset_name);
-		sprintf(engine.system_error_message3, "Image width %u, Max. expected 320", w);
-		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_FILE);
-	}
-	if (h > 200) {
-		_dos_close(fileHandler);
-		sprintf(engine.system_error_message1, "FILE_LoadPCXImage function error");
-		sprintf(engine.system_error_message2, "Excesive height on image file %s ", asset_name);
-		sprintf(engine.system_error_message3, "Image height %u, Max. expected 200", h);
-		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_FILE);
-	}*/
 	image_size = (long) w * h;
 
 	if (image_size > size) {
@@ -495,20 +482,6 @@ void FILE_LoadPCXSprite(const char *dat_name, const char *asset_name, byte *buff
 	h = yMax - yMin + 1;
 	*height = h;
 
-	/*if (w > 448) {
-		_dos_close(fileHandler);
-		sprintf(engine.system_error_message1, "FILE_LoadPCXSprite function error");
-		sprintf(engine.system_error_message2, "Excesive width on image file %s ", asset_name);
-		sprintf(engine.system_error_message3, "Image width %u, Max. expected 448", w);
-		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_FILE);
-	}
-	if (h > 288) {
-		_dos_close(fileHandler);
-		sprintf(engine.system_error_message1, "FILE_LoadPCXSprite function error");
-		sprintf(engine.system_error_message2, "Excesive height on image file %s ", asset_name);
-		sprintf(engine.system_error_message3, "Image height %u, Max. expected 200", h);
-		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_FILE);
-	}*/
 	image_size = (long) w * h;
 
 	if (image_size > size) {
@@ -889,8 +862,8 @@ void FILE_LoadAnimationFile(const char *dat_name, const char *asset_name, Sprite
 	fclose(f);
 }
 
-/** FILE :: Load animation data from ani file
- * - Reads an .ANI file inside a .DAT file 
+/** FILE :: Load sprite configuration data from cfg file
+ * - Reads a .CFG file inside a .DAT file 
  */
 void FILE_LoadSpriteConfigFile(const char *dat_name, const char *asset_name, SpriteConfig *cfg) {
 	FILE *f;
@@ -1006,7 +979,6 @@ void FILE_LoadSpriteConfigFile(const char *dat_name, const char *asset_name, Spr
 	fclose(f);
 }
 
-
 byte *FILE_LoadA2MSongInfo(const char *dat_name, const char *asset_name, dword *size, int mem_type) {
 
 	FILE *f;
@@ -1054,9 +1026,7 @@ byte *FILE_LoadA2MSongInfo(const char *dat_name, const char *asset_name, dword *
 	return buffer;
 }
 
-
-/** FILE :: Load animation data from ani file
- * - Reads an .ANI file inside a .DAT file 
+/** FILE :: Load settigs data from cfg file
  */
 void FILE_LoadSettingsFile(const char *config_file) {
 	FILE *f;
@@ -1066,6 +1036,33 @@ void FILE_LoadSettingsFile(const char *config_file) {
 	int dummy;
 
 	// Open settings file and search parameters
+	f = fopen(config_file, "rb");
+	if (!f) {
+
+		// Unable to open settings file.
+		// Just create it with default settings
+		settings.video_mode = 0;  // VGA
+		settings.sound_device = 1;// PCSpeaker
+		settings.sound_volume = 50;
+		settings.scenes_music = 1;// ON
+		settings.ingame_music = 1;// ON
+		settings.music_volume = 50;
+		settings.mouse_enabled = 1;// ON
+		settings.language = 1;     // EN
+
+		settings.up_key = 17;   // W
+		settings.down_key = 31; // S
+		settings.left_key = 30; // A
+		settings.right_key = 32;// D
+
+		settings.loop_key = 57;      // SPACE
+		settings.fire_key = 11;      //
+		settings.throw_key = 28;     //
+		settings.change_gun_key = 15;// TAB
+
+		FILE_SaveSettingsFile(config_file);
+	}
+
 	f = fopen(config_file, "rb");
 	if (!f) {
 		sprintf(engine.system_error_message1, "FILE_LoadSettingsFile function error");
@@ -1093,16 +1090,19 @@ void FILE_LoadSettingsFile(const char *config_file) {
 			case 3:// Sound volume
 				fscanf(f, " %d,", &settings.sound_volume);
 				break;
-			case 4:// Music device
-				fscanf(f, " %d,", &settings.music_device);
+			case 4:// Music on scenes
+				fscanf(f, " %d,", &settings.scenes_music);
 				break;
-			case 5:// Music volume
+			case 5:// Music ingame
+				fscanf(f, " %d,", &settings.ingame_music);
+				break;
+			case 6:// Music volume
 				fscanf(f, " %d,", &settings.music_volume);
 				break;
-			case 6:// Mouse enabled
+			case 7:// Mouse enabled
 				fscanf(f, " %d,", &settings.mouse_enabled);
 				break;
-			case 7:// Language
+			case 8:// Language
 				fscanf(f, " %d,", &settings.language);
 				break;
 			case 10:// Up key
@@ -1128,9 +1128,6 @@ void FILE_LoadSettingsFile(const char *config_file) {
 				break;
 			case 17:// Change gun key
 				fscanf(f, " %d,", &settings.change_gun_key);
-				break;
-			case 18:// Combat mode key
-				fscanf(f, " %d,", &settings.combat_mode_key);
 				break;
 			default:
 				fscanf(f, " %d,", &dummy);
@@ -1163,6 +1160,68 @@ void FILE_LoadSettingsFile(const char *config_file) {
 	fclose(f);
 }
 
+/** FILE :: Save settigs data to cfg file
+ */
+void FILE_SaveSettingsFile(const char *config_file) {
+	FILE *f;
+
+	// Open settings file and search parameters
+	f = fopen(config_file, "w");
+	if (!f) {
+		sprintf(engine.system_error_message1, "FILE_SaveSettingsFile function error");
+		sprintf(engine.system_error_message2, "Unable to open settings file %s ", config_file);
+		sprintf(engine.system_error_message3, "");
+		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_FILE);
+	}
+
+	// Set pointer at the begining
+	fseek(f, 0, SEEK_SET);// Set file pointer at the begining of the file
+
+	fprintf(f, "#001# %u,\n", settings.video_mode);
+	fprintf(f, "#002# %u,\n", settings.sound_device);
+	fprintf(f, "#003# %u,\n", settings.sound_volume);
+	fprintf(f, "#004# %u,\n", settings.scenes_music);
+	fprintf(f, "#005# %u,\n", settings.ingame_music);
+	fprintf(f, "#006# %u,\n", settings.music_volume);
+	fprintf(f, "#007# %u,\n", settings.mouse_enabled);
+	fprintf(f, "#008# %u,\n", settings.language);
+	fprintf(f, "#009# 0,\n");
+	fprintf(f, "#010# %u,\n", settings.up_key);
+	fprintf(f, "#011# %u,\n", settings.down_key);
+	fprintf(f, "#012# %u,\n", settings.left_key);
+	fprintf(f, "#013# %u,\n", settings.right_key);
+	fprintf(f, "#014# %u,\n", settings.loop_key);
+	fprintf(f, "#015# %u,\n", settings.fire_key);
+	fprintf(f, "#016# %u,\n", settings.throw_key);
+	fprintf(f, "#017# %u,\n", settings.change_gun_key);
+	fprintf(f, "#018# 0,\n");
+	fprintf(f, "#019# 0,\n");
+	fprintf(f, "#020# 0,\n");
+	fprintf(f, "#255# 0,\n");
+	fprintf(f, "#255# EOF,\n");
+	fprintf(f, "#999# #INFO>> Param 1 : Video mode = VGA(0), EGA(1), CGA(2)\n");
+	fprintf(f, "#999# #INFO>> Param 2 : Sound = OFF(0), SPK(1), ADLIB(2), SBLASTER(3)\n");
+	fprintf(f, "#999# #INFO>> Param 3 : Sound Volume = 0..100\n");
+	fprintf(f, "#999# #INFO>> Param 4 : Music = OFF(0), SPK(1), ADLIB(2), SBLASTER(3)\n");
+	fprintf(f, "#999# #INFO>> Param 5 : Music (ingame) = OFF(0), ON(1)\n");
+	fprintf(f, "#999# #INFO>> Param 6 : Music Volume = 0..100\n");
+	fprintf(f, "#999# #INFO>> Param 7 : Mouse= Disable(0), Enable(1)\n");
+	fprintf(f, "#999# #INFO>> Param 8 : Language = SP(0), EN(1), FR(2), GR(3)\n");
+	fprintf(f, "#999# #INFO>> Param 9 : Spare\n");
+	fprintf(f, "#999# #INFO>> Param 10 : Up key\n");
+	fprintf(f, "#999# #INFO>> Param 11 : Down key\n");
+	fprintf(f, "#999# #INFO>> Param 12 : Left key\n");
+	fprintf(f, "#999# #INFO>> Param 13 : Right key\n");
+	fprintf(f, "#999# #INFO>> Param 14 : Loop key\n");
+	fprintf(f, "#999# #INFO>> Param 15 : Fire key\n");
+	fprintf(f, "#999# #INFO>> Param 16 : Throw key\n");
+	fprintf(f, "#999# #INFO>> Param 17 : Change gun key\n");
+	fprintf(f, "#999# #INFO>> Param 18 : Spare\n");
+	fprintf(f, "#999# #INFO>> Param 19 : Spare\n");
+	fprintf(f, "#999# #INFO>> Param 20 : Spare\n");
+
+	fclose(f);
+}
 
 void FILE_LoadSpeakerSong(const char *dat_name, const char *asset_name, Song *song) {
 	FILE *f;

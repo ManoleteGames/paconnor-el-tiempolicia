@@ -295,13 +295,10 @@ add_custom_target(dialogs
     COMMAND ${CMAKE_COMMAND} -E copy
     ${CMAKE_CURRENT_SOURCE_DIR}/assets/text/FR/DIALOGFR.DAT
     ${CMAKE_BINARY_DIR}/
-)
-
-add_custom_target(settings
     COMMAND ${CMAKE_COMMAND} -E copy
-    ${CMAKE_CURRENT_SOURCE_DIR}/assets/settings/SETTINGS.CFG
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/text/GR/DIALOGGR.DAT
     ${CMAKE_BINARY_DIR}/
 )
 
 #add_dependencies(main assets)
-add_dependencies(paconnor extender binaries images fonts maps tilesets sprites palettes dialogs sounds settings)
+add_dependencies(paconnor extender binaries images fonts maps tilesets sprites palettes dialogs sounds)

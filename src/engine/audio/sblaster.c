@@ -197,6 +197,7 @@ word SB_GetBasePort(void) {
 				return 0x200 + (port << 4);
 			}
 	}
+	return -1;
 }
 
 static void SB_ServiceIRQ2_Handler(void) {
@@ -512,8 +513,6 @@ void SB_Init(void) {
 }
 
 bool SB_Check(void) {
-	bool detected;
-	byte a, b;
 
 	int port;
 	for (port = 1; port < 9; port++) {
@@ -525,6 +524,7 @@ bool SB_Check(void) {
 	if (port == 9) {
 		return false;
 	}
+	return false;
 }
 
 void SB_Handler(SoundEffect *sound, Song *song) {

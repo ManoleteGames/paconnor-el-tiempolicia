@@ -882,8 +882,8 @@ void Scene1_SetHotspotsAndEvents(void) {
 	map->hotspot_enabling_room2[6] = true;
 	map->hotspot_enabling_room2[7] = true;
 	map->hotspot_enabling_room2[8] = true;
-	map->hotspot_enabling_room2[9] = false;
-	map->hotspot_enabling_room2[10] = false;
+	map->hotspot_enabling_room2[9] = true;
+	map->hotspot_enabling_room2[10] = true;
 	map->hotspot_enabling_room2[11] = false;
 	map->hotspot_enabling_room2[12] = false;
 	map->hotspot_enabling_room2[13] = false;
@@ -1444,11 +1444,6 @@ void Scene1_Loop(void) {
 					if (enemy[2].status_behavior != ENEMY_STATUS_STATIC_NPC) {
 						map->event_enabling_room1[5] = false;
 					}
-
-					// Thugs die
-					if (enemy[6].status_behavior != ENEMY_STATUS_STATIC_NPC) {
-						map->event_enabling_room1[5] = false;
-					}
 				}
 				break;
 			case 2:// Police office
@@ -1551,8 +1546,14 @@ void Scene1_Loop(void) {
 											}
 										}
 										break;
-									case 10:// Spare
+									case 10:// Shells
 										if (map->hotspot_enabling_room2[10]) {
+											if (cursor.left_click) {
+												UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1H, 198, 199, 200, false, 100);
+
+											} else {
+												UI_ShowDescription(UI_TXT_SCN1H, 27);
+											}
 										}
 										break;
 									case 11:// Spare

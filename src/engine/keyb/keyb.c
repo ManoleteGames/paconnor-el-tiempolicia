@@ -73,7 +73,7 @@ static _go32_dpmi_seginfo old_keyb_handler, new_keyb_handler;
 
 bool KEYB_IsAnyKeyPressed(void) {
 	int i;
-	for (i = 0; i < 0x33; i++) {
+	for (i = 0; i < 0x54; i++) {
 		if (kbKeyState[i]) {
 			return true;
 		}
@@ -116,6 +116,10 @@ byte KEYB_GetLastKeyPressed_ASCII(void) {
 			return 0;
 			break;
 	}
+}
+
+byte KEYB_GetLastKeyPressed_CODE(void) {
+	return kbLastScancode;
 }
 
 /** KEYB :: Keyboard interrupt handler
@@ -173,7 +177,7 @@ void KEYB_Init(void) {
 	kbBindingFire = settings.fire_key;
 	kbBindingThrow = settings.throw_key;
 	kbBindingChangeGun = settings.change_gun_key;
-	kbBindingCombat = settings.combat_mode_key;
+	kbBindingCombat = 46;
 
 	engine.keyboard_initialized = true;
 }
