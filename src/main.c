@@ -890,16 +890,17 @@ static void Menu(void) {
 	GFX_SetSpriteGraphic(opt_pnl_spr_num, 0, SPRITE_GRAPHICS_ID_PNL_OPTIONS, 0, 0);
 	GFX_SetSpritePosition(opt_pnl_spr_num, 320, 5);
 
-	UI_LoadButton(6, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_BACK, 409, 70);         // Back
+	UI_LoadButton(6, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_BACK, 409, 98);         // Back
 	UI_LoadButton(7, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_SOUND, 324, 9);         // Sound
-	UI_LoadButton(8, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_LEFT, 324, 31);         // Sound volume left
-	UI_LoadButton(9, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_RIGHT, 365, 31);        // Sound volume right
+	UI_LoadButton(8, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_LEFT, 324, 32);         // Sound volume left
+	UI_LoadButton(9, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_RIGHT, 365, 32);        // Sound volume right
 	UI_LoadButton(10, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_MUSIC_SCENES, 385, 9); // Scenes music
 	UI_LoadButton(11, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_MUSIC_INGAME, 385, 31);// Ingame music
 	UI_LoadButton(12, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_LEFT, 385, 53);        // Music volume left
 	UI_LoadButton(13, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_RIGHT, 426, 53);       // Music volume right
-	UI_LoadButton(14, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_LANGUAGE, 324, 46);    // Language
-	UI_LoadButton(15, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_KEYS, 324, 68);        // Redefine keys
+	UI_LoadButton(14, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_LANGUAGE, 324, 48);    // Language
+	UI_LoadButton(15, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_KEYS, 324, 70);        // Redefine keys
+	UI_LoadButton(18, ENTITY_ID_BTN, SPRITE_GRAPHICS_ID_BTN_DIFICULTY, 385, 70);   // Dificulty keys
 
 	// Password assets
 	pass_pnl_spr_num = GFX_FindEmptySpriteSlot();
@@ -1026,6 +1027,7 @@ static void Menu(void) {
 			UI_SetButtonPosition(13, UI_GetButtonXPosition(13) - 4, UI_GetButtonYPosition(13));
 			UI_SetButtonPosition(14, UI_GetButtonXPosition(14) - 4, UI_GetButtonYPosition(14));
 			UI_SetButtonPosition(15, UI_GetButtonXPosition(15) - 4, UI_GetButtonYPosition(15));
+			UI_SetButtonPosition(18, UI_GetButtonXPosition(18) - 4, UI_GetButtonYPosition(18));
 
 			if (gfx_sprite_stack[opt_pnl_spr_num].screen_pos_x <= 188) {
 				show_options_menu = false;
@@ -1090,16 +1092,31 @@ static void Menu(void) {
 			// Language option
 			switch (settings.language) {
 				case 0:// SP
-					VIDEO_StringToScreenBuffer(208, 55, ui->txt_file[UI_TXT_GLOBAL]->line[18], FONT_SLIM_WHITE);
+					VIDEO_StringToScreenBuffer(210, 57, ui->txt_file[UI_TXT_GLOBAL]->line[18], FONT_SLIM_WHITE);
 					break;
 				case 1:// EN
-					VIDEO_StringToScreenBuffer(208, 55, ui->txt_file[UI_TXT_GLOBAL]->line[19], FONT_SLIM_WHITE);
+					VIDEO_StringToScreenBuffer(210, 57, ui->txt_file[UI_TXT_GLOBAL]->line[19], FONT_SLIM_WHITE);
 					break;
 				case 2:// FR
-					VIDEO_StringToScreenBuffer(208, 55, ui->txt_file[UI_TXT_GLOBAL]->line[20], FONT_SLIM_WHITE);
+					VIDEO_StringToScreenBuffer(210, 57, ui->txt_file[UI_TXT_GLOBAL]->line[20], FONT_SLIM_WHITE);
 					break;
 				case 3:// GR
-					VIDEO_StringToScreenBuffer(208, 55, ui->txt_file[UI_TXT_GLOBAL]->line[21], FONT_SLIM_WHITE);
+					VIDEO_StringToScreenBuffer(210, 57, ui->txt_file[UI_TXT_GLOBAL]->line[21], FONT_SLIM_WHITE);
+					break;
+				default:
+					break;
+			}
+
+			// Dificulty option
+			switch (settings.dificulty) {
+				case 0:// Easy
+					VIDEO_StringToScreenBuffer(272, 78, ui->txt_file[UI_TXT_GLOBAL]->line[22], FONT_SLIM_WHITE);
+					break;
+				case 1:// Medium
+					VIDEO_StringToScreenBuffer(272, 78, ui->txt_file[UI_TXT_GLOBAL]->line[23], FONT_SLIM_WHITE);
+					break;
+				case 2:// Hard
+					VIDEO_StringToScreenBuffer(272, 78, ui->txt_file[UI_TXT_GLOBAL]->line[24], FONT_SLIM_WHITE);
 					break;
 				default:
 					break;
@@ -1201,6 +1218,7 @@ static void Menu(void) {
 			UI_SetButtonPosition(13, UI_GetButtonXPosition(13) + 4, UI_GetButtonYPosition(13));
 			UI_SetButtonPosition(14, UI_GetButtonXPosition(14) + 4, UI_GetButtonYPosition(14));
 			UI_SetButtonPosition(15, UI_GetButtonXPosition(15) + 4, UI_GetButtonYPosition(15));
+			UI_SetButtonPosition(18, UI_GetButtonXPosition(18) + 4, UI_GetButtonYPosition(18));
 			if (gfx_sprite_stack[opt_pnl_spr_num].screen_pos_x >= 320) {
 				show_options_menu = false;
 				hide_options_menu = false;
@@ -1629,6 +1647,14 @@ static void Menu(void) {
 				hide_password_menu = true;
 				show_main_menu = true;
 				break;
+			case 18:// Dificulty setting
+				settings.dificulty++;
+				if (settings.dificulty > 2) settings.dificulty = 0;
+				SetDelayTime(300);
+				while (!AwaitDelayTime()) {
+					// Just wait
+				}
+				break;
 			default:
 				Error("Unknown button pressed", "", "", ERROR_SYSTEM);
 				break;
@@ -1676,7 +1702,7 @@ void LoadGlobalAssets(void) {
 	GFX_LoadSpriteGraphicsRLE("BULLETS.DAT", "BULLET3.PCX", SPRITE_GRAPHICS_ID_BULLET3, 8, 8, 4, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 	GFX_LoadSpriteGraphicsRLE("BULLETS.DAT", "WEBS.PCX", SPRITE_GRAPHICS_ID_WEBS, 8, 8, 4, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 	GFX_LoadSpriteGraphicsRLE("BULLETS.DAT", "GRENADE.PCX", SPRITE_GRAPHICS_ID_GRENADE1, 8, 8, 4, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
-	GFX_LoadSpriteGraphicsRLE("BULLETS.DAT", "ROCKET.PCX", SPRITE_GRAPHICS_ID_MISILE1, 16, 16, 4, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
+	GFX_LoadSpriteGraphicsRLE("BULLETS.DAT", "ROCKET.PCX", SPRITE_GRAPHICS_ID_MISILE1, 16, 16, 8, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 	GFX_LoadSpriteGraphicsRLE("BULLETS.DAT", "SHADOW.PCX", SPRITE_GRAPHICS_ID_BULLET_SHADOW, 8, 8, 2, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 	GFX_LoadSpriteGraphicsRLE("BULLETS.DAT", "PUNCH1.PCX", SPRITE_GRAPHICS_ID_PUNCH, 12, 12, 1, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 	GFX_LoadSpriteGraphicsRLE("BULLETS.DAT", "PUKE.PCX", SPRITE_GRAPHICS_ID_PUKE, 16, 16, 4, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
@@ -1738,8 +1764,9 @@ void LoadGlobalAssets(void) {
 	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "BTNIMUS.PCX", SPRITE_GRAPHICS_ID_BTN_MUSIC_INGAME, 55, 21, 3, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "BTNLANG.PCX", SPRITE_GRAPHICS_ID_BTN_LANGUAGE, 55, 21, 3, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "BTNKEYS.PCX", SPRITE_GRAPHICS_ID_BTN_KEYS, 55, 21, 3, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
+	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "BTNDIF.PCX", SPRITE_GRAPHICS_ID_BTN_DIFICULTY, 55, 21, 3, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 
-	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "POPTIONS.PCX", SPRITE_GRAPHICS_ID_PNL_OPTIONS, 124, 86, 1, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
+	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "POPTIONS.PCX", SPRITE_GRAPHICS_ID_PNL_OPTIONS, 124, 90, 1, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "PPASS.PCX", SPRITE_GRAPHICS_ID_PNL_PASS, 120, 41, 1, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "MTITLE.PCX", SPRITE_GRAPHICS_ID_TITLE, 243, 41, 1, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
 	GFX_LoadSpriteGraphicsRLE("SMENU.DAT", "MCHAT.PCX", SPRITE_GRAPHICS_ID_MCHAT, 136, 88, 1, SPRITE_TRANSP_COLOR, SPRITE_HIT_COLOR, CT_SPRITE);
@@ -2169,7 +2196,7 @@ static void EndCredits(void) {
 /** MAIN FUNCTION*******
  */
 int main(int argc, char **argv) {
-	//gdb_start();
+	gdb_start();
 
 	engine.good_mode = false;
 	engine.debug_mode = false;
@@ -2228,7 +2255,7 @@ int main(int argc, char **argv) {
 
 	while (!engine.exit_game) {
 
-		//if (ui->pause) gdb_checkpoint();
+		if (ui->pause) gdb_checkpoint();
 
 		switch (engine.scene) {
 			case 0:// main menu
@@ -2275,6 +2302,7 @@ int main(int argc, char **argv) {
 				break;
 		}
 	}
+
 	ExitDos();
 	return 0;
 }

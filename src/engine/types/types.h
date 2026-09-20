@@ -21,6 +21,7 @@ typedef struct {
 	int mouse_enabled;
 
 	int language;
+	int dificulty;
 
 	int up_key;
 	int down_key;
@@ -953,6 +954,8 @@ typedef struct {
 	bool in_shoot_range;
 	bool can_see_actor;
 	int punch_range;
+	int punch_speed;
+	int punch_damage;
 	int shoot_range;
 	int shoot_x, shoot_y;
 	byte shoot_accuracy;

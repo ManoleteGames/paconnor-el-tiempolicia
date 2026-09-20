@@ -1049,6 +1049,7 @@ void FILE_LoadSettingsFile(const char *config_file) {
 		settings.music_volume = 50;
 		settings.mouse_enabled = 1;// ON
 		settings.language = 1;     // EN
+		settings.dificulty = 0;    // Easy
 
 		settings.up_key = 17;   // W
 		settings.down_key = 31; // S
@@ -1104,6 +1105,9 @@ void FILE_LoadSettingsFile(const char *config_file) {
 				break;
 			case 8:// Language
 				fscanf(f, " %d,", &settings.language);
+				break;
+			case 9:// Dificulty
+				fscanf(f, " %d,", &settings.dificulty);
 				break;
 			case 10:// Up key
 				fscanf(f, " %d,", &settings.up_key);
@@ -1185,7 +1189,7 @@ void FILE_SaveSettingsFile(const char *config_file) {
 	fprintf(f, "#006# %u,\n", settings.music_volume);
 	fprintf(f, "#007# %u,\n", settings.mouse_enabled);
 	fprintf(f, "#008# %u,\n", settings.language);
-	fprintf(f, "#009# 0,\n");
+	fprintf(f, "#009# %u,\n", settings.dificulty);
 	fprintf(f, "#010# %u,\n", settings.up_key);
 	fprintf(f, "#011# %u,\n", settings.down_key);
 	fprintf(f, "#012# %u,\n", settings.left_key);
@@ -1207,7 +1211,7 @@ void FILE_SaveSettingsFile(const char *config_file) {
 	fprintf(f, "#999# #INFO>> Param 6 : Music Volume = 0..100\n");
 	fprintf(f, "#999# #INFO>> Param 7 : Mouse= Disable(0), Enable(1)\n");
 	fprintf(f, "#999# #INFO>> Param 8 : Language = SP(0), EN(1), FR(2), GR(3)\n");
-	fprintf(f, "#999# #INFO>> Param 9 : Spare\n");
+	fprintf(f, "#999# #INFO>> Param 9 : Dificulty = Easy(0), Medium(1), Hard(2) \n");
 	fprintf(f, "#999# #INFO>> Param 10 : Up key\n");
 	fprintf(f, "#999# #INFO>> Param 11 : Down key\n");
 	fprintf(f, "#999# #INFO>> Param 12 : Left key\n");

@@ -63,7 +63,8 @@ void EFFECT_LoadEffect(byte entity_id, byte graphics_id, int pos_x, int pos_y, b
 	GFX_SetSpritePosition(sprite_slot, pos_x - camera->pos_x, pos_y - camera->pos_y);
 	if (full_animation) GFX_SetDefaultAnimation(effect[number].num_sprite, inverted, loop, speed);
 	else
-		GFX_SetSingleFrameAnimation(sprite_slot, frame);
+		GFX_SetSingleFrameAnimation(sprite_slot, frame, false);
+	GFX_SetSpriteUnmasked(sprite_slot, true);
 }
 
 void EFFECT_UnloadEffect(int number) {

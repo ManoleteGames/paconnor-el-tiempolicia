@@ -571,14 +571,6 @@ void Update(int player_follow) {
 	UI_UpdateUI(actor->mode_combat);
 	GFX_DrawCursorSprite();
 
-	/*engine.debug1_INT = enemy_counter;
-	engine.debug2_INT = boss->status_behavior;
-	engine.debug3_INT = boss->pattern_step;
-	engine.debug4_INT = boss->boss_attack_pattern[0];
-	engine.debug5_INT = boss->boss_attack_pattern[1];
-	engine.debug6_INT = boss->boss_attack_pattern[2];
-	*/
-
 	//UpdateStatusPannel();// Draws status pannel on the screen buffer
 
 	LimitFPS(40);//25

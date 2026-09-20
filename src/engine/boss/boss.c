@@ -137,8 +137,21 @@ void BOSS_Load(const char *dat_name, int x, int y, int type, int face_gfx_id, in
 	boss->speed_diagonalv_FP = (boss->speed_vertical_FP * 10) / 14;
 	boss->speed_diagonalh_FP = (boss->speed_horizontal_FP * 10) / 14;
 
-	boss->max_life = life;
-	boss->life = life;
+	switch (settings.dificulty) {
+		case 1:// Medium
+			boss->max_life = life + (life >> 1);
+			boss->life = life + (life >> 1);
+			break;
+		case 2:// Hard
+			boss->max_life = life + life;
+			boss->life = life + life;
+			break;
+		default://Easy
+			boss->max_life = life;
+			boss->life = life;
+			break;
+	}
+
 	boss->damage = 0;
 	boss->is_hit = false;
 
@@ -226,10 +239,93 @@ void BOSS_Load(const char *dat_name, int x, int y, int type, int face_gfx_id, in
 
 	boss->gun->graphics_id = gun_graphics_id;
 	boss->gun->bullet_graphics_id = bullet_graphics_id;
-	boss->gun->max_accuracy = 4;
-	boss->gun->bullet_speed = 5;
-	boss->gun->damage = 20;
-	boss->gun->max_distance = 300;
+
+	// Gun damage
+	switch (boss->type) {
+		case BOSS_TYPE_RAT:
+			boss->gun->max_accuracy = 4;
+			boss->gun->bullet_speed = 5;
+			boss->gun->max_distance = 300;
+			boss->punch_speed = 6;
+			switch (settings.dificulty) {
+				case 1:// Medium
+					boss->gun->damage = 30;
+					boss->punch_damage = 45;
+					break;
+				case 2:// Hard
+					boss->gun->damage = 40;
+					boss->punch_damage = 60;
+					break;
+				default:// Easy
+					boss->gun->damage = 20;
+					boss->punch_damage = 30;
+					break;
+			}
+			break;
+		case BOSS_TYPE_SPIDER:
+			boss->gun->max_accuracy = 4;
+			boss->gun->bullet_speed = 5;
+			boss->gun->max_distance = 300;
+			boss->punch_speed = 6;
+			switch (settings.dificulty) {
+				case 1:// Medium
+					boss->gun->damage = 30;
+					boss->punch_damage = 45;
+					break;
+				case 2:// Hard
+					boss->gun->damage = 40;
+					boss->punch_damage = 60;
+					break;
+				default:// Easy
+					boss->gun->damage = 20;
+					boss->punch_damage = 30;
+					break;
+			}
+			break;
+		case BOSS_TYPE_PRIEST:
+			boss->gun->max_accuracy = 4;
+			boss->gun->bullet_speed = 5;
+			boss->gun->max_distance = 300;
+			boss->punch_speed = 6;
+			switch (settings.dificulty) {
+				case 1:// Medium
+					boss->gun->damage = 30;
+					boss->punch_damage = 45;
+					break;
+				case 2:// Hard
+					boss->gun->damage = 40;
+					boss->punch_damage = 60;
+					break;
+				default:// Easy
+					boss->gun->damage = 20;
+					boss->punch_damage = 30;
+					break;
+			}
+			break;
+		case BOSS_TYPE_MECHA:
+			boss->gun->max_accuracy = 4;
+			boss->gun->bullet_speed = 5;
+			boss->gun->max_distance = 300;
+			boss->gun->damage = 50;
+			boss->punch_speed = 4;
+			boss->punch_damage = 60;
+
+			switch (settings.dificulty) {
+				case 1:// Medium
+					boss->gun->damage = 75;
+					boss->punch_damage = 90;
+					break;
+				case 2:// Hard
+					boss->gun->damage = 100;
+					boss->punch_damage = 120;
+					break;
+				default:// Easy
+					boss->gun->damage = 50;
+					boss->punch_damage = 60;
+					break;
+			}
+			break;
+	}
 
 	// Patterns
 	boss->pattern_step = 0;
@@ -1225,26 +1321,16 @@ void BOSS_Update(void) {
 								boss->gun->current_recoil = 0;
 								AUDIO_PlaySound(AUDIO_SHOTGUN_EFFECT, 1);
 								BOSS_SetShotAnimation();
-								boss->shoot_x = actor->pos_x + (actor->width_px >> 1) + 32;
-								boss->shoot_y = actor->pos_y + (actor->height_px >> 1);
-								//BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x, boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
-								MISILE_LoadMisile(SPRITE_GRAPHICS_ID_MISILE1, SPRITE_GRAPHICS_ID_BULLET_SHADOW, ENTITY_ID_ENEMY_BULLET, boss->pos_x, boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, 10, 150);
-								boss->shoot_x = actor->pos_x + (actor->width_px >> 1);
-								boss->shoot_y = actor->pos_y + (actor->height_px >> 1);
-								BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x, boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
-								boss->shoot_x = actor->pos_x + (actor->width_px >> 1) - 32;
-								boss->shoot_y = actor->pos_y + (actor->height_px >> 1);
-								BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x, boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
+								boss->shoot_x = actor->middle_x;
+								boss->shoot_y = actor->middle_y;
+								MISILE_LoadMisile(SPRITE_GRAPHICS_ID_MISILE1, SPRITE_GRAPHICS_ID_BULLET_SHADOW, ENTITY_ID_ENEMY_BULLET, boss->pos_x - 8, boss->pos_y + (boss->height_px >> 1) + 32, boss->shoot_x, boss->shoot_y, boss->gun->bullet_speed, boss->gun->damage, 5, 5);
 								boss->action_step++;
 
-								// Rampage add 2 more bullets
+								// Rampage add 1 more misile
 								if (boss->status_behavior == BOSS_STATUS_RAMPAGE) {
-									boss->shoot_x = actor->pos_x + (actor->width_px >> 1) + 5;
-									boss->shoot_y = actor->pos_y + (actor->height_px >> 1) + 5;
-									BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x, boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
-									boss->shoot_x = actor->pos_x + (actor->width_px >> 1) - 5;
-									boss->shoot_y = actor->pos_y + (actor->height_px >> 1) + 5;
-									BULLET_LoadBullet(boss->gun->bullet_graphics_id, ENTITY_ID_ENEMY_BULLET, 16, 16, boss->pos_x, boss->pos_y + (boss->height_px >> 1), boss->shoot_x, boss->shoot_y, boss->shoot_accuracy, boss->gun->max_distance, boss->gun->bullet_speed, boss->gun->damage);
+									boss->shoot_x = actor->middle_x + 8;
+									boss->shoot_y = actor->middle_y;
+									MISILE_LoadMisile(SPRITE_GRAPHICS_ID_MISILE1, SPRITE_GRAPHICS_ID_BULLET_SHADOW, ENTITY_ID_ENEMY_BULLET, boss->pos_x - 8, boss->pos_y + (boss->height_px >> 1) + 36, boss->shoot_x, boss->shoot_y, boss->gun->bullet_speed + 1, boss->gun->damage, 5, 5);
 								}
 								break;
 						}
@@ -1275,7 +1361,7 @@ void BOSS_Update(void) {
 				switch (boss->action_step) {
 					case 0:// set animation
 						BOSS_SetPunchAnimation();
-						BULLET_LoadBullet(SPRITE_GRAPHICS_ID_EMPTY, ENTITY_ID_ENEMY_BULLET, boss->width_px, boss->height_px + 16, boss->pos_x - 64, boss->pos_y, boss->pos_x + 64, boss->pos_y, 4, 128, 6, 30);
+						BULLET_LoadBullet(SPRITE_GRAPHICS_ID_EMPTY, ENTITY_ID_ENEMY_BULLET, boss->width_px, boss->height_px + 16, boss->pos_x - 64, boss->pos_y, boss->pos_x + 64, boss->pos_y, 4, 128, boss->punch_speed, boss->punch_damage);
 						boss->action_step = 0;
 						boss->action_step++;
 						break;

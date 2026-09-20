@@ -90,7 +90,7 @@ void PARTICLE_LoadParticle(int graphics_id, int entity_id, int source_x, int sou
 
 	GFX_SetSpriteGraphic(particle[number].sprite_num, 0, graphics_id, 0, 0);
 	//GFX_SetDefaultAnimation(particle[number].sprite_num, false, false, speed);
-	GFX_SetSingleFrameAnimation(particle[number].sprite_num, 0);
+	GFX_SetSingleFrameAnimation(particle[number].sprite_num, 0, false);
 
 	// Set colission points
 	//  ---------------

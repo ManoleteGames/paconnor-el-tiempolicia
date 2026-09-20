@@ -318,7 +318,7 @@ Set-Location -Path "$parentPath\sprites\items"
 python3 "$PSScriptRoot/makedat.py" "ITEMS.DAT" "MEDIKIT.PCX" "DOCU.PCX" "AMMO1.PCX" "AMMO2.PCX" "AMMO3.PCX" "AMMO4.PCX" "GRENADE.PCX" "KEYRED.PCX" "KEYBLUE.PCX" "KEYYELLOW.PCX" "KEYGREEN.PCX"
 Write-Host Generating button sprites DAT file....
 Set-Location -Path "$parentPath\sprites\menu"
-python3 "$PSScriptRoot/makedat.py" "SMENU.DAT" "BTNNEW.PCX" "BTNPASS.PCX" "BTNOPT.PCX" "BTNCRED.PCX" "BTNEXIT.PCX" "BTNBACK.PCX" "BTNOK.PCX" "BTNLEFT.PCX" "BTNRIGHT.PCX" "MCHAT.PCX" "POPTIONS.PCX" "PPASS.PCX" "MTITLE.PCX" "BTNSOUND.PCX" "BTNSMUS.PCX" "BTNIMUS.PCX" "BTNLANG.PCX" "BTNKEYS.PCX"
+python3 "$PSScriptRoot/makedat.py" "SMENU.DAT" "BTNNEW.PCX" "BTNPASS.PCX" "BTNOPT.PCX" "BTNCRED.PCX" "BTNEXIT.PCX" "BTNBACK.PCX" "BTNOK.PCX" "BTNLEFT.PCX" "BTNRIGHT.PCX" "MCHAT.PCX" "POPTIONS.PCX" "PPASS.PCX" "MTITLE.PCX" "BTNSOUND.PCX" "BTNSMUS.PCX" "BTNIMUS.PCX" "BTNLANG.PCX" "BTNKEYS.PCX" "BTNDIF.PCX"
 
 Write-Host ////////////////////////////// TILESETS /////////////////////////////////
 Write-Host Generating scene 1-1 tileset DAT file....

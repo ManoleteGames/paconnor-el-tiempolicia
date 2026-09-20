@@ -139,6 +139,7 @@
 #define SPRITE_GRAPHICS_ID_BTN_MUSIC_SCENES 109
 #define SPRITE_GRAPHICS_ID_BTN_MUSIC_INGAME 110
 #define SPRITE_GRAPHICS_ID_BTN_LANGUAGE 111
+#define SPRITE_GRAPHICS_ID_BTN_DIFICULTY 205
 
 // Enemy graphics
 #define SPRITE_GRAPHICS_ID_ENEMY1 112
@@ -280,7 +281,7 @@ void GFX_SetDefaultAnimation(int sprite_num, bool inverted, bool loop, byte spee
 void GFX_LoadAnimations(const char *dat_file, const char *asset_file, SpriteAnimation *anim, int total_anims);
 void GFX_UpdateSpriteAnimation(int sprite_num, int anim_num, SpriteAnimation anim_data);
 void GFX_SetSpriteGraphicsId(int spr_num, int graphic_index, int graphics_id);
-void GFX_SetSingleFrameAnimation(int sprite_num, int frame);
+void GFX_SetSingleFrameAnimation(int sprite_num, int frame, bool inverted);
 int GFX_GetSpriteGraphicsWidth_px(int graphics_id);
 int GFX_GetSpriteGraphicsHeight_px(int graphics_id);
 void GFX_SetSpriteGfxOrder(int sprite_num, int one, int two, int three, int four, int five);

@@ -1040,7 +1040,7 @@ void GFX_SetDefaultCursorAnimation(bool inverted, bool loop, byte speed) {
 /** GFX :: Set single frame animation for a sprite
  *  - Set a single frame for all sprite graphics, with no offset and default speed, loop and inverted values
  */
-void GFX_SetSingleFrameAnimation(int sprite_num, int frame) {
+void GFX_SetSingleFrameAnimation(int sprite_num, int frame, bool inverted) {
 	int i, j;
 
 	if (gfx_sprite_stack[sprite_num].gfx[0].graphics_id < 0 || gfx_sprite_stack[sprite_num].gfx[0].graphics_id >= SPRITE_MAX_GRAPHICS) {
@@ -1085,7 +1085,7 @@ void GFX_SetSingleFrameAnimation(int sprite_num, int frame) {
 	gfx_sprite_stack[sprite_num].gfx[0].anim_frames = 1;
 	gfx_sprite_stack[sprite_num].gfx[0].anim_counter = 0;
 	gfx_sprite_stack[sprite_num].gfx[0].anim_end = false;
-	gfx_sprite_stack[sprite_num].gfx[0].inverted = false;
+	gfx_sprite_stack[sprite_num].gfx[0].inverted = inverted;
 	gfx_sprite_stack[sprite_num].gfx[0].anim_loop = false;
 	gfx_sprite_stack[sprite_num].gfx[0].anim_speed = 5;
 

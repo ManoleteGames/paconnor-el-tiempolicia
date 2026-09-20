@@ -25,7 +25,7 @@ void MISILE_DrawColissionPixels(Misile m) {
 
 /** MISILE :: Load misile
  */
-int MISILE_LoadMisile(int graphics_id, int shadow_graphic_id, int entity_id, int pos_x, int pos_y, int target_x, int target_y, int max_time, int max_distance) {
+int MISILE_LoadMisile(int graphics_id, int shadow_graphic_id, int entity_id, int pos_x, int pos_y, int target_x, int target_y, int speed, int damage, int max_time, int max_distance) {
 	int i, sprite_slot, number;
 	int dx, dy;
 	int distance;
@@ -40,48 +40,38 @@ int MISILE_LoadMisile(int graphics_id, int shadow_graphic_id, int entity_id, int
 		}
 	}
 
+	// Check if misile is already loaded
+	if (misile[number].loaded) {
+		Error("MISILE_InitMisile function error", "Misile already loaded", "", ERROR_SYSTEM);
+	}
+
 	// Check if max grenades is reached
 	if (number >= MISILE_MAX_MISILES - 1) {
 		Error("MISILE_InitMisile function error", "Max number of misiles", "", ERROR_SYSTEM);
 	}
 
 	misile[number].current_time_ms = TIMER_GetMilliseconds();
-	misile[number].end_time_ms = misile[number].current_time_ms + (actor->grenades_max_time * 1000);
+	misile[number].end_time_ms = misile[number].current_time_ms + (max_time * 1000);
 	misile[number].current_time = max_time;
 	misile[number].pos_x = pos_x;
 	misile[number].pos_y = pos_y;
 	misile[number].pos_z = 1;
-	misile[number].speed = 3;
-	misile[number].damage = MISILE_DAMAGE;
+	misile[number].speed = speed;
+	misile[number].damage = damage;
 	misile[number].graphics_id = graphics_id;
 	misile[number].shadow_graphic_id = shadow_graphic_id;
 	misile[number].current_step = 0;
 	misile[number].hit_on = 0;
-	misile[number].direction_counter = 0;
-
-	misile[number].target_x = target_x - 4 - 8 + (rand() % 32);
-	misile[number].target_y = target_y - 4 - 8 + (rand() % 32);
-
-	// calculate distance from source
-	dx = misile[number].target_x - misile[number].pos_x;
-	dy = misile[number].target_y - misile[number].pos_y;
-
-	// calculate steps
-	if (abs(dx) > abs(dy))
-		distance = abs(dx);
-	else
-		distance = abs(dy);
 
 	// calculate fixed point velocity and position
-	misile[number].vx_FP = (dx << FP) / distance;
-	misile[number].vy_FP = (dy << FP) / distance;
-
+	dx = 0;
+	dy = 1;
+	misile[number].vx_FP = (dx << FP);
+	misile[number].vy_FP = (dy << FP);
 	misile[number].x_FP = misile[number].pos_x << FP;
 	misile[number].y_FP = misile[number].pos_y << FP;
-
-	misile[number].steps = distance;
-	if (misile[number].steps > max_distance)
-		misile[number].steps = max_distance;
+	misile[number].steps = max_distance;
+	misile[number].facing = MISILE_FACING_DOWN;
 
 	sprite_slot = GFX_FindEmptySpriteSlot();
 	if (sprite_slot == -1) {
@@ -91,14 +81,13 @@ int MISILE_LoadMisile(int graphics_id, int shadow_graphic_id, int entity_id, int
 		Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_GRAPHICS);
 	} else {
 		misile[number].sprite_num = sprite_slot;
-		GFX_InitSprite(entity_id, number, sprite_slot, 0, 4, 4);
+		GFX_InitSprite(entity_id, number, sprite_slot, 16, 4, 4);
 	}
 
 	// Set main graphics
 	GFX_SetSpriteGraphic(misile[number].sprite_num, 0, graphics_id, 0, 0);
 	GFX_SetSpriteGraphic(misile[number].sprite_num, 1, shadow_graphic_id, 0, 0);
-	GFX_SetSingleFrameAnimation(misile[number].sprite_num, 0);
-	GFX_SetSpriteBlinkingProperties(misile[i].sprite_num, true, 20, MISILE_BLINK_COLOR);
+	GFX_SetSingleFrameAnimation(misile[i].sprite_num, 4, false);
 
 	misile[number].width_px = GFX_GetSpriteWidth_px(misile[number].sprite_num);
 	misile[number].height_px = GFX_GetSpriteHeight_px(misile[number].sprite_num);
@@ -112,17 +101,17 @@ int MISILE_LoadMisile(int graphics_id, int shadow_graphic_id, int entity_id, int
 	// |  2         3  |
 	//  ---------------
 	// Point 0
-	misile[number].colission_area.points[0][0] = misile[number].width_px >> 4;
-	misile[number].colission_area.points[0][1] = misile[number].height_px >> 4;
+	misile[number].colission_area.points[0][0] = -8;
+	misile[number].colission_area.points[0][1] = -8;
 	// Point 1
-	misile[number].colission_area.points[1][0] = misile[number].width_px - (misile[number].width_px >> 4);
-	misile[number].colission_area.points[1][1] = misile[number].height_px >> 4;
+	misile[number].colission_area.points[1][0] = misile[number].width_px + 8;
+	misile[number].colission_area.points[1][1] = -8;
 	// Point 2
-	misile[number].colission_area.points[2][0] = misile[number].width_px >> 4;
-	misile[number].colission_area.points[2][1] = misile[number].height_px - (misile[number].height_px >> 4);
+	misile[number].colission_area.points[2][0] = -8;
+	misile[number].colission_area.points[2][1] = misile[number].height_px + 8;
 	// Point 3
-	misile[number].colission_area.points[3][0] = misile[number].width_px - (misile[number].width_px >> 4);
-	misile[number].colission_area.points[3][1] = misile[number].height_px - (misile[number].height_px >> 4);
+	misile[number].colission_area.points[3][0] = misile[number].width_px + 8;
+	misile[number].colission_area.points[3][1] = misile[number].height_px + 8;
 
 	misile[number].on_target = false;
 	misile[number].loaded = true;
@@ -249,7 +238,7 @@ void MISILE_Update(void) {
 	int update_misile;
 	int tile_type;
 	int dx, dy;
-	int distance;
+	int obj_number, enemy_number;
 
 	misile_update_counter++;
 	if (misile_update_counter > 6) {
@@ -260,10 +249,6 @@ void MISILE_Update(void) {
 	for (i = 0; i < MISILE_MAX_MISILES; i++) {
 		if (misile[i].loaded) {
 
-			// Update sprite screen pos
-			gfx_sprite_stack[misile[i].sprite_num].screen_pos_x = misile[i].pos_x - camera->pos_x;
-			gfx_sprite_stack[misile[i].sprite_num].screen_pos_y = misile[i].pos_y - misile[i].pos_z - camera->pos_y;
-
 			// debug
 			//MISILE_DrawColissionPixels(misile[i]);
 
@@ -271,69 +256,227 @@ void MISILE_Update(void) {
 			update_misile = (i + misile_update_counter) & 1;
 			if (update_misile) {
 
-
 				misile[i].current_time_ms = TIMER_GetMilliseconds();
 				misile[i].current_time = (misile[i].end_time_ms - misile[i].current_time_ms) / 1000;
 
-				// Direction calculation
-				misile[i].direction_counter++;
-				if (misile[i].direction_counter > 20) {
-					misile[i].direction_counter = 0;
-					MISILE_LookAt(i, actor->middle_x, actor->middle_y, &misile[i].facing);
-					switch (misile[i].facing) {
-						case 1:// right
-							GFX_SetSingleFrameAnimation(misile[i].sprite_num, 2);
-							break;
-						case 2:// Left
-							GFX_SetSingleFrameAnimation(misile[i].sprite_num, 2);
-							break;
-						case 4://down
-							GFX_SetSingleFrameAnimation(misile[i].sprite_num, 0);
-							break;
-						case 5:// down-right
-							GFX_SetSingleFrameAnimation(misile[i].sprite_num, 3);
-							break;
-						case 6:// down-left
-							GFX_SetSingleFrameAnimation(misile[i].sprite_num, 3);
-							break;
-						case 8:// up
-							GFX_SetSingleFrameAnimation(misile[i].sprite_num, 0);
-							break;
-						case 9:// up-right
-							GFX_SetSingleFrameAnimation(misile[i].sprite_num, 1);
-							break;
-						case 10:// up-left
-							GFX_SetSingleFrameAnimation(misile[i].sprite_num, 1);
-							break;
-						default:
-							break;
-					}
-
-					misile[i].target_x = actor->middle_x - 4 - 8 + (rand() % 32);
-					misile[i].target_y = actor->middle_y - 4 - 8 + (rand() % 32);
-
-					// calculate distance from source
-					dx = misile[i].target_x - misile[i].pos_x;
-					dy = misile[i].target_y - misile[i].pos_y;
-
-					// calculate steps
-					if (abs(dx) > abs(dy))
-						distance = abs(dx);
-					else
-						distance = abs(dy);
-
-					// calculate fixed point velocity and position
-					misile[i].vx_FP = (dx << FP) / distance;
-					misile[i].vy_FP = (dy << FP) / distance;
-
-					misile[i].x_FP = misile[i].pos_x << FP;
-					misile[i].y_FP = misile[i].pos_y << FP;
-
-					misile[i].steps = distance;
-				}
-
 				// Not on target
 				if (!misile[i].on_target) {
+
+					// Update direction
+					misile[i].current_step++;
+					if ((misile[i].current_step >= misile[i].steps)) {
+						misile[i].current_step = 0;
+
+						switch (misile[i].facing) {
+							case MISILE_FACING_RIGHT:// facing right
+								// stay right by default
+								dx = 1;
+								dy = 0;
+								// Go down right
+								if (actor->pos_y > misile[i].pos_y + misile[i].height_px) {
+									dx = 1;
+									dy = 1;
+									misile[i].facing = MISILE_FACING_DOWN_RIGHT;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 3, false);
+								}
+								// Go up right
+								if (actor->pos_y + actor->height_px < misile[i].pos_y) {
+									dx = 1;
+									dy = -1;
+									misile[i].facing = MISILE_FACING_UP_RIGHT;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 1, false);
+								}
+								// Go up right
+								if (actor->pos_x + actor->width_px < misile[i].pos_x) {
+									dx = 1;
+									dy = -1;
+									misile[i].facing = MISILE_FACING_UP_RIGHT;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 1, false);
+								}
+								break;
+							case MISILE_FACING_LEFT:// facing left
+								// stay left by default
+								dx = -1;
+								dy = 0;
+								// Go down left
+								if (actor->pos_y > misile[i].pos_y + misile[i].height_px) {
+									dx = -1;
+									dy = 1;
+									misile[i].facing = MISILE_FACING_DOWN_LEFT;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 5, false);
+								}
+								// Go up left
+								if (actor->pos_y + actor->height_px < misile[i].pos_y) {
+									dx = -1;
+									dy = -1;
+									misile[i].facing = MISILE_FACING_UP_LEFT;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 7, false);
+								}
+								// Go up left
+								if (actor->pos_x > misile[i].pos_x + misile[i].width_px) {
+									dx = 1;
+									dy = -1;
+									misile[i].facing = MISILE_FACING_UP_LEFT;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 7, false);
+								}
+								break;
+							case MISILE_FACING_DOWN:// facing down
+								// stay down by default
+								dx = 0;
+								dy = 1;
+								// Go down right
+								if (actor->pos_x > misile[i].pos_x + misile[i].width_px) {
+									dx = 1;
+									dy = 1;
+									misile[i].facing = MISILE_FACING_DOWN_RIGHT;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 3, false);
+								}
+								// Go down left
+								if (actor->pos_x + actor->width_px < misile[i].pos_x) {
+									dx = -1;
+									dy = 1;
+									misile[i].facing = MISILE_FACING_DOWN_LEFT;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 5, false);
+								}
+								break;
+							case MISILE_FACING_DOWN_RIGHT:// facing down-right
+								// stay down-right by default
+								dx = 1;
+								dy = 1;
+								// Go right
+								if (actor->pos_x > misile[i].pos_x + misile[i].width_px) {
+									dx = 1;
+									dy = 0;
+									misile[i].facing = MISILE_FACING_RIGHT;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 2, false);
+								}
+								// Go down
+								if (actor->pos_x < misile[i].pos_x - misile[i].width_px) {
+									dx = 0;
+									dy = 1;
+									misile[i].facing = MISILE_FACING_DOWN;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 4, true);
+								}
+								// Go right
+								if (actor->pos_y + actor->height_px < misile[i].pos_y) {
+									dx = 1;
+									dy = 0;
+									misile[i].facing = MISILE_FACING_RIGHT;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 2, false);
+								}
+								break;
+							case MISILE_FACING_DOWN_LEFT:// facing down-left
+								// stay down-left by default
+								dx = -1;
+								dy = 1;
+								// Go left
+								if (actor->pos_x + actor->width_px < misile[i].pos_x) {
+									dx = -1;
+									dy = 0;
+									misile[i].facing = MISILE_FACING_LEFT;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 6, false);
+								}
+								// Go down
+								if (actor->pos_x > misile[i].pos_x + misile[i].width_px) {
+									dx = 0;
+									dy = 1;
+									misile[i].facing = MISILE_FACING_DOWN;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 4, false);
+								}
+								// Go down
+								if (actor->pos_y + actor->height_px > misile[i].pos_y) {
+									dx = 0;
+									dy = 1;
+									misile[i].facing = MISILE_FACING_DOWN;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 4, false);
+								}
+								break;
+							case MISILE_FACING_UP:// facing up
+								// stay up by default
+								dx = 0;
+								dy = -1;
+								// Go up left
+								if (actor->pos_x + actor->width_px < misile[i].pos_x) {
+									dx = -1;
+									dy = -1;
+									misile[i].facing = MISILE_FACING_UP_LEFT;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 7, false);
+								}
+								// Go up right
+								if (actor->pos_x > misile[i].pos_x + misile[i].width_px) {
+									dx = 1;
+									dy = -1;
+									misile[i].facing = MISILE_FACING_UP_RIGHT;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 1, false);
+								}
+								// Go up right
+								if (actor->pos_y + actor->height_px > misile[i].pos_y) {
+									dx = 1;
+									dy = -1;
+									misile[i].facing = MISILE_FACING_UP_RIGHT;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 1, false);
+								}
+								break;
+							case MISILE_FACING_UP_RIGHT:// facing up-right
+								// stay up by default
+								dx = 1;
+								dy = -1;
+								// Go up
+								if (actor->pos_x + actor->width_px < misile[i].pos_x) {
+									dx = 0;
+									dy = -1;
+									misile[i].facing = MISILE_FACING_UP;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 0, false);
+								}
+								// Go right
+								if (actor->pos_x + actor->width_px > misile[i].pos_x) {
+									dx = 1;
+									dy = 0;
+									misile[i].facing = MISILE_FACING_RIGHT;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 2, false);
+								}
+								// Go right
+								if (actor->pos_y > misile[i].pos_y + misile[i].height_px) {
+									dx = 1;
+									dy = 0;
+									misile[i].facing = MISILE_FACING_RIGHT;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 2, false);
+								}
+								break;
+							case MISILE_FACING_UP_LEFT:// facing up-left
+								// stay up by default
+								dx = -1;
+								dy = -1;
+								// Go up
+								if (actor->pos_x > misile[i].pos_x + misile[i].width_px) {
+									dx = 0;
+									dy = -1;
+									misile[i].facing = MISILE_FACING_UP;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 0, false);
+								}
+								// Go left
+								if (actor->pos_x + actor->width_px < misile[i].pos_x) {
+									dx = -1;
+									dy = 0;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 6, false);
+								}
+								// Go left
+								if (actor->pos_y > misile[i].pos_y + misile[i].height_px) {
+									dx = -1;
+									dy = 0;
+									misile[i].facing = MISILE_FACING_LEFT;
+									GFX_SetSingleFrameAnimation(misile[i].sprite_num, 6, false);
+								}
+								break;
+							default:
+								dx = 0;
+								dy = 0;
+								break;
+						}
+
+						misile[i].vx_FP = (dx << FP);
+						misile[i].vy_FP = (dy << FP);
+					}
 
 					// Calculate new pos
 					for (j = 0; j < misile[i].speed; j++) {
@@ -371,18 +514,9 @@ void MISILE_Update(void) {
 								break;
 						}
 
-
 						if (misile[i].current_time <= 0) {
 							misile[i].on_target = true;
 						}
-
-
-						/*misile[i].current_step++;
-						if (misile[i].current_step >= misile[i].steps) {
-							misile[i].on_target = true;
-							GFX_SetSingleFrameAnimation(misile[i].sprite_num, 0);
-							break;
-						}*/
 					}
 				}
 
@@ -393,11 +527,15 @@ void MISILE_Update(void) {
 					gfx_sprite_stack[misile[i].sprite_num].screen_pos_y = misile[i].pos_y - camera->pos_y;
 					misile[i].pos_z = 0;
 
-					PARTICLE_LoadParticle(SPRITE_GRAPHICS_ID_EXPLOSION1, ENTITY_ID_EXPLOSION, misile[i].pos_x - 16, misile[i].pos_y - misile[i].pos_z - 16, misile[i].pos_x - 16, misile[i].pos_y - misile[i].pos_z - 16, 3, 0, 0, 0);
+					PARTICLE_LoadParticle(SPRITE_GRAPHICS_ID_EXPLOSION1, ENTITY_ID_EXPLOSION, misile[i].pos_x - 16, misile[i].pos_y - misile[i].pos_z - 16, misile[i].pos_x - 16, misile[i].pos_y - misile[i].pos_z - 16, 3, misile[i].damage, 32, 32);
 					AUDIO_PlaySound(AUDIO_EXPLOSSION, 16);
 					MISILE_UnloadMisile(i);
 				}
 			}
+
+			// Update sprite screen pos
+			gfx_sprite_stack[misile[i].sprite_num].screen_pos_x = misile[i].pos_x - camera->pos_x;
+			gfx_sprite_stack[misile[i].sprite_num].screen_pos_y = misile[i].pos_y - misile[i].pos_z - camera->pos_y;
 		}
 	}
 }

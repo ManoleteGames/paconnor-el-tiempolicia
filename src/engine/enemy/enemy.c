@@ -34,7 +34,17 @@ void ENEMY_SetGun(int enemy_number, int type, int graphics_id, int bullet_graphi
 	switch (type) {
 		case ENEMY_GUN_BARE_HANDS:
 			enemy[enemy_number].gun->max_accuracy = 4;
-			enemy[enemy_number].gun->damage = 10;
+			switch (settings.dificulty) {
+				case 1:// Medium
+					enemy[enemy_number].gun->damage = 20;
+					break;
+				case 2:// Hard
+					enemy[enemy_number].gun->damage = 30;
+					break;
+				default://Easy
+					enemy[enemy_number].gun->damage = 10;
+					break;
+			}
 			enemy[enemy_number].gun->recoil_time = 10;
 			enemy[enemy_number].gun->max_distance = 6;
 			enemy[enemy_number].gun->accurate = false;
@@ -45,7 +55,17 @@ void ENEMY_SetGun(int enemy_number, int type, int graphics_id, int bullet_graphi
 			break;
 		case ENEMY_GUN_PISTOL:
 			enemy[enemy_number].gun->max_accuracy = 4;
-			enemy[enemy_number].gun->damage = 20;
+			switch (settings.dificulty) {
+				case 1:// Medium
+					enemy[enemy_number].gun->damage = 30;
+					break;
+				case 2:// Hard
+					enemy[enemy_number].gun->damage = 40;
+					break;
+				default://Easy
+					enemy[enemy_number].gun->damage = 20;
+					break;
+			}
 			enemy[enemy_number].gun->recoil_time = 5;
 			enemy[enemy_number].gun->max_distance = 130;
 			enemy[enemy_number].gun->accurate = true;
@@ -56,7 +76,17 @@ void ENEMY_SetGun(int enemy_number, int type, int graphics_id, int bullet_graphi
 			break;
 		case ENEMY_GUN_AK:
 			enemy[enemy_number].gun->max_accuracy = 1;
-			enemy[enemy_number].gun->damage = 20;
+			switch (settings.dificulty) {
+				case 1:// Medium
+					enemy[enemy_number].gun->damage = 30;
+					break;
+				case 2:// Hard
+					enemy[enemy_number].gun->damage = 40;
+					break;
+				default://Easy
+					enemy[enemy_number].gun->damage = 20;
+					break;
+			}
 			enemy[enemy_number].gun->recoil_time = 1;
 			enemy[enemy_number].gun->max_distance = 150;
 			enemy[enemy_number].gun->accurate = false;
@@ -67,7 +97,17 @@ void ENEMY_SetGun(int enemy_number, int type, int graphics_id, int bullet_graphi
 			break;
 		case ENEMY_GUN_SHOTGUN:
 			enemy[enemy_number].gun->max_accuracy = 1;
-			enemy[enemy_number].gun->damage = 20;
+			switch (settings.dificulty) {
+				case 1:// Medium
+					enemy[enemy_number].gun->damage = 30;
+					break;
+				case 2:// Hard
+					enemy[enemy_number].gun->damage = 40;
+					break;
+				default://Easy
+					enemy[enemy_number].gun->damage = 20;
+					break;
+			}
 			enemy[enemy_number].gun->recoil_time = 10;
 			enemy[enemy_number].gun->max_distance = 100;
 			enemy[enemy_number].gun->accurate = false;
@@ -78,7 +118,17 @@ void ENEMY_SetGun(int enemy_number, int type, int graphics_id, int bullet_graphi
 			break;
 		case ENEMY_GUN_RIFLE:
 			enemy[enemy_number].gun->max_accuracy = 2;
-			enemy[enemy_number].gun->damage = 30;
+			switch (settings.dificulty) {
+				case 1:// Medium
+					enemy[enemy_number].gun->damage = 40;
+					break;
+				case 2:// Hard
+					enemy[enemy_number].gun->damage = 50;
+					break;
+				default://Easy
+					enemy[enemy_number].gun->damage = 30;
+					break;
+			}
 			enemy[enemy_number].gun->recoil_time = 7;
 			enemy[enemy_number].gun->max_distance = 200;
 			enemy[enemy_number].gun->accurate = true;
@@ -198,8 +248,21 @@ void ENEMY_Load(const char *dat_name, byte number, int x, int y, int face_gfx_id
 	enemy[number].speed_diagonalh_FP = (enemy[number].speed_horizontal_FP * 10) / 14;
 
 	enemy[number].speed = ENEMY_SPEED;
-	enemy[number].max_life = life;
-	enemy[number].life = life;
+	switch (settings.dificulty) {
+		case 1:// Medium
+			enemy[number].max_life = life + (life >> 1);
+			enemy[number].life = life + (life >> 1);
+			break;
+		case 2:// Hard
+			enemy[number].max_life = life + life;
+			enemy[number].life = life + life;
+			break;
+		default://Easy
+			enemy[number].max_life = life;
+			enemy[number].life = life;
+			break;
+	}
+
 	enemy[number].damage = 0;
 	enemy[number].is_hit = false;
 

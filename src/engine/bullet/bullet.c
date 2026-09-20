@@ -105,7 +105,7 @@ void BULLET_LoadBullet(int graphics_id, int entity_id, int width, int height, in
 
 	// Set effect graphics
 	GFX_SetSpriteGraphic(bullet[number].sprite_num, 0, graphics_id, 0, 0);
-	GFX_SetSingleFrameAnimation(bullet[number].sprite_num, 0);
+	GFX_SetSingleFrameAnimation(bullet[number].sprite_num, 0, false);
 
 	// Set colission points
 	//  ---------------

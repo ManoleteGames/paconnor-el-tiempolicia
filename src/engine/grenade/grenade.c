@@ -65,7 +65,7 @@ int GRENADE_LoadGrenade(int graphics_id, int entity_id, int pos_x, int pos_y, in
 
 	// Set effect graphics
 	GFX_SetSpriteGraphic(grenade[number].sprite_num, 0, graphics_id, 0, 0);
-	GFX_SetSingleFrameAnimation(grenade[number].sprite_num, 0);
+	GFX_SetSingleFrameAnimation(grenade[number].sprite_num, 0, false);
 	GFX_SetSpriteBlinkingProperties(grenade[i].sprite_num, true, 20, GRENADE_BLINK_COLOR);
 
 	grenade[number].width_px = GFX_GetSpriteWidth_px(grenade[number].sprite_num);
@@ -531,7 +531,7 @@ void GRENADE_Update(void) {
 
 						if ((grenade[i].current_step >= grenade[i].steps) && (grenade[i].pos_z == 0)) {
 							grenade[i].on_target = true;
-							GFX_SetSingleFrameAnimation(grenade[i].sprite_num, 0);
+							GFX_SetSingleFrameAnimation(grenade[i].sprite_num, 0, false);
 							break;
 						}
 					}
