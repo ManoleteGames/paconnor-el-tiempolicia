@@ -1981,9 +1981,10 @@ void ENEMY_Update(void) {
 							break;
 						case 4:
 							ENEMY_UnloadEnemy(i);
-
+							enemy[i].action_dead = false;
 							break;
 						default:
+							enemy[i].action_dead = false;
 							break;
 					}
 				}

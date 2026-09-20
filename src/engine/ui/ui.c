@@ -232,11 +232,11 @@ void UI_UpdateUI(bool combat_mode) {
 	if (ui->show_speech) {
 		ui->actor_was_on_combat_mode = actor->mode_combat;
 		ACTOR_SetCombatMode(false);
-		speech_finished = VIDEO_ChatToScreenBuffer(gfx_chat_panel, cursor.right_click_FN);
+		speech_finished = VIDEO_ChatToScreenBuffer(gfx_chat_panel, cursor.right_click_FN || kbKeySpace_FP);
 		ui->speech_time++;
 
 		// Cancel speech by right click
-		if (speech_finished && cursor.right_click_FN) {
+		if (speech_finished && (cursor.right_click_FN || kbKeySpace_FP)) {
 			MOUSE_MaskRightClick();
 			ui->speech_time = ui->speech_timeout;
 		}

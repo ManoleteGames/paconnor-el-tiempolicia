@@ -515,7 +515,7 @@ void Scene6_Loop(void) {
 	GFX_LoadPalette("PALETTES.DAT", "SCN61.PCX", 256);
 
 	VIDEO_StringToScreenBuffer(50, 60, ui->txt_file[UI_TXT_SCN6I]->line[40], FONT_BIG_BLACK);
-	VIDEO_StringToScreenBuffer(30, 85, ui->txt_file[UI_TXT_SCN6I]->line[41], FONT_BIG_BLACK);
+	VIDEO_StringToScreenBuffer(50, 85, ui->txt_file[UI_TXT_SCN6I]->line[41], FONT_BIG_BLACK);
 	VIDEO_StringToScreenBuffer(90, 135, ui->txt_file[UI_TXT_SCN6I]->line[42], FONT_SLIM_WHITE);
 	VIDEO_StringToScreenBuffer(160, 135, ui->txt_file[UI_TXT_SCN6I]->line[43], FONT_SLIM_WHITE);
 
@@ -902,21 +902,21 @@ void Scene6_Loop(void) {
 						break;
 					case 2:// fight
 						// Emeny throw items
-						if (enemy[0].action_dead) {
+						if (enemy[0].action_dead && (enemy[0].action_step == 1)) {
 							switch (rand() % 8) {
 								case 0:// Nothing
 									break;
 								case 1:// Medikit
-									if (!item[7].is_loaded) ITEM_LoadItem(7, ENTITY_ID_ITEM_MEDIKIT, SPRITE_GRAPHICS_ID_ITEM_MEDIKIT, enemy[0].pos_x, enemy[0].pos_y);
+									if (!item[7].is_loaded) ITEM_LoadItem(7, ENTITY_ID_ITEM_MEDIKIT, SPRITE_GRAPHICS_ID_ITEM_MEDIKIT, enemy[0].pos_x, enemy[0].pos_y + 16);
 									break;
 								case 2:// Grenades
-									if (!item[7].is_loaded) ITEM_LoadItem(7, ENTITY_ID_ITEM_GRENADE, SPRITE_GRAPHICS_ID_ITEM_GRENADE, enemy[0].pos_x, enemy[0].pos_y);
+									if (!item[7].is_loaded) ITEM_LoadItem(7, ENTITY_ID_ITEM_GRENADE, SPRITE_GRAPHICS_ID_ITEM_GRENADE, enemy[0].pos_x, enemy[0].pos_y + 16);
 									break;
 								case 3:// Ammo 3
-									if (!item[7].is_loaded) ITEM_LoadItem(7, ENTITY_ID_ITEM_AMMO3, SPRITE_GRAPHICS_ID_ITEM_AMMO3, enemy[0].pos_x, enemy[0].pos_y);
+									if (!item[7].is_loaded) ITEM_LoadItem(7, ENTITY_ID_ITEM_AMMO3, SPRITE_GRAPHICS_ID_ITEM_AMMO3, enemy[0].pos_x, enemy[0].pos_y + 16);
 									break;
 								case 4:// Ammo 4
-									if (!item[7].is_loaded) ITEM_LoadItem(7, ENTITY_ID_ITEM_AMMO4, SPRITE_GRAPHICS_ID_ITEM_AMMO4, enemy[0].pos_x, enemy[0].pos_y);
+									if (!item[7].is_loaded) ITEM_LoadItem(7, ENTITY_ID_ITEM_AMMO4, SPRITE_GRAPHICS_ID_ITEM_AMMO4, enemy[0].pos_x, enemy[0].pos_y + 16);
 									break;
 								default:
 									break;
@@ -949,6 +949,7 @@ void Scene6_Loop(void) {
 	VIDEO_ClearScreen();
 	AUDIO_StopSong();
 	ENEMY_UnloadEnemies();
+	ITEM_UnloadItems();
 	OBJECT_UnloadObjects();
 	EFFECT_UnloadEffects();
 	BULLET_UnloadBullets();

@@ -660,7 +660,7 @@ void Scene3_Loop(void) {
 	GFX_LoadPalette("PALETTES.DAT", "SCN31.PCX", 256);
 
 	VIDEO_StringToScreenBuffer(50, 60, ui->txt_file[UI_TXT_SCN3I]->line[40], FONT_BIG_BLACK);
-	VIDEO_StringToScreenBuffer(80, 85, ui->txt_file[UI_TXT_SCN3I]->line[41], FONT_BIG_BLACK);
+	VIDEO_StringToScreenBuffer(50, 85, ui->txt_file[UI_TXT_SCN3I]->line[41], FONT_BIG_BLACK);
 	VIDEO_StringToScreenBuffer(90, 135, ui->txt_file[UI_TXT_SCN3I]->line[42], FONT_SLIM_WHITE);
 	VIDEO_StringToScreenBuffer(160, 135, ui->txt_file[UI_TXT_SCN3I]->line[43], FONT_SLIM_WHITE);
 
@@ -1332,7 +1332,7 @@ void Scene3_Loop(void) {
 								while (!end_sequence) {
 									switch (sequence_step) {
 										case 0://
-											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY2_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 31, 32, 355, true, 100);
+											UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY3_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN3D, 31, 32, 355, true, 100);
 											sequence_step++;
 											break;
 										case 1://

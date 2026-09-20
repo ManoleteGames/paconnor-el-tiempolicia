@@ -117,11 +117,13 @@ void KEYB_Shutdown(void);
 #define LAST_SCANCODE() (kbLastScancode & 0x7F)
 extern byte kbLastScancode;
 extern bool kbKeyState[128];
+extern bool kbKeySpace_FP;
 extern byte lastKeyPressed;
 void KEYB_Init(void);
 void KEYB_Free(void);
 bool KEYB_IsAnyKeyPressed(void);
 byte KEYB_GetLastKeyPressed_ASCII(void);
 byte KEYB_GetLastKeyPressed_CODE(void);
+void KEYB_Update(void);
 
 #endif

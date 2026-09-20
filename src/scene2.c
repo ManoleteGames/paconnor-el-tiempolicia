@@ -814,7 +814,7 @@ void Scene2_Loop(void) {
 	GFX_LoadPalette("PALETTES.DAT", "SCN21.PCX", 256);
 
 	VIDEO_StringToScreenBuffer(50, 60, ui->txt_file[UI_TXT_SCN2I]->line[40], FONT_BIG_BLACK);
-	VIDEO_StringToScreenBuffer(90, 85, ui->txt_file[UI_TXT_SCN2I]->line[41], FONT_BIG_BLACK);
+	VIDEO_StringToScreenBuffer(50, 85, ui->txt_file[UI_TXT_SCN2I]->line[41], FONT_BIG_BLACK);
 	VIDEO_StringToScreenBuffer(90, 135, ui->txt_file[UI_TXT_SCN2I]->line[48], FONT_SLIM_WHITE);
 	VIDEO_StringToScreenBuffer(160, 135, ui->txt_file[UI_TXT_SCN2I]->line[49], FONT_SLIM_WHITE);
 

@@ -1,6 +1,8 @@
+#include "keyb.h"
 #include "../engine.h"
 
 byte kbLastScancode;
+bool kbKeySpace_FP, kbKeySpace_old;
 bool kbKeyState[128];
 static const unsigned char kbKeyASCII[128] = {
 		0,
@@ -190,4 +192,12 @@ void KEYB_Shutdown(void) {
 			_go32_dpmi_free_iret_wrapper(&new_keyb_handler);
 	}
 	engine.keyboard_initialized = false;
+}
+
+void KEYB_Update(void) {
+	kbKeySpace_FP = false;
+	if (kbKeyState[SCANCODE_SPACE] && !kbKeySpace_old) {
+		kbKeySpace_FP = true;
+	}
+	kbKeySpace_old = kbKeyState[SCANCODE_SPACE];
 }
