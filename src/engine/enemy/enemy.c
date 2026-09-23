@@ -1969,6 +1969,7 @@ void ENEMY_Update(void) {
 									ENEMY_SetHitAnimation(i, enemy[i].status_facing);
 									break;
 								case ENTITY_ID_ACTOR_KICK:
+								case ENTITY_ID_EXPLOSION:
 									ENEMY_SetDeadAnimation(i, enemy[i].status_facing);
 									enemy[i].x_FP += enemy[i].hit_vx_FP << 2;
 									enemy[i].y_FP += enemy[i].hit_vy_FP << 2;

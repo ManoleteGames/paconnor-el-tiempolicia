@@ -51,7 +51,6 @@ static void LoadTexts(void) {
 	FILE_LoadTextFile(language, "INTRO.TXT", ui->txt_file[UI_TXT_INTRO]);
 	FILE_LoadTextFile(language, "GLOBAL.TXT", ui->txt_file[UI_TXT_GLOBAL]);
 	FILE_LoadTextFile(language, "CREDITS.TXT", ui->txt_file[UI_TXT_CREDITS]);
-	FILE_LoadTextFile(language, "NAMES.TXT", ui->txt_file[UI_TXT_NAMES]);
 	FILE_LoadTextFile(language, "SCN1D.TXT", ui->txt_file[UI_TXT_SCN1D]);
 	FILE_LoadTextFile(language, "SCN1H.TXT", ui->txt_file[UI_TXT_SCN1H]);
 	FILE_LoadTextFile(language, "SCN1I.TXT", ui->txt_file[UI_TXT_SCN1I]);
@@ -2196,7 +2195,7 @@ static void EndCredits(void) {
 /** MAIN FUNCTION*******
  */
 int main(int argc, char **argv) {
-	gdb_start();
+	//gdb_start();
 
 	engine.good_mode = false;
 	engine.debug_mode = false;
@@ -2255,7 +2254,7 @@ int main(int argc, char **argv) {
 
 	while (!engine.exit_game) {
 
-		if (ui->pause) gdb_checkpoint();
+		//if (ui->pause) gdb_checkpoint();
 
 		switch (engine.scene) {
 			case 0:// main menu

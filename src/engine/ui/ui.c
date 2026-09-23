@@ -13,7 +13,6 @@ void UI_Init(void) {
 	ui->txt_file[UI_TXT_INTRO] = MM_PushChunk(sizeof(TextFile), CT_ENGINE);
 	ui->txt_file[UI_TXT_GLOBAL] = MM_PushChunk(sizeof(TextFile), CT_ENGINE);
 	ui->txt_file[UI_TXT_CREDITS] = MM_PushChunk(sizeof(TextFile), CT_ENGINE);
-	ui->txt_file[UI_TXT_NAMES] = MM_PushChunk(sizeof(TextFile), CT_ENGINE);
 	ui->txt_file[UI_TXT_SCN1D] = MM_PushChunk(sizeof(TextFile), CT_ENGINE);
 	ui->txt_file[UI_TXT_SCN1H] = MM_PushChunk(sizeof(TextFile), CT_ENGINE);
 	ui->txt_file[UI_TXT_SCN1I] = MM_PushChunk(sizeof(TextFile), CT_ENGINE);

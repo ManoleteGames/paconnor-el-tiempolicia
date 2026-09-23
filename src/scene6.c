@@ -411,7 +411,7 @@ void Scene6_SetHotspotsAndEvents(void) {
 	map->event_enabling_room1[3] = true;
 	map->event_enabling_room1[4] = true;
 	map->event_enabling_room1[5] = true;
-	map->event_enabling_room1[6] = false;
+	map->event_enabling_room1[6] = true;
 	map->event_enabling_room1[7] = false;
 	map->event_enabling_room1[8] = false;
 	map->event_enabling_room1[9] = false;
@@ -793,6 +793,8 @@ void Scene6_Loop(void) {
 							VIDEO_FadeOut(4);
 							ENEMY_UnloadEnemies();
 							OBJECT_UnloadObjects();
+							ITEM_UnloadItems();
+							MISILE_UnloadMisiles();
 							EFFECT_UnloadEffects();
 							BULLET_UnloadBullets();
 							PARTICLE_UnloadParticles();
@@ -1123,6 +1125,11 @@ void Scene6_Loop(void) {
 					default:
 						break;
 				}
+
+				engine.debug1_INT = enemy[0].action_hit;
+				engine.debug2_INT = enemy[0].action_walk;
+				engine.debug3_INT = enemy[1].action_hit;
+				engine.debug4_INT = enemy[1].action_walk;
 		}
 
 		Update(true);

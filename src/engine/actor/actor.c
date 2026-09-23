@@ -3299,6 +3299,8 @@ void ACTOR_Update(void) {
 		// avoid damage if actor is looping
 		if ((actor->hit_by == ENTITY_ID_ENEMY_BULLET) && actor->action_loop) actor->damage = 0;
 
+		if (engine.good_mode) actor->damage = 0;
+
 		if (actor->damage > actor->life) actor->damage = actor->life;
 		if (!actor->life_shown) {
 			actor->life -= actor->damage;
