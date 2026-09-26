@@ -138,12 +138,6 @@ PACONNOR/
 
 ---
 
-## 📸 Capturas
-
-![Captura del juego](docs/screenshot1.png)
-
----
-
 ## 📜 Historia
 
 ### Año 2045
