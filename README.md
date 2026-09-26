@@ -1,3 +1,192 @@
+###################################################### ENGLISH #######################################################################
+
+# 🕵️ PACONNOR, The Timecop
+
+> **An action-adventure shooter for MS-DOS, set in a dystopian future.**
+
+[![Platform](https://img.shields.io/badge/Platform-MS--DOS-555555)](https://github.com/ManoleteGames/paconnor-el-tiempolicia)
+[![Language](https://img.shields.io/badge/Language-C-blue)](https://github.com/ManoleteGames/paconnor-el-tiempolicia)
+[![Status](https://img.shields.io/badge/Status-In%20Development-orange)](https://github.com/ManoleteGames/paconnor-el-tiempolicia)
+
+You can download the latest *release* and run it using emulators such as **DOSBox, PCem or 86Box**.
+
+You can also play it directly on **[Itch.io](https://manoletegames.itch.io/paconnor-el-tiempolicia)**.
+
+---
+
+## 📖 Table of Contents
+
+* [🎮 Description](#-description)
+* [✨ Features](#-features)
+* [🕹️ Controls](#️-controls)
+* [🖥️ Requirements](#️-requirements)
+* [🛠️ Building](#️-building)
+* [📁 Project Structure](#-project-structure)
+* [📸 Screenshots](#-screenshots)
+* [📜 Story](#-story)
+* [📋 Development Status](#-development-status)
+* [👨‍💻 Author](#-author)
+
+---
+
+## 🎮 Description
+
+**PACONNOR, The Timecop** is an action game for **MS-DOS**, inspired by classics such as *The Chaos Engine*, *True Lies* and *Demolition Man*.
+
+The player takes control of a jaded police inspector who must save the world and free it from a cult that controls everything.
+
+The project is developed in **C using DJGPP**, with **320×200 VGA graphics**.
+
+---
+
+## ✨ Features
+
+* 🎯 Keyboard and mouse action
+* 🕹️ Top-down perspective
+* 🖥️ 320×200 VGA graphics
+* 💾 Designed for MS-DOS
+* 🔫 Weapons, enemies and projectiles
+* 🤖 A futuristic and decaying city
+* ⏳ Time travel
+* 🎵 Retro music and sound effects
+* 🔊 PC Speaker support
+
+---
+
+## 🕹️ Controls
+
+| Action        | Key                    |
+| ------------- | ---------------------- |
+| Move          | **W A S D**            |
+| Dodge         | **SPACE**              |
+| Aim           | 🖱️ Mouse              |
+| Shoot         | 🖱️ Left mouse button  |
+| Throw grenade | 🖱️ Right mouse button |
+| Reload weapon | **R**                  |
+| Fists         | **1**                  |
+| Pistol        | **2**                  |
+| Shotgun       | **3**                  |
+| UZI           | **4**                  |
+| Rifle         | **5**                  |
+| Pause         | **P**                  |
+| Quit          | **ESC**                |
+
+---
+
+## 🖥️ Requirements
+
+* 💻 MS-DOS compatible PC
+* ⚙️ **486 DX2 66 MHz** processor or better
+* 🖥️ **VGA** graphics card
+* 🖱️ MS-DOS compatible mouse
+* 🔊 **PC Speaker**
+* 💾 **16 MB RAM**
+
+---
+
+## 🛠️ Building
+
+The project uses **DJGPP** to build the DOS-compatible executable.
+
+The source code is written in **C**, using techniques and technologies designed around the hardware of the era.
+
+---
+
+## 📁 Project Structure
+
+```text
+PACONNOR/
+├── ASSETS/                 # Game assets
+│   ├── BINARIES/           # Text-mode screens
+│   ├── FONTS/              # Fonts
+│   ├── IMAGES/             # PCX images
+│   ├── MAPS/               # Game maps
+│   ├── PALETTES/           # Color palettes
+│   ├── SETTINGS/           # Configuration files
+│   ├── SOUNDS/             # Sounds
+│   ├── SPRITES/            # PCX sprites
+│   ├── TEXT/               # Dialogues and text
+│   ├── TILESETS/           # Tilesets used by the maps
+│   └── UTILS/              # Packaging and music composition utilities
+│
+├── SRC/                    # Source code
+│   └── ENGINE/             # Game engine
+│       ├── ACTOR/          # Main character
+│       ├── AUDIO/          # Sound system
+│       ├── BOSS/           # Boss management
+│       ├── BULLET/         # Bullet management
+│       ├── CAMERA/         # Camera handling
+│       ├── EFFECT/         # Graphical effects
+│       ├── ENEMY/          # Enemy management
+│       ├── FILE/           # File handling
+│       ├── GFX/            # Graphics system
+│       ├── GRENADE/        # Grenade management
+│       ├── ITEM/           # Item management
+│       ├── KEYB/           # Keyboard handling
+│       ├── MAP/            # Map management
+│       ├── MEM/            # Memory management
+│       ├── MOUSE/          # Mouse handling
+│       ├── NPC/            # Non-player characters
+│       ├── OBJECT/         # Destructible objects
+│       ├── PARTICLE/       # Particle system
+│       ├── TIMER/          # Timers
+│       ├── TYPES/          # Data type definitions
+│       ├── UI/             # User interface
+│       ├── UTILS/          # General-purpose functions and calculations
+│       └── VIDEO/          # Video handling
+│
+└── README.md
+```
+
+---
+
+## 📜 Story
+
+### The Year 2045
+
+The world is no longer the same.
+
+The city is controlled by a cult that dominates every aspect of society. The government, major corporations and a large part of the population are under its influence.
+
+**Paconnor**, a veteran police inspector who has struggled to adapt to the new times, is given a mission that will change his life.
+
+A time machine.
+
+A city in decay.
+
+And one last chance to change the future.
+
+---
+
+## 📋 Development Status
+
+| System               | Status |
+| -------------------- | :----: |
+| 🎨 Graphics engine   |    ✅   |
+| 🗺️ Map scrolling    |    ✅   |
+| 💾 Memory management |    ✅   |
+| ⌨️ Keyboard          |    ✅   |
+| 🖱️ Mouse            |    ✅   |
+| 💥 Collision system  |    ✅   |
+| 🤖 Enemy AI          |    ✅   |
+| 🔊 PC Speaker sound  |    ✅   |
+| 🎵 AdLib music       |   🚧   |
+| 🔊 Sound Blaster     |   🚧   |
+| 📜 Spanish           |    ✅   |
+| 📜 English           |    ✅   |
+| 📜 French            |    ✅   |
+| 📜 German            |   🚧   |
+
+### Legend
+
+* ✅ **Completed**
+* 🚧 **In development**
+* ⬜ **Pending**
+
+---
+
+###################################################### SPANISH #######################################################################
+
 # 🕵️ PACONNOR, El tiempolicia
 
 > **Un shooter de acción y aventura para MS-DOS, ambientado en un futuro distópico.**
@@ -182,6 +371,8 @@ Y una última oportunidad para cambiar el futuro.
 * ⬜ **Pendiente**
 
 ---
+
+####################################################################################################################################
 
 ## 👨‍💻 Autor
 
