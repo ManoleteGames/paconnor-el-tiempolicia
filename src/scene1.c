@@ -66,7 +66,7 @@ void Scene1_Intro(void) {
 				VIDEO_FadeIn(4);
 
 				TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 50);
-				AUDIO_PlaySong(true);
+				AUDIO_PlayScenesSong(true);
 				dialog_step = 0;
 
 				src_index = 0;
@@ -1022,7 +1022,7 @@ void Scene1_Loop(void) {
 		// Just wait
 	}
 
-	AUDIO_PlaySong(true);
+	AUDIO_PlayIngameSong(true);
 	VIDEO_FadeIn(1);
 	MOUSE_ShowCursor();
 
@@ -1220,7 +1220,7 @@ void Scene1_Loop(void) {
 								VIDEO_FadeIn(1);
 
 								TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 55);
-								AUDIO_PlaySong(true);
+								AUDIO_PlayIngameSong(true);
 
 								ACTOR_SetGun(actor->sprite_num, ACTOR_GUN_TYPE_BARE_HANDS);
 								ACTOR_SetCombatMode(false);
@@ -1356,7 +1356,7 @@ void Scene1_Loop(void) {
 								AUDIO_UnloadSong();
 								AUDIO_LoadSong(AUDIO_SONG_7);// Load song
 								TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 50);
-								AUDIO_PlaySong(true);
+								AUDIO_PlayIngameSong(true);
 							}
 							break;
 						case 3:// Event 3. Blocked path
@@ -2923,7 +2923,7 @@ void Scene1_Outro(void) {
 				VIDEO_FadeIn(4);
 
 				TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 50);
-				AUDIO_PlaySong(true);
+				AUDIO_PlayScenesSong(true);
 
 				step++;
 				break;
@@ -3578,7 +3578,7 @@ void Scene1_Outro(void) {
 					// Just wait
 				}
 				TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 10);
-				AUDIO_PlaySong(false);
+				AUDIO_PlayScenesSong(false);
 				step++;
 				break;
 			case 87:

@@ -35,13 +35,13 @@
 #define AUDIO_MAX_SONG_SIZE 20000
 
 #define AUDIO_SONG_1 1// Menu song
-#define AUDIO_SONG_2 2// scene 1 intro song
-#define AUDIO_SONG_3 3// scene 1 outro song
+#define AUDIO_SONG_2 2// scene intro song
+#define AUDIO_SONG_3 3// scene outro song
 #define AUDIO_SONG_4 4// scene 1 travel
-#define AUDIO_SONG_5 5
-#define AUDIO_SONG_6 6
-#define AUDIO_SONG_7 7
-#define AUDIO_SONG_8 8
+#define AUDIO_SONG_5 5// Ingame no fight song
+#define AUDIO_SONG_6 6// Logo ms-dos club song
+#define AUDIO_SONG_7 7// Ingame fight song
+#define AUDIO_SONG_8 8// Spare song
 
 void AUDIO_Init(void);
 void AUDIO_Shutdown(void);
@@ -51,7 +51,8 @@ bool AUDIO_CheckAdlib(void);
 void AUDIO_PlayIntro(void);
 void AUDIO_TimerHandler(void);
 void AUDIO_LoadSong(int song_number);
-void AUDIO_PlaySong(bool loop);
+void AUDIO_PlayScenesSong(bool loop);
+void AUDIO_PlayIngameSong(bool loop);
 void AUDIO_StopSong(void);
 void AUDIO_PauseSong(void);
 void AUDIO_ResumeSong(void);

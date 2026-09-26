@@ -67,7 +67,7 @@ void Scene2_Intro(void) {
 				VIDEO_FadeIn(4);
 
 				TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 50);
-				AUDIO_PlaySong(true);
+				AUDIO_PlayScenesSong(true);
 
 				scanline_scroll = 0;
 				step++;
@@ -835,7 +835,7 @@ void Scene2_Loop(void) {
 			CAM_Init(map->width_px, map->height_px, 60 << 4, 0 << 4);// Initialize camera
 			MAP_DrawMapToMapVideoBuffer();
 			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 55);
-			AUDIO_PlaySong(true);
+			AUDIO_PlayIngameSong(true);
 			break;
 		default:
 			sprintf(engine.system_error_message1, "Scene2_Loop function error");
@@ -874,7 +874,7 @@ void Scene2_Loop(void) {
 		// Just wait
 	}
 
-	AUDIO_PlaySong(true);
+	AUDIO_PlayIngameSong(true);
 	VIDEO_FadeIn(1);
 	MOUSE_ShowCursor();
 
@@ -977,7 +977,7 @@ void Scene2_Loop(void) {
 							AUDIO_UnloadSong();
 							AUDIO_LoadSong(AUDIO_SONG_7);// Load song
 							TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 50);
-							AUDIO_PlaySong(true);
+							AUDIO_PlayIngameSong(true);
 
 							ENEMY_SetBehavior(0, ENEMY_STATUS_CHASE);
 							ENEMY_SetBehavior(1, ENEMY_STATUS_CHASE);
@@ -1480,7 +1480,7 @@ void Scene2_Outro(void) {
 				VIDEO_FadeIn(4);
 
 				TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 50);
-				AUDIO_PlaySong(true);
+				AUDIO_PlayScenesSong(true);
 
 				step++;
 				break;

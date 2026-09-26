@@ -93,6 +93,7 @@ static void Logo(void) {
 				VIDEO_ClearPalette();
 				GFX_LoadPalette("PALETTES.DAT", "LDOSCLUB.PCX", 256);
 				AUDIO_LoadSong(AUDIO_SONG_6);// Load song
+
 				GFX_PCXImageToBuffer("ILOGO.DAT", "LDOSCLUB.PCX", 180 * 135, gfx->image_buffer1, &gfx->image_buffer1_width, &gfx->image_buffer1_height);
 				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 70, 32);
 				VIDEO_VSync();
@@ -104,7 +105,7 @@ static void Logo(void) {
 				break;
 			case 11:// Set delay time
 				TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 10);
-				AUDIO_PlaySong(false);
+				AUDIO_PlayScenesSong(false);
 				logo_step = 12;
 				break;
 			case 12:// Load some assets
@@ -452,7 +453,7 @@ static void Intro(void) {
 
 				VIDEO_ClearScreenBuffer();
 				TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 50);
-				AUDIO_PlaySong(true);
+				AUDIO_PlayScenesSong(true);
 				GFX_LoadPalette("PALETTES.DAT", "INTRO.PCX", 256);
 				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 230, 168, 45, 12, 222);
 
@@ -796,7 +797,7 @@ static void Menu(void) {
 	AUDIO_LoadSong(AUDIO_SONG_2);
 
 	TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 50);
-	AUDIO_PlaySong(true);
+	AUDIO_PlayScenesSong(true);
 
 	VIDEO_FadeIn(4);
 
@@ -1544,7 +1545,7 @@ static void Menu(void) {
 				if (settings.sound_device == 0) AUDIO_StopSong();
 				if (settings.sound_device == 1) {
 					AUDIO_LoadSong(AUDIO_SONG_2);
-					AUDIO_PlaySong(true);
+					AUDIO_PlayScenesSong(true);
 				}
 
 				SetDelayTime(300);
@@ -1812,7 +1813,7 @@ static void EndCredits(void) {
 				VIDEO_FadeIn(4);
 
 				TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 50);
-				AUDIO_PlaySong(true);
+				AUDIO_PlayScenesSong(true);
 
 				step++;
 				break;

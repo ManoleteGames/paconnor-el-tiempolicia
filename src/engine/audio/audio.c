@@ -174,29 +174,58 @@ void AUDIO_LoadSong(int song_number) {
 	}
 }
 
-void AUDIO_PlaySong(bool loop) {
-	song.loop = loop;
-	switch (settings.sound_device) {
-		case AUDIO_DEVICE_NONE:
-			song.loaded = false;
-			break;
-		case AUDIO_DEVICE_SPEAKER:// PC Speaker;
-			SPK_PlaySong(&song);
-			break;
-		case AUDIO_DEVICE_ADLIB:// Adlib
-			ADLIB_PlaySong(&song);
-			break;
-		case AUDIO_DEVICE_SBLASTER:// Sound blaster
-			SB_PlaySong(&song);
-			break;
-		default:
-			sprintf(engine.system_error_message1, "AUDIO_PlaySong function error");
-			sprintf(engine.system_error_message2, "Undefined music device number %u", settings.sound_device);
-			sprintf(engine.system_error_message3, "Please run setup.exe to identify your audio card");
-			Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SOUND);
-			break;
+void AUDIO_PlayScenesSong(bool loop) {
+	if (settings.scenes_music) {
+		song.loop = loop;
+		switch (settings.sound_device) {
+			case AUDIO_DEVICE_NONE:
+				song.loaded = false;
+				break;
+			case AUDIO_DEVICE_SPEAKER:// PC Speaker;
+				SPK_PlaySong(&song);
+				break;
+			case AUDIO_DEVICE_ADLIB:// Adlib
+				ADLIB_PlaySong(&song);
+				break;
+			case AUDIO_DEVICE_SBLASTER:// Sound blaster
+				SB_PlaySong(&song);
+				break;
+			default:
+				sprintf(engine.system_error_message1, "AUDIO_PlayScenesSong function error");
+				sprintf(engine.system_error_message2, "Undefined music device number %u", settings.sound_device);
+				sprintf(engine.system_error_message3, "Please run setup.exe to identify your audio card");
+				Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SOUND);
+				break;
+		}
 	}
 }
+
+void AUDIO_PlayIngameSong(bool loop) {
+	song.loop = loop;
+	if (settings.ingame_music) {
+		switch (settings.sound_device) {
+			case AUDIO_DEVICE_NONE:
+				song.loaded = false;
+				break;
+			case AUDIO_DEVICE_SPEAKER:// PC Speaker;
+				SPK_PlaySong(&song);
+				break;
+			case AUDIO_DEVICE_ADLIB:// Adlib
+				ADLIB_PlaySong(&song);
+				break;
+			case AUDIO_DEVICE_SBLASTER:// Sound blaster
+				SB_PlaySong(&song);
+				break;
+			default:
+				sprintf(engine.system_error_message1, "AUDIO_PlayIngameSong function error");
+				sprintf(engine.system_error_message2, "Undefined music device number %u", settings.sound_device);
+				sprintf(engine.system_error_message3, "Please run setup.exe to identify your audio card");
+				Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SOUND);
+				break;
+		}
+	}
+}
+
 
 void AUDIO_StopSong(void) {
 	switch (settings.sound_device) {

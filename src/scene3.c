@@ -67,7 +67,7 @@ void Scene3_Intro(void) {
 				VIDEO_FadeIn(4);
 
 				TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 50);
-				AUDIO_PlaySong(true);
+				AUDIO_PlayScenesSong(true);
 
 				step++;
 				break;
@@ -731,7 +731,7 @@ void Scene3_Loop(void) {
 		// Just wait
 	}
 
-	AUDIO_PlaySong(true);
+	AUDIO_PlayIngameSong(true);
 	VIDEO_FadeIn(1);
 	MOUSE_ShowCursor();
 
@@ -848,7 +848,7 @@ void Scene3_Loop(void) {
 							AUDIO_UnloadSong();
 							AUDIO_LoadSong(AUDIO_SONG_5);// Load song
 							TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 50);
-							AUDIO_PlaySong(true);
+							AUDIO_PlayIngameSong(true);
 
 							scene_step = 1;
 							end_sequence = false;
@@ -927,7 +927,7 @@ void Scene3_Loop(void) {
 							AUDIO_UnloadSong();
 							AUDIO_LoadSong(AUDIO_SONG_7);// Load song
 							TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 55);
-							AUDIO_PlaySong(true);
+							AUDIO_PlayIngameSong(true);
 
 							scene_step = 2;
 							end_sequence = false;
@@ -1477,7 +1477,7 @@ void Scene3_Outro(void) {
 				VIDEO_FadeIn(4);
 
 				TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 50);
-				AUDIO_PlaySong(true);
+				AUDIO_PlayScenesSong(true);
 
 				step++;
 				break;

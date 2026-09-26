@@ -64,7 +64,7 @@ void Scene6_Intro(void) {
 				VIDEO_FadeIn(4);
 
 				TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 50);
-				AUDIO_PlaySong(true);
+				AUDIO_PlayScenesSong(true);
 
 				step++;
 				break;
@@ -587,7 +587,7 @@ void Scene6_Loop(void) {
 		// Just wait
 	}
 
-	AUDIO_PlaySong(true);
+	AUDIO_PlayIngameSong(true);
 	VIDEO_FadeIn(1);
 	MOUSE_ShowCursor();
 
@@ -1184,7 +1184,7 @@ void Scene6_Outro(void) {
 				VIDEO_FadeIn(4);
 
 				TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 50);
-				AUDIO_PlaySong(true);
+				AUDIO_PlayScenesSong(true);
 
 				step++;
 				break;
