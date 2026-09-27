@@ -89,8 +89,8 @@ void Scene5_Intro(void) {
 				break;
 			case 6:// Show text
 				   // Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN5I]->line[1], FONT_SLIM_BLACK);
 				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN5I]->line[2], FONT_SLIM_BLACK);
 				step++;
@@ -104,8 +104,8 @@ void Scene5_Intro(void) {
 				break;
 			case 8:// Hide text
 				   // Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 				step++;
 				break;
 			case 9:// Just wait
@@ -117,8 +117,8 @@ void Scene5_Intro(void) {
 				break;
 			case 10:// Show text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN5I]->line[3], FONT_SLIM_BLACK);
 				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN5I]->line[4], FONT_SLIM_BLACK);
 				step++;
@@ -132,8 +132,8 @@ void Scene5_Intro(void) {
 				break;
 			case 12:// Hide text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 				step++;
 				break;
 			case 13:// Just wait
@@ -145,8 +145,8 @@ void Scene5_Intro(void) {
 				break;
 			case 14:// Show text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN5I]->line[5], FONT_SLIM_BLACK);
 				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN5I]->line[6], FONT_SLIM_BLACK);
 				step++;
@@ -161,8 +161,8 @@ void Scene5_Intro(void) {
 			case 16://  Clear back and Show text
 				VIDEO_ClearScreenBuffer();
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN5I]->line[7], FONT_SLIM_BLACK);
 				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN5I]->line[8], FONT_SLIM_BLACK);
 				step++;
@@ -301,8 +301,8 @@ void Scene5_Intro(void) {
 				break;
 			case 37:// Show text box and image 9
 				VIDEO_ClearScreenBuffer();
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 
 				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 266, 146, 20, 50, 222);
 				VIDEO_BufferToScreenBuffer(gfx->image_buffer1, gfx->image_buffer1_width, gfx->image_buffer1_height, gfx->image_buffer1_width, gfx->image_buffer1_height, 23, 53);
@@ -317,8 +317,8 @@ void Scene5_Intro(void) {
 				break;
 			case 39:// Show text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN5I]->line[10], FONT_SLIM_BLACK);
 				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN5I]->line[11], FONT_SLIM_BLACK);
 				step++;
@@ -332,8 +332,8 @@ void Scene5_Intro(void) {
 				break;
 			case 41:// Hide text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 
 				step++;
 				break;
@@ -346,8 +346,8 @@ void Scene5_Intro(void) {
 				break;
 			case 43:// Show text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN5I]->line[12], FONT_SLIM_BLACK);
 				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN5I]->line[13], FONT_SLIM_BLACK);
 				step++;
@@ -361,8 +361,8 @@ void Scene5_Intro(void) {
 				break;
 			case 45:// Hide text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 
 				step++;
 				break;
@@ -375,8 +375,8 @@ void Scene5_Intro(void) {
 				break;
 			case 47:// Show text
 					// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 46, 5, 1, 233);
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 293, 40, 9, 4, 208);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN5I]->line[14], FONT_SLIM_BLACK);
 				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN5I]->line[15], FONT_SLIM_BLACK);
 				step++;
@@ -1597,7 +1597,7 @@ void Scene5_Outro(void) {
 				break;
 			case 6://Speech
 				   // Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
 				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN5I]->line[20], FONT_SLIM_BLACK);
 				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN5I]->line[21], FONT_SLIM_BLACK);
@@ -1611,7 +1611,7 @@ void Scene5_Outro(void) {
 				break;
 			case 7:// Hide speech
 				   // Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
 				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 				step++;
 				break;
@@ -1623,7 +1623,7 @@ void Scene5_Outro(void) {
 				step++;
 				break;
 			case 9://Speech
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
 				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN5I]->line[22], FONT_SLIM_BLACK);
 				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN5I]->line[23], FONT_SLIM_BLACK);
@@ -1650,7 +1650,7 @@ void Scene5_Outro(void) {
 				step++;
 				break;
 			case 12:// Clear chat Fade first and show Second image
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
 				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 
 				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 110, 146, 30, 50, 222);
@@ -1668,7 +1668,7 @@ void Scene5_Outro(void) {
 				break;
 			case 14://Speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 239);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 296, 46, 5, 1, 202);
 				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 290, 40, 8, 4, 208);
 				VIDEO_StringToScreenBuffer(12, 12, ui->txt_file[UI_TXT_SCN5I]->line[24], FONT_SLIM_BLACK);
 				VIDEO_StringToScreenBuffer(12, 22, ui->txt_file[UI_TXT_SCN5I]->line[25], FONT_SLIM_BLACK);
@@ -1723,8 +1723,8 @@ void Scene5_Outro(void) {
 						scroll_end = true;
 
 					// Draw text background
-					VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 242);
-					VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 250);
+					VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 202);
+					VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 208);
 
 					VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN5I]->line[30], FONT_SLIM_BLACK);
 					VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN5I]->line[31], FONT_SLIM_BLACK);
@@ -1750,8 +1750,8 @@ void Scene5_Outro(void) {
 			case 20://Image 2
 
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 242);
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 250);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 208);
 
 				VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN5I]->line[32], FONT_SLIM_BLACK);
 				VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN5I]->line[33], FONT_SLIM_BLACK);
@@ -1780,8 +1780,8 @@ void Scene5_Outro(void) {
 				break;
 			case 24://Speech
 				// Draw text background
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 242);
-				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 250);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 252, 30, 23, 7, 202);
+				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 248, 26, 25, 9, 208);
 
 				VIDEO_StringToScreenBuffer(28, 13, ui->txt_file[UI_TXT_SCN5I]->line[34], FONT_SLIM_BLACK);
 				VIDEO_StringToScreenBuffer(28, 25, ui->txt_file[UI_TXT_SCN5I]->line[35], FONT_SLIM_BLACK);
