@@ -14,6 +14,7 @@ void Scene2_GameOver(void) {
 	BULLET_UnloadBullets();
 	PARTICLE_UnloadParticles();
 	GRENADE_UnloadGrenades();
+	BOSS_Unload();
 	NPC_UnloadNpcs();
 	Update(false);
 
@@ -1443,6 +1444,7 @@ void Scene2_Loop(void) {
 	NPC_UnloadNpcs();
 	ITEM_UnloadItems();
 	ACTOR_UnloadActor();
+	GFX_UnloadSprites();
 	MAP_UnloadMap();
 	Scene2_UnloadAssets();
 }

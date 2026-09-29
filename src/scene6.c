@@ -205,7 +205,7 @@ void Scene6_Intro(void) {
 				step++;
 				break;
 			case 22:// Show chat
-				VIDEO_StringToScreenBuffer(106, 105, ui->txt_file[UI_TXT_SCN6I]->line[9], FONT_SLIM_BLACK);
+				VIDEO_StringToScreenBuffer(106, 125, ui->txt_file[UI_TXT_SCN6I]->line[9], FONT_SLIM_BLACK);
 				VIDEO_VSync();
 				VIDEO_ScreenBufferToVRAM();
 				SetDelayTime(6000);
@@ -1150,6 +1150,8 @@ void Scene6_Loop(void) {
 	PARTICLE_UnloadParticles();
 	GRENADE_UnloadGrenades();
 	ACTOR_UnloadActor();
+	BOSS_Unload();
+	GFX_UnloadSprites();
 	MAP_UnloadMap();
 	Scene6_UnloadAssets();
 }

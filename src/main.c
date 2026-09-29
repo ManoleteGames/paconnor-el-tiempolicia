@@ -2196,6 +2196,8 @@ static void EndCredits(void) {
 /** MAIN FUNCTION*******
  */
 int main(int argc, char **argv) {
+
+	// debug
 	//gdb_start();
 
 	engine.good_mode = false;
@@ -2255,6 +2257,7 @@ int main(int argc, char **argv) {
 
 	while (!engine.exit_game) {
 
+		// debug
 		//if (ui->pause) gdb_checkpoint();
 
 		switch (engine.scene) {

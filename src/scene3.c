@@ -1435,6 +1435,7 @@ void Scene3_Loop(void) {
 	BOSS_Unload();
 	ITEM_UnloadItems();
 	ACTOR_UnloadActor();
+	GFX_UnloadSprites();
 	MAP_UnloadMap();
 	Scene3_UnloadAssets();
 }

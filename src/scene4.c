@@ -939,6 +939,7 @@ void Scene4_Loop(void) {
 	PARTICLE_UnloadParticles();
 	GRENADE_UnloadGrenades();
 	ACTOR_UnloadActor();
+	GFX_UnloadSprites();
 	MAP_UnloadMap();
 	Scene4_UnloadAssets();
 }

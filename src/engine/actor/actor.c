@@ -78,7 +78,7 @@ void ACTOR_SetGun(int actor_spr_num, int type) {
 		case ACTOR_GUN_TYPE_UZI:
 			// Set graphics id
 			actor->gun->graphics_id = SPRITE_GRAPHICS_ID_GUN4;
-			actor->gun->effect_graphics_id = SPRITE_GRAPHICS_ID_PISTOL_EFFECT;
+			actor->gun->effect_graphics_id = SPRITE_GRAPHICS_ID_UZI_EFFECT;
 			actor->gun->bullet_graphics_id = SPRITE_GRAPHICS_ID_BULLET1;
 			GFX_SetSpriteGraphicsId(actor->sprite_num, ACTOR_ANIM_RARM_INDEX, SPRITE_GRAPHICS_ID_ACTOR_RARM_UZI);
 

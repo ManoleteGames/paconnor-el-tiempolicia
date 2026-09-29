@@ -1540,6 +1540,8 @@ void Scene5_Loop(void) {
 	PARTICLE_UnloadParticles();
 	GRENADE_UnloadGrenades();
 	ACTOR_UnloadActor();
+	BOSS_Unload();
+	GFX_UnloadSprites();
 	MAP_UnloadMap();
 	Scene5_UnloadAssets();
 }
