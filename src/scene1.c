@@ -1360,60 +1360,66 @@ void Scene1_Loop(void) {
 							}
 							break;
 						case 3:// Event 3. Blocked path
-							if (map->event_enabling_room1[3]) {
-								// Clear event 3
-								map->event_enabling_room1[3] = false;
-								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 1, 2, 3, false, 100);
+							if (!actor->mode_combat) {
+								if (map->event_enabling_room1[3]) {
+									// Clear event 3
+									map->event_enabling_room1[3] = false;
+									UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 1, 2, 3, false, 100);
+								}
 							}
 							break;
 						case 4:// Event 4. Cultists
-							if (map->event_enabling_room1[4]) {
-								// Clear event 4
-								map->event_enabling_room1[4] = false;
-								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 4, 5, 6, true, 100);
-								while (!UI_IsSpeechFinished()) {
-									Update(false);
+							if (!actor->mode_combat) {
+								if (map->event_enabling_room1[4]) {
+									// Clear event 4
+									map->event_enabling_room1[4] = false;
+									UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 4, 5, 6, true, 100);
+									while (!UI_IsSpeechFinished()) {
+										Update(false);
+									}
+									UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 7, 8, 9, false, 100);
+									while (!UI_IsSpeechFinished()) {
+										Update(false);
+									}
+									UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 10, 11, 12, true, 100);
+									while (!UI_IsSpeechFinished()) {
+										Update(false);
+									}
+									UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 13, 14, 15, true, 100);
+									while (!UI_IsSpeechFinished()) {
+										Update(false);
+									}
+									UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 16, 17, 18, false, 100);
+									while (!UI_IsSpeechFinished()) {
+										Update(false);
+									}
+									UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 19, 20, 21, false, 100);
+									while (!UI_IsSpeechFinished()) {
+										Update(false);
+									}
+									UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 22, 23, 24, false, 100);
 								}
-								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 7, 8, 9, false, 100);
-								while (!UI_IsSpeechFinished()) {
-									Update(false);
-								}
-								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 10, 11, 12, true, 100);
-								while (!UI_IsSpeechFinished()) {
-									Update(false);
-								}
-								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 13, 14, 15, true, 100);
-								while (!UI_IsSpeechFinished()) {
-									Update(false);
-								}
-								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 16, 17, 18, false, 100);
-								while (!UI_IsSpeechFinished()) {
-									Update(false);
-								}
-								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 19, 20, 21, false, 100);
-								while (!UI_IsSpeechFinished()) {
-									Update(false);
-								}
-								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 22, 23, 24, false, 100);
 							}
 							break;
 						case 5:// Event 5. XXX
-							if (map->event_enabling_room1[5]) {
-								// Clear event 5
-								map->event_enabling_room1[5] = false;
-								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 25, 26, 27, true, 100);
-								while (!UI_IsSpeechFinished()) {
-									Update(false);
+							if (!actor->mode_combat) {
+								if (map->event_enabling_room1[5]) {
+									// Clear event 5
+									map->event_enabling_room1[5] = false;
+									UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 25, 26, 27, true, 100);
+									while (!UI_IsSpeechFinished()) {
+										Update(false);
+									}
+									UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 28, 29, 30, false, 100);
+									while (!UI_IsSpeechFinished()) {
+										Update(false);
+									}
+									UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 31, 32, 33, false, 100);
+									while (!UI_IsSpeechFinished()) {
+										Update(false);
+									}
+									UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 34, 35, 36, true, 100);
 								}
-								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 28, 29, 30, false, 100);
-								while (!UI_IsSpeechFinished()) {
-									Update(false);
-								}
-								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ACTORCHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 31, 32, 33, false, 100);
-								while (!UI_IsSpeechFinished()) {
-									Update(false);
-								}
-								UI_ShowSpeech(gfx_chat_panel, SPRITE_GRAPHICS_ID_ENEMY1_CHAT, SPRITE_GRAPHICS_ID_CHAT, UI_TXT_SCN1D, 34, 35, 36, true, 100);
 							}
 							break;
 						case 6:// Event 6. Open door

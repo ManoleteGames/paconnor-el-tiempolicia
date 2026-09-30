@@ -2146,7 +2146,7 @@ void ACTOR_Update(void) {
 	}
 
 	// Combat mode switching
-	if (engine.ingame & kbKeyState[SCANCODE_C]) {
+	/*if (engine.ingame & kbKeyState[SCANCODE_C]) {
 		if (actor->mode_combat) {
 			ACTOR_SetCombatMode(false);
 			ACTOR_SetFullStandAnimation(actor->last_facing);
@@ -2154,7 +2154,7 @@ void ACTOR_Update(void) {
 			ACTOR_SetCombatMode(true);
 		}
 		kbKeyState[SCANCODE_C] = false;
-	}
+	}*/
 
 	//// ---------------- ACTOR ACTIONS ----------------
 
@@ -2195,11 +2195,39 @@ void ACTOR_Update(void) {
 	}
 
 	// change gun
-	if (idle && actor->mode_combat && (kbKeyState[SCANCODE_1] || kbKeyState[SCANCODE_2] || kbKeyState[SCANCODE_3] || kbKeyState[SCANCODE_4] || kbKeyState[SCANCODE_5])) {
+	if (idle && actor->mode_combat && (kbKeyState[SCANCODE_1] || kbKeyState[SCANCODE_2] || kbKeyState[SCANCODE_3] || kbKeyState[SCANCODE_4] || kbKeyState[SCANCODE_5] || kbKeyState[SCANCODE_TAB])) {
 		idle = false;
 		actor->action_change_gun = true;
 		actor->shoot_accuracy = 0;
 		actor->action_step = 0;
+
+		// Switch gun
+		if (kbKeyState[SCANCODE_TAB]) {// Switch between guns
+			switch (actor->gun->type) {
+				case ACTOR_GUN_TYPE_BARE_HANDS:
+					actor->new_gun = ACTOR_GUN_TYPE_PISTOL;
+					kbKeyState[SCANCODE_TAB] = false;
+					break;
+				case ACTOR_GUN_TYPE_PISTOL:
+					actor->new_gun = ACTOR_GUN_TYPE_SHOTGUN;
+					kbKeyState[SCANCODE_TAB] = false;
+					break;
+				case ACTOR_GUN_TYPE_SHOTGUN:
+					actor->new_gun = ACTOR_GUN_TYPE_UZI;
+					kbKeyState[SCANCODE_TAB] = false;
+					break;
+				case ACTOR_GUN_TYPE_UZI:
+					actor->new_gun = ACTOR_GUN_TYPE_SNIPPER;
+					kbKeyState[SCANCODE_TAB] = false;
+					break;
+				case ACTOR_GUN_TYPE_SNIPPER:
+					actor->new_gun = ACTOR_GUN_TYPE_BARE_HANDS;
+					kbKeyState[SCANCODE_TAB] = false;
+					break;
+				default:
+					break;
+			}
+		}
 
 		// Select gun
 		if (kbKeyState[SCANCODE_1]) {// Bare hands
