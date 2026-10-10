@@ -55,8 +55,7 @@
 
 #include "audio/audio.h"
 #include "audio/speaker.h"
-#include "audio/a2m.h"
-#include "audio/adlib.h"
+
 
 #include "npc/npc.h"
 

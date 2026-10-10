@@ -9,6 +9,7 @@
 #include "mem/mem.h"
 #include "mouse/mouse.h"
 #include "types/types.h"
+#include "video/vga.h"
 #include "video/video.h"
 #include <string.h>
 
@@ -51,8 +52,8 @@ static bool GetDosVersion(void) {
 /** ENINE :: Gets memory information and evaluates if it is enought RAM memory
  */
 static bool GetMemInfo(void) {
-	word totalMem;
-	word availableMem;
+	unsigned long totalMem;
+	unsigned long availableMem;
 
 	unsigned long dpmi_page_size;
 	__dpmi_memory_info dpmi_mem;
@@ -61,13 +62,11 @@ static bool GetMemInfo(void) {
 	__dpmi_get_memory_information(&dpmi_mem);
 	__dpmi_get_free_memory_information(&dpmi_free_mem);
 
-	availableMem = (word) ((dpmi_free_mem.total_number_of_free_pages * dpmi_page_size) / 1024);
-	totalMem = (word) ((dpmi_free_mem.total_number_of_physical_pages * dpmi_page_size) / 1024);
-
-	//sleep(1);
+	availableMem = (word) ((dpmi_free_mem.total_number_of_free_pages * dpmi_page_size) >> 10);
+	totalMem = (word) ((dpmi_free_mem.total_number_of_physical_pages * dpmi_page_size) >> 10);
 
 	ScreenSetCursor(7, 19);
-	printf(" REQ. %u kb ........... %u kb. free of %u kb. \n", MM_RAM_REQ, availableMem, totalMem);
+	printf(" REQ. %u kb ........... %ld kb. free of %ld kb. \n", MM_RAM_REQ + 2000, availableMem, totalMem);
 
 	ScreenSetCursor(7, 6);
 	if (availableMem >= MM_RAM_REQ) {

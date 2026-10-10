@@ -26,8 +26,8 @@
 
 extern Video *video;
 void VIDEO_Init(void);
-extern void (*VIDEO_VSync)(void);
-extern void (*VIDEO_ScreenBufferToVRAM)(void);
+void VIDEO_VSync(void);
+void VIDEO_ScreenBufferToVRAM(void);
 void VIDEO_SetActiveBuffer(int bufferNumber);
 void VIDEO_CharToScreenBuffer(int x, int y, word width, word height, byte transparent_color, byte *data);
 void VIDEO_StringToScreenBuffer(int x, int y, char *string, int font_number);

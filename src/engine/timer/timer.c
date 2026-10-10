@@ -112,11 +112,11 @@ void TIMER_Init(void) {
 
 		disable();
 
-		LOCK_VARIABLE(timeouts);
-		LOCK_FUNCTION(TIMER_Handler);
-		LOCK_FUNCTION(TIMER_AudioCallback);
-		LOCK_FUNCTION(TIMER_VideoCallback);
-		LOCK_FUNCTION(TIMER_MiscCallback);
+		//LOCK_VARIABLE(timeouts);
+		//LOCK_FUNCTION(TIMER_Handler);
+		//LOCK_FUNCTION(TIMER_AudioCallback);
+		//LOCK_FUNCTION(TIMER_VideoCallback);
+		//LOCK_FUNCTION(TIMER_MiscCallback);
 
 		_go32_dpmi_get_protected_mode_interrupt_vector(TIMER_IRS, &old_timer_handler);
 		new_timer_handler.pm_offset = (uint32_t) TIMER_Handler;
@@ -125,12 +125,13 @@ void TIMER_Init(void) {
 
 		// Reconfigure timer
 		// - by default 18.2 Hz wich is 55 ms. aprox.
+		// - 20 ms -> 50 Hz
 		// - 10 ms -> 100 Hz
 		// - 5 ms. -> 250 Hz
 		// - 2 ms. -> 500 Hz
 		// - 1 ms. -> 1000 Hz
-		engine.interrupt_time_ms = 5;
-		new_freq = 1193182 / (dword) 250;
+		engine.interrupt_time_ms = 10;
+		new_freq = 1193182 / (dword) 100;
 
 		//I/O port     Usage
 		//0x40         Channel 0 data port (read/write) for interrupts

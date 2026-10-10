@@ -5,7 +5,7 @@
 
 #define MM_CURRENT_TOP_PTR() (void *) (mmRawMem + mmMemUsed)
 #define MM_MAX_NUM_CHUNKS 1550
-#define MM_RAM_REQ 8000
+#define MM_RAM_REQ 6000
 
 void MM_Init(void);
 void MM_Shutdown(void);

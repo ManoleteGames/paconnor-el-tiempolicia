@@ -104,11 +104,11 @@ bool VGA_CheckGraphicsCard(void) {
 void VGA_VSync(void) {
 	/* wait until any previous retrace has ended */
 	do {
-	} while (inportb(VGA_ADC_PORT) & 0x08);// Check bit 3
+	} while (!(inp(VGA_ADC_PORT) & 0x08));// Check bit 3
 
 	/* wait until a new retrace has just begun */
-	do {
-	} while (!(inportb(VGA_ADC_PORT) & 0x08));// Check bit 3
+	/*do {
+	} while (inp(VGA_ADC_PORT) & 0x08);// Check bit 3*/
 }
 
 /** VGA :: Show cursor

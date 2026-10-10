@@ -65,7 +65,7 @@ void Scene1_Intro(void) {
 				VIDEO_ScreenBufferToVRAM();
 				VIDEO_FadeIn(4);
 
-				TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 50);
+				TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 40);
 				AUDIO_PlayScenesSong(true);
 				dialog_step = 0;
 
@@ -972,7 +972,7 @@ void Scene1_Loop(void) {
 			ACTOR_SetCombatMode(false);
 			CAM_Init(map->width_px, map->height_px, 0 << 4, 18 << 4);// Initialize camera
 			MAP_DrawMapToMapVideoBuffer();
-			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 55);
+			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 40);
 			break;
 		case 2:// Room 2. Inside police office
 			Scene1_LoadRoom2();
@@ -980,7 +980,7 @@ void Scene1_Loop(void) {
 			ACTOR_SetCombatMode(false);
 			CAM_Init(map->width_px, map->height_px, 30 << 4, 42 << 4);// Initialize camera
 			MAP_DrawMapToMapVideoBuffer();
-			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 55);
+			TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 40);
 			break;
 		default:
 			sprintf(engine.system_error_message1, "Scene1_Loop function error");
@@ -2928,7 +2928,7 @@ void Scene1_Outro(void) {
 				VIDEO_ScreenBufferToVRAM();
 				VIDEO_FadeIn(4);
 
-				TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 50);
+				TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 40);
 				AUDIO_PlayScenesSong(true);
 
 				step++;

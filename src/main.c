@@ -11,6 +11,8 @@
 #include "engine/keyb/keyb.h"
 #include "engine/types/types.h"
 #include "engine/ui/ui.h"
+#include "engine/video/vga.h"
+#include "engine/video/video.h"
 #include "scene1.h"
 #include "scene2.h"
 #include "scene3.h"
@@ -18,8 +20,8 @@
 #include "scene5.h"
 #include "scene6.h"
 
-#define GDB_IMPLEMENTATION
-#include "gdbstub.h"
+//#define GDB_IMPLEMENTATION
+//#include "gdbstub.h"
 
 /** Load language text files
  */
@@ -134,7 +136,7 @@ static void Logo(void) {
 				logo_step = 22;
 				break;
 			case 22:// wait song ended
-				if (AUDIO_IsSongEnded()) {
+				if (AUDIO_IsSongEnded() || (settings.sound_device == AUDIO_DEVICE_NONE)) {
 					logo_step = 23;
 					VIDEO_RotatePaletteEnd_Async();
 					VIDEO_FadeOut(1);
@@ -452,7 +454,7 @@ static void Intro(void) {
 				GFX_PCXImageToBuffer("INTRO.DAT", "INTRO2.PCX", 640 * 96, gfx->image_buffer2, &gfx->image_buffer2_width, &gfx->image_buffer2_height);
 
 				VIDEO_ClearScreenBuffer();
-				TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 50);
+				TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 40);
 				AUDIO_PlayScenesSong(true);
 				GFX_LoadPalette("PALETTES.DAT", "INTRO.PCX", 256);
 				VIDEO_DrawSquareToScreenBuffer(video->screen_buffer[VIDEO_SCREEN_BUFFER_BACK], video->screen_width, video->screen_height, 230, 168, 45, 12, 222);
@@ -796,7 +798,7 @@ static void Menu(void) {
 
 	AUDIO_LoadSong(AUDIO_SONG_2);
 
-	TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 50);
+	TIMER_UpdateTimerTime(TIMER_AUDIO_NUMBER, 40);
 	AUDIO_PlayScenesSong(true);
 
 	VIDEO_FadeIn(4);

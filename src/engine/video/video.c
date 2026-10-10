@@ -26,8 +26,6 @@ void VIDEO_Init(void) {
 			// Screen buffers. Must be the same size as the VGA resolution
 			video->screen_width = VGA_RESOLUTION_WIDTH;
 			video->screen_height = VGA_RESOLUTION_HEIGHT;
-			VIDEO_ScreenBufferToVRAM = VGA_ScreenMainBufferToVRAM;
-			VIDEO_VSync = VGA_VSync;
 			break;
 		case VIDEO_MODE_EGA:
 			if (!engine.EGA_present) {
@@ -39,8 +37,6 @@ void VIDEO_Init(void) {
 			// Screen buffers. Must be the same size as the EGA resolution
 			video->screen_width = EGA_RESOLUTION_WIDTH;
 			video->screen_height = EGA_RESOLUTION_HEIGHT;
-			VIDEO_ScreenBufferToVRAM = EGA_ScreenMainBufferToVRAM;
-			VIDEO_VSync = EGA_VSync;
 			break;
 		case VIDEO_MODE_CGA:
 			if (!engine.CGA_present) {
@@ -52,8 +48,6 @@ void VIDEO_Init(void) {
 			// Screen buffers. Must be the same size as the CGA resolution
 			video->screen_width = CGA_RESOLUTION_WIDTH;
 			video->screen_height = CGA_RESOLUTION_HEIGHT;
-			VIDEO_ScreenBufferToVRAM = CGA_ScreenMainBufferToVRAM;
-			VIDEO_VSync = CGA_VSync;
 			break;
 		default:
 			sprintf(engine.system_error_message1, "VIDEO_Init function error");
@@ -123,7 +117,26 @@ void VIDEO_TimerHandler(void) {
 /** VIDEO :: Vertical sync
  *  - Depending on the video mode, call the correct function
  */
-void (*VIDEO_VSync)(void);
+void VIDEO_VSync(void) {
+	switch (settings.video_mode) {
+		case VIDEO_MODE_VGA:
+			VGA_VSync();
+			break;
+		case VIDEO_MODE_EGA:
+			EGA_VSync();
+			break;
+		case VIDEO_MODE_CGA:
+			CGA_VSync();
+			break;
+		default:
+			sprintf(engine.system_error_message1, "VIDEO_VSync function error");
+			sprintf(engine.system_error_message2, "Unknown video mode selected");
+			sprintf(engine.system_error_message3, " ");
+			Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_VIDEO);
+			break;
+			break;
+	}
+}
 
 /** VIDEO :: Text image on Video memory
  *  - Loads a binary file and print it directly on video memory
@@ -168,7 +181,26 @@ void VIDEO_PCXImageToVRAM(const char *dat_name, const char *asset_name, int size
 /** VIDEO :: Draws screen buffer on Video memory
  *  - Depending on the video mode, call the correct function
  */
-void (*VIDEO_ScreenBufferToVRAM)(void);
+void VIDEO_ScreenBufferToVRAM(void) {
+	// Depending on the video mode, call the correct function
+	switch (settings.video_mode) {
+		case VIDEO_MODE_VGA:
+			VGA_ScreenMainBufferToVRAM();
+			break;
+		case VIDEO_MODE_EGA:
+			EGA_ScreenMainBufferToVRAM();
+			break;
+		case VIDEO_MODE_CGA:
+			CGA_ScreenMainBufferToVRAM();
+			break;
+		default:
+			sprintf(engine.system_error_message1, "VIDEO_ScreenBufferToVRAM function error");
+			sprintf(engine.system_error_message2, "Unknown video mode selected");
+			sprintf(engine.system_error_message3, " ");
+			Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_VIDEO);
+			break;
+	}
+}
 
 /** VIDEO :: Fills screen buffer with the data on the current cam position
  */

@@ -1,10 +1,7 @@
 #include <stdio.h>
 #include "../engine.h"
 #include "audio.h"
-#include "adlib.h"
 #include "speaker.h"
-#include "sblaster.h"
-#include "a2m.h"
 
 static SoundEffect sound_effect;
 static Song song;
@@ -12,18 +9,14 @@ static Song song;
 void AUDIO_Init(void) {
 	if (!engine.audio_initialized) {
 
-		A2M_Init();
+		// Allocate mem for song buffer
+		song.buffer = MM_PushChunk(AUDIO_MAX_SONG_SIZE, CT_MUSIC);
+		song.buffer_max_size = AUDIO_MAX_SONG_SIZE;
 
 		switch (settings.sound_device) {
 			case AUDIO_DEVICE_NONE:
-				break;
 			case AUDIO_DEVICE_SPEAKER:// PC Speaker;
 				SPK_Init();
-
-				// Allocate mem for song buffer
-				song.buffer = MM_PushChunk(AUDIO_MAX_SONG_SIZE, CT_MUSIC);
-				song.buffer_max_size = AUDIO_MAX_SONG_SIZE;
-
 				break;
 			case AUDIO_DEVICE_ADLIB:// Adlib
 				if (!engine.adlib_present) {
@@ -32,7 +25,7 @@ void AUDIO_Init(void) {
 					sprintf(engine.system_error_message3, "Please run setup.exe to identify your audio card");
 					Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SOUND);
 				}
-				ADLIB_Init();
+				//ADLIB_Init();
 				break;
 			case AUDIO_DEVICE_SBLASTER:// Sound blaster
 				if (!engine.sb_present) {
@@ -41,7 +34,7 @@ void AUDIO_Init(void) {
 					sprintf(engine.system_error_message3, "Please run setup.exe to identify your audio card");
 					Error(engine.system_error_message1, engine.system_error_message2, engine.system_error_message3, ERROR_SOUND);
 				}
-				SB_Init();
+				//SB_Init();
 				break;
 			default:
 				sprintf(engine.system_error_message1, "AUDIO_Init function error");
@@ -81,10 +74,10 @@ void AUDIO_Shutdown(void) {
 			case AUDIO_DEVICE_SPEAKER:// PC Speaker;
 				break;
 			case AUDIO_DEVICE_ADLIB:// Adlib
-				ADLIB_Shutdown();
+				//ADLIB_Shutdown();
 				break;
 			case AUDIO_DEVICE_SBLASTER:// Sound blaster
-				SB_Shutdown();
+				//SB_Shutdown();
 				break;
 			default:
 				sprintf(engine.system_error_message1, "AUDIO_Shutdown function error");
@@ -106,10 +99,10 @@ void AUDIO_PlaySound(byte sound, byte priority) {
 				SPK_PlaySound(&sound_effect, sound);
 				break;
 			case AUDIO_DEVICE_ADLIB:
-				ADLIB_PlaySound(&sound_effect, sound);
+				//ADLIB_PlaySound(&sound_effect, sound);
 				break;
 			case AUDIO_DEVICE_SBLASTER:
-				SB_PlaySound(&sound_effect, sound);
+				//SB_PlaySound(&sound_effect, sound);
 				break;
 			default:
 				sprintf(engine.system_error_message1, "AUDIO_PlaySound function error");
@@ -122,11 +115,11 @@ void AUDIO_PlaySound(byte sound, byte priority) {
 }
 
 bool AUDIO_CheckAdlib(void) {
-	return ADLIB_CheckFMInstalled();
+	return false;//ADLIB_CheckFMInstalled();
 }
 
 bool AUDIO_CheckSoundBlaster(void) {
-	return SB_Check();
+	return false;//SB_Check();
 }
 
 void AUDIO_TimerHandler(void) {
@@ -137,10 +130,10 @@ void AUDIO_TimerHandler(void) {
 			SPK_Handler(&sound_effect, &song);
 			break;
 		case AUDIO_DEVICE_ADLIB:// Adlib
-			ADLIB_Handler(&sound_effect, &song);
+			//ADLIB_Handler(&sound_effect, &song);
 			break;
 		case AUDIO_DEVICE_SBLASTER:// Sound blaster
-			SB_Handler(&sound_effect, &song);
+			//SB_Handler(&sound_effect, &song);
 			break;
 		default:
 			sprintf(engine.system_error_message1, "AUDIO_TimerHandler function error");
@@ -160,10 +153,10 @@ void AUDIO_LoadSong(int song_number) {
 			SPK_LoadSong(&song, song_number);
 			break;
 		case AUDIO_DEVICE_ADLIB:// Adlib
-			ADLIB_LoadSong(&song, song_number);
+			//ADLIB_LoadSong(&song, song_number);
 			break;
 		case AUDIO_DEVICE_SBLASTER:// Sound blaster
-			SB_LoadSong(&song, song_number);
+			//SB_LoadSong(&song, song_number);
 			break;
 		default:
 			sprintf(engine.system_error_message1, "AUDIO_LoadSong function error");
@@ -185,10 +178,10 @@ void AUDIO_PlayScenesSong(bool loop) {
 				SPK_PlaySong(&song);
 				break;
 			case AUDIO_DEVICE_ADLIB:// Adlib
-				ADLIB_PlaySong(&song);
+				//ADLIB_PlaySong(&song);
 				break;
 			case AUDIO_DEVICE_SBLASTER:// Sound blaster
-				SB_PlaySong(&song);
+				//SB_PlaySong(&song);
 				break;
 			default:
 				sprintf(engine.system_error_message1, "AUDIO_PlayScenesSong function error");
@@ -211,10 +204,10 @@ void AUDIO_PlayIngameSong(bool loop) {
 				SPK_PlaySong(&song);
 				break;
 			case AUDIO_DEVICE_ADLIB:// Adlib
-				ADLIB_PlaySong(&song);
+				//ADLIB_PlaySong(&song);
 				break;
 			case AUDIO_DEVICE_SBLASTER:// Sound blaster
-				SB_PlaySong(&song);
+				//SB_PlaySong(&song);
 				break;
 			default:
 				sprintf(engine.system_error_message1, "AUDIO_PlayIngameSong function error");
@@ -236,10 +229,10 @@ void AUDIO_StopSong(void) {
 			SPK_StopSong(&song);
 			break;
 		case AUDIO_DEVICE_ADLIB:// Adlib
-			ADLIB_StopSong(&song);
+			//ADLIB_StopSong(&song);
 			break;
 		case AUDIO_DEVICE_SBLASTER:// Sound blaster
-			SB_StopSong(&song);
+			//SB_StopSong(&song);
 			break;
 		default:
 			sprintf(engine.system_error_message1, "AUDIO_StopSong function error");
